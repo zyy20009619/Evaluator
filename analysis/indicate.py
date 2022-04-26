@@ -5,12 +5,13 @@ import numpy as np
 def gen_xlsx(file_path, metric_change, modules_name, result):
     workbook = xlsxwriter.Workbook(file_path)
     bold = workbook.add_format({'bold': 1})
-    gen_hotmap_sheet(workbook, bold, metric_change, modules_name)
-    gen_diff_sheet(workbook, bold, result)
+    _gen_change_sheet(workbook, bold, metric_change, modules_name)
+    _gen_hotmap_sheet(workbook, bold, metric_change, modules_name)
+    _gen_diff_sheet(workbook, bold, result)
     workbook.close()
 
 
-def gen_hotmap_sheet(workbook, bold, metric_change, modules_name):
+def _gen_hotmap_sheet(workbook, bold, metric_change, modules_name):
     worksheet1 = workbook.add_worksheet('演化趋势')
     headings1 = ["module_name", "scoh", "scop", "odd", "idd", "DSC"]
     worksheet1.write_row('A1', headings1, bold)

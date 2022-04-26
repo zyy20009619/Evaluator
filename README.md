@@ -2,7 +2,7 @@
 
 ## 功能
 
-- 根据项目依赖文件度量项目质量
+- 度量功能：根据项目功能依赖文件度量项目质量
 
      ```python
      python measure.py -d [dep_path]   #以package为粒度计算
@@ -20,15 +20,24 @@ package name映射文件格式示例：
 
 ![image-20220314102614421](image\ppmapping.png)
 
+对diff后的结果进行分析
+
+
+
 ## 命令说明
 
  ```python
+ usage: measure.py [-h] [-d DEP] [-mp MPMAPPING] [-pp PPMAPPING] [-c1 COM1] [-c2 COM2] [-df DIFF] [-pro PROJECT] [-out OUTPUT]
+ 
  -h, --help                            show this help message and exit
  -d DEP, --dep DEP                     dependency file path
  -mp MPMAPPING, --mpmapping MPMAPPING  mapping between module and packages
  -pp PPMAPPING, --ppmapping PPMAPPING  mapping between old package name and new package name
  -c1 COM1, --com1 COM1                 the measure result path of the previous version
  -c2 COM2, --com2 COM2                 the measure result path of the later version
+ -df DIFF, --diff DIFF                 the folder path of diff result
+ -pro PROJECT, --project PROJECT       the folder path of project
+ -out OUTPUT, --output OUTPUT          the folder path of output
  ```
 
 ## 使用步骤

@@ -1,12 +1,14 @@
+def com_struct_metric(current_module, module_info, struct_dep):
+    iodd = dict()
+    iidd = dict()
+    fan_in = dict()
+    fan_out = dict()
+    scoh, idcc_list = _com_call_coh(module_info[current_module], struct_dep, fan_in, fan_out, iodd, iidd)
+    scop, odd, idd, edcc_list = _com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out)
+    return scoh, scop, odd, idd, idcc_list, edcc_list, fan_in, fan_out, iodd, iidd
 
-def com_struct_metric(variables, current_module, module_info, struct_dep, method_class, call):
-    scoh, idcc_list = com_call_coh(module_info[current_module], struct_dep)
-    scop, odd, idd, edcc_list = com_call_coup(variables, current_module, module_info, struct_dep)
-    return scoh, scop, odd, idd, idcc_list, edcc_list
 
-
-def com_call_coh(classes_id, struct_dep):
-    # count the IDCC
+def _com_call_coh(classes_id, struct_dep, fan_in, fan_out, iodd, iidd):
     idcc_list = dict()
     has_connections = 0
     all_connections = len(classes_id) * len(classes_id)
@@ -23,17 +25,20 @@ def com_call_coh(classes_id, struct_dep):
         if id1 not in idcc_list:
             idcc_list[id1] = 0
         idcc_list[id1] += current_class_odd + current_class_idd
+        fan_in[id1] = current_class_idd
+        fan_out[id1] = current_class_odd
+        iodd[id1] = current_class_odd
+        iidd[id1] = current_class_idd
     scoh = has_connections / all_connections
     return scoh, idcc_list
 
 
-def com_call_coup(variables, current_module, module_info, struct_dep):
+def _com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out):
     scop = 0
     idd_list = list()
     odd_list = list()
     edcc_list = dict()
     for module in module_info:
-        # when '!=', count the EDCC
         if module != current_module:
             has_connections = 0
             current_module_odd = 0
@@ -51,6 +56,8 @@ def com_call_coup(variables, current_module, module_info, struct_dep):
                 if id1 not in edcc_list:
                     edcc_list[id1] = 0
                 edcc_list[id1] += current_class_odd + current_class_idd
+                fan_in[id1] += current_class_idd
+                fan_out[id1] += current_class_odd
                 current_module_odd += current_class_odd
                 current_module_idd += current_class_idd
             if current_module_odd != 0:
