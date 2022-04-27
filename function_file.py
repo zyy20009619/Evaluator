@@ -1,41 +1,46 @@
+import os
 from module_measurement.module_metric_compete import get_module_metric
 from analysis.indicate import gen_xlsx
 from util.rel_data import get_rel_info
 from util.csv_operator import write_result_to_csv
 from util.json_operator import read_file, write_result_to_json, read_folder
+from util.path_operator import create_file_path
 
 
-def measure_module_metrics(dep_path, cmt_path, mapping_path):
+def measure_module_metrics(dep_path, output, mapping_path):
     dep_dic = read_file(dep_path)
     mapping_dic = read_file(mapping_path)
     if dep_dic and mapping_dic:
         module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-            dep_dic, mapping_dic)
+            dep_dic, mapping_dic, output)
         module_dic = get_module_metric(dep_dic['variables'], module_info, inherit, descendent, method_class, dep, call,
                                        called, override, overrided, import_val, imported_val, parameter,
                                        method_define_var, method_use_field,
-                                       cmt_path, 'module')
-        write_result_to_json('measure_result.json', module_dic)
-        write_result_to_csv('measure_result_class.csv', 'measure_result_method.csv', module_dic)
+                                       'module')
+        write_result_to_json(create_file_path(output + '\\measureResult', 'measure_result.json'), module_dic)
+        write_result_to_csv(create_file_path(output + '\\measureResult', 'measure_result_class.csv'),
+                            create_file_path(output + '\\measureResult', 'measure_result_method.csv'), module_dic)
         return True
     return False
 
 
-def measure_package_metrics(dep_path, cmt_path):
+def measure_package_metrics(dep_path, output):
     dep_dic = read_file(dep_path)
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-            dep_dic, dict())
+            dep_dic, dict(), output)
         package_dic = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
-                                        call, called, override, overrided, import_val, imported_val, parameter, method_define_var,
-                                        method_use_field, cmt_path, 'package')
-        write_result_to_json('measure_result.json', package_dic)
-        write_result_to_csv('measure_result_class.csv', 'measure_result_method.csv', package_dic)
+                                        call, called, override, overrided, import_val, imported_val, parameter,
+                                        method_define_var,
+                                        method_use_field, 'package')
+        write_result_to_json(create_file_path(output + '\\measureResult', 'measure_result.json'), package_dic)
+        write_result_to_csv(create_file_path(output + '\\measureResult', 'measure_result_class.csv'),
+                            create_file_path(output + '\\measureResult', 'measure_result_method.csv'), package_dic)
         return True
     return False
 
 
-def compare_diff(folder_path1, folder_path2, mapping):
+def compare_diff(folder_path1, folder_path2, mapping, output):
     measure_json_dict1, dep_json_dict1 = read_folder(folder_path1, 'measure_result.json', 'dep.json')
     measure_json_dict2, dep_json_dict2 = read_folder(folder_path2, 'measure_result.json', 'dep.json')
     if mapping:
@@ -50,9 +55,9 @@ def compare_diff(folder_path1, folder_path2, mapping):
     modules_name = list()
     _get_measure_diff(measure_json_dict1, measure_json_dict2, measure_diff, modules_name, metric_change)
     _get_dep_diff(dep_json_dict1, dep_json_dict2, dep_diff)
-    write_result_to_json('measure_diff.json', measure_diff)
-    write_result_to_json('dep_diff.json', dep_diff)
-    gen_xlsx('diff_result.xlsx', metric_change, modules_name, measure_diff)
+    write_result_to_json(create_file_path(output + '\\diffResult', 'measure_diff.json'), measure_diff)
+    write_result_to_json(create_file_path(output + '\\diffResult', 'dep_diff.json'), dep_diff)
+    gen_xlsx(create_file_path(output + '\\diffResult', 'diff_result.xlsx'), metric_change, modules_name, measure_diff)
     return True
 
 

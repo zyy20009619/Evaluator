@@ -1,19 +1,20 @@
 import os
 import matplotlib.pyplot as plt
 from util.json_operator import read_folder, write_result_to_json
+from util.path_operator import create_file_path
 from detect_algo.arch_debt.measure_arch import measure_maintenance
 from detect_algo.arch_debt.regression_model.model_selector import model_selector
 
 
-def analyse_data(diff_folder_path, project_path):
+def analyse_data(diff_folder_path, output):
     measure_diff, dep_diff = read_folder(diff_folder_path, 'measure_diff.json', 'dep_diff.json')
-    if not (measure_diff or dep_diff or os.path.exists(project_path)):
+    if not (measure_diff or dep_diff):
         return False
-    _scan_problems(diff_folder_path, measure_diff, dep_diff, project_path)
+    _scan_problems(diff_folder_path, measure_diff, dep_diff, output)
     return True
 
 
-def _scan_problems(diff_folder_path, measure_diff, dep_diff, project_path):
+def _scan_problems(diff_folder_path, measure_diff, dep_diff, output):
     all_causes = dict()
     coupling_dic = dict()
     functionality_list = list()
@@ -45,60 +46,7 @@ def _scan_problems(diff_folder_path, measure_diff, dep_diff, project_path):
     all_causes['functionality'] = functionality_list
     all_causes['modularity'] = modularity_list
     all_causes['evolution'] = evolution_list
-    write_result_to_json(os.path.join(diff_folder_path, 'causes.json'), all_causes)
-    # causes_entities: a list of error-prone classes
-    [version_list, coupling_mc_list, functionality_mc_list, author_list, cmt_list, change_loc_list,
-     issue_list] = measure_maintenance(project_path,
-                                       list(set(causes_entities)),
-                                       causes_to_entities)
-
-    model_selector(version_list, [j[1] for j in coupling_mc_list])
-    #
-    # # 每种现象拟合一条回归曲线（暂时使用散点图表示）
-    # _fit_mc_curve(version_list, _com_percentage_of_other_metrics([j[0] for j in coupling_mc_list], author_list),
-    #               'coupling_author')
-    # _fit_mc_curve(version_list, _com_percentage_of_other_metrics([j[1] for j in coupling_mc_list], cmt_list),
-    #               'coupling_cmt')
-    # _fit_mc_curve(version_list, _com_percentage_of_loc([j[2] for j in coupling_mc_list], change_loc_list),
-    #               'coupling_changeloc')
-    # _fit_mc_curve(version_list, _com_percentage_of_other_metrics([j[3] for j in coupling_mc_list], issue_list),
-    #               'coupling_issue')
-    # _fit_mc_curve(version_list, [j[4] for j in coupling_mc_list], 'coupling_issue-cmt')
-    # _fit_mc_curve(version_list, [j[5] for j in coupling_mc_list], 'coupling_issueLoc')
-    # _fit_mc_curve(version_list, _com_percentage_of_other_metrics([j[0] for j in functionality_mc_list], author_list),
-    #               'functionality_author')
-    # _fit_mc_curve(version_list, _com_percentage_of_other_metrics([j[1] for j in functionality_mc_list], cmt_list),
-    #               'functionality_cmt')
-    # _fit_mc_curve(version_list, _com_percentage_of_loc([j[2] for j in functionality_mc_list], change_loc_list),
-    #               'functionality_changeloc')
-    # _fit_mc_curve(version_list, _com_percentage_of_other_metrics([j[3] for j in functionality_mc_list], issue_list),
-    #               'functionality_issue')
-    # _fit_mc_curve(version_list, [j[4] for j in functionality_mc_list], 'functionality_issue-cmt')
-    # _fit_mc_curve(version_list, [j[5] for j in functionality_mc_list], 'functionality_issueLoc')
-
-
-def _com_percentage_of_other_metrics(one_count_list, all_count_list):
-    res_list = list()
-    for index in range(0, len(all_count_list)):
-        res_list.append(one_count_list[index] / len(all_count_list[index]))
-    return res_list
-
-
-def _com_percentage_of_loc(one_count_list, all_count_list):
-    res_list = list()
-    for index in range(0, len(all_count_list)):
-        res_list.append(one_count_list[index] / all_count_list[index])
-    return res_list
-
-
-def _fit_mc_curve(version_list, mc_list, title_name):
-    plt.title(title_name, fontsize=24)
-    plt.xlabel("versions", fontsize=14)
-    plt.ylabel("maintenance_cost", fontsize=14)
-
-    plt.axis([0, len(version_list), 0, max(mc_list)])
-    plt.scatter(version_list, mc_list, c='red', edgecolors='none', s=20)
-    plt.show()
+    write_result_to_json(create_file_path(output + '\\analyseResult', 'causes.json'), all_causes)
 
 
 def _sort_coupling_dic(coupling_dic, sort_dic):

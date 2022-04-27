@@ -1,3 +1,4 @@
+import os
 import argparse
 from function_file import measure_package_metrics, compare_diff, measure_module_metrics
 from detect_algo.detect_root_cause import analyse_data
@@ -11,7 +12,6 @@ def command():
     parser.add_argument('-c1', '--com1', help='the measure result path of the previous version')
     parser.add_argument('-c2', '--com2', help='the measure result path of the later version')
     parser.add_argument('-df', '--diff', help='the folder path of diff result')
-    parser.add_argument('-pro', '--project', help='the folder path of project')
     parser.add_argument('-out', '--output', help='the folder path of output')
 
     args = parser.parse_args()
@@ -21,31 +21,31 @@ def command():
     com1 = args.com1
     com2 = args.com2
     diff = args.diff
-    project = args.project
+    output = args.output
+    if not output or not os.path.exists(output):
+        output = '.'
     if dep and not mpmapping:
-        if measure_package_metrics(dep):
+        if measure_package_metrics(dep, output):
             print('Measure finished!!!')
         else:
             print('The file path is not exist!')
     if dep and mpmapping:
-        if measure_module_metrics(dep, mpmapping):
+        if measure_module_metrics(dep, output, mpmapping):
             print('Measure finished!!!')
         else:
             print('The file path is not exist!')
+
     if com1 and com2:
-        if compare_diff(com1, com2, ppmapping):
+        if compare_diff(com1, com2, ppmapping, output):
             print('Compare finished!!!')
         else:
             print('The file path is not exist!')
-    if diff and project:
-        if analyse_data(diff, project):
+    if diff:
+        if analyse_data(diff, output):
             print('Analyse finished!!!')
         else:
             print('The file path is not exist!')
 
 
 if __name__ == '__main__':
-    # print(os.getcwd())
-    # print(sys.path)
-    # sys.path.append(os.getcwd())
     command()
