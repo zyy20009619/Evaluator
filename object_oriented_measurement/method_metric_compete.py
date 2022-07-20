@@ -78,7 +78,7 @@ def del_method_dep(call, called, contain, override, overrided, parameter, method
                     parm_num,
                     get_modifiers(variables[id])]
     method_metric = dict(zip(METHOD_METRICS, method_value))
-    method_dic[variables[c]['qualifiedName']] = method_metric
+    method_dic[variables[id]['qualifiedName']] = method_metric
     return NOP
 
 

@@ -6,10 +6,10 @@ from detect_algo.detect_root_cause import analyse_data
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='')  # single version measure/multi-version measure/compare
-    parser.add_argument('-pro', help='project path', default='')
-    parser.add_argument('-ver', help='project version', default='')
-    parser.add_argument('-dep', help='dependency file path', default=r'')
+    parser.add_argument('-opt', help='function options(sv/mv/com)', default='sv')  # single version measure/multi-version measure/compare
+    parser.add_argument('-pro', help='project path', default=r'C:\Users\20465\Desktop\data\testpros\gitcodes\apollo')
+    parser.add_argument('-ver', help='project version', default='v0.4.0')
+    parser.add_argument('-dep', help='dependency file path', default=r'C:\Users\20465\Desktop\data\test_data\microservice\apollo\v0.4.0')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
     parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
     parser.add_argument('-c1', help='the measure result path of the previous version', default='')
