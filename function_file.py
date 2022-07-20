@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+import numpy as np
 from module_measurement.module_metric_compete import get_module_metric
 from analysis.indicate import gen_xlsx
 from util.rel_data import get_rel_info
@@ -6,6 +8,7 @@ from util.csv_operator import write_result_to_csv
 from util.json_operator import read_file, write_result_to_json, read_folder
 from util.path_operator import create_file_path
 
+GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
 def measure_module_metrics(dep_path, output, mapping_path):
     dep_dic = read_file(dep_path)
@@ -25,6 +28,11 @@ def measure_module_metrics(dep_path, output, mapping_path):
 
 
 def measure_package_metrics(dep_path, output):
+    # execute2 = "java -jar {} {}".format(base_dir +
+    #                                     '/utils/commitextractor/commit.jar', project_path)
+    # os.system(execute2)
+
+    module_data = list()
     dep_dic = read_file(dep_path)
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
@@ -32,12 +40,36 @@ def measure_package_metrics(dep_path, output):
         package_dic = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
                                         call, called, override, overrided, import_val, imported_val, parameter,
                                         method_define_var,
-                                        method_use_field, 'package')
+                                        method_use_field, 'package', module_data)
         write_result_to_json(create_file_path(output + '\\measureResult', 'measure_result.json'), package_dic)
         write_result_to_csv(create_file_path(output + '\\measureResult', 'measure_result_class.csv'),
                             create_file_path(output + '\\measureResult', 'measure_result_method.csv'), package_dic)
-        return True
-    return False
+    return module_data
+
+
+def measure_multi_version(dep_path, output):
+    project_list = list()
+    version_list= os.listdir(dep_path)
+    for ver in version_list:
+        current_path = os.path.join(dep_path, ver)
+        dep_file = os.listdir(current_path)[0]
+        module_data = measure_package_metrics(os.path.join(current_path, dep_file), os.path.join(output, ver))
+        tmp_pro = np.array(module_data).mean(axis=0).tolist()
+        project_list.append(tmp_pro)
+
+    project_list = np.around(project_list, 4)
+    draw_line_chart(version_list, project_list, output)
+
+
+def draw_line_chart(version_list, project_list, output):
+    plt.title('change curve')
+    # plt.plot(version_list, project_list, label=['SMQ', 'ODD', 'IDD', 'SPREAD', 'FOUCUS', 'ICF', 'ECF', 'REI'])
+    plt.plot(version_list, project_list, label=['SCOH', 'SCOP', 'ODD', 'IDD'])
+    plt.legend()
+    plt.xlabel('version')
+    plt.ylabel('quality score')
+    plt.savefig(output + '/change.jpg')
+    # plt.show()
 
 
 def compare_diff(folder_path1, folder_path2, mapping, output):
