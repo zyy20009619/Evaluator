@@ -26,87 +26,87 @@ def read_dep_file(node_file):
     return resList
 
 
-def formatFileName(fileNameList):
-    for index in range(0, len(fileNameList)):
-        fileName = fileNameList[index]
-        # fileName = fileName.replace(".", "_")
-        fileName = fileName.replace("/", "\\")
-        fileNameList[index] = fileName
-    return fileNameList
+def formatFileName(file_name_list):
+    for index in range(0, len(file_name_list)):
+        file_name = file_name_list[index]
+        file_name = file_name.replace("/", "\\")
+        file_name_list[index] = file_name
+    return file_name_list
 
 
 # read mc file
 def read_mc_file(mc_file):
     mc_author_dict = dict()  # [filename][author] = the commit count by this author
     mc_commit_times_dict = dict()  # [filename] = cmttimes
-    mcChangeLocDict = dict()  # [fileName] = loc
+    mc_change_loc_dict = dict()  # [fileName] = loc
     mc_issue_count_dict = dict()  # [fileName][issueId] = issue cmt counts
     mc_issue_loc_dict = dict()  # [fileName][issueId] = issueloc
     with open(mc_file, "r", encoding="utf8") as fp:
+        # csv.field_size_limit(500 * 1024 * 1024)
         reader = csv.reader(fp, delimiter=",")
         for each in reader:
-            [commit_id, author, date, issueIds, files, addLocs, delLocs] = each
-            fileNameList = files.split(";")
-            addLocList = addLocs.split(";")
-            delLocList = delLocs.split(";")
-            if issueIds == "":
-                issueIdList = list()
+            [commit_id, author, date, issue_ids, files, add_locs, del_locs] = each
+            file_name_list = files.split(";")
+            add_loc_list = add_locs.split(";")
+            del_loc_list = del_locs.split(";")
+            if issue_ids == "":
+                issue_id_list = list()
             else:
-                issueIdList = issueIds.split(";")
+                issue_id_list = issue_ids.split(";")
 
-            formatFileName(fileNameList)
+            formatFileName(file_name_list)
 
-            for fileName in fileNameList:
+            for file_name in file_name_list:
                 # author releated
-                if fileName not in mc_author_dict:
-                    mc_author_dict[fileName] = dict()
-                if author not in mc_author_dict[fileName]:
-                    mc_author_dict[fileName][author] = 1
+                if file_name not in mc_author_dict:
+                    mc_author_dict[file_name] = dict()
+                if author not in mc_author_dict[file_name]:
+                    mc_author_dict[file_name][author] = 1
                 else:
-                    mc_author_dict[fileName][author] += 1
+                    mc_author_dict[file_name][author] += 1
 
             # commit related
-            for fileName in fileNameList:
-                if fileName not in mc_commit_times_dict:
-                    mc_commit_times_dict[fileName] = list()
-                mc_commit_times_dict[fileName].append(commit_id)
+            for file_name in file_name_list:
+                if file_name not in mc_commit_times_dict:
+                    mc_commit_times_dict[file_name] = list()
+                mc_commit_times_dict[file_name].append(commit_id)
 
             # LOC changed related
-            for index in range(0, len(fileNameList)):
-                fileName = fileNameList[index]
-                loc = int(addLocList[index]) + int(delLocList[index])
-                if fileName not in mcChangeLocDict:
-                    mcChangeLocDict[fileName] = loc
+            for index in range(0, len(file_name_list)):
+                file_name = file_name_list[index]
+                loc = int(add_loc_list[index]) + int(del_loc_list[index])
+                if file_name not in mc_change_loc_dict:
+                    mc_change_loc_dict[file_name] = loc
                 else:
-                    mcChangeLocDict[fileName] += loc
+                    mc_change_loc_dict[file_name] += loc
 
             # issue counts related
-            for index in range(0, len(fileNameList)):
-                fileName = fileNameList[index]
-                if fileName not in mc_issue_count_dict:
-                    mc_issue_count_dict[fileName] = dict()
-                for issueId in issueIdList:
-                    if issueId not in mc_issue_count_dict[fileName]:
-                        mc_issue_count_dict[fileName][issueId] = list()
-                    mc_issue_count_dict[fileName][issueId].append(commit_id)
+            for index in range(0, len(file_name_list)):
+                file_name = file_name_list[index]
+                if file_name not in mc_issue_count_dict:
+                    mc_issue_count_dict[file_name] = dict()
+                for issueId in issue_id_list:
+                    if issueId not in mc_issue_count_dict[file_name]:
+                        mc_issue_count_dict[file_name][issueId] = list()
+                    mc_issue_count_dict[file_name][issueId].append(commit_id)
 
             # issue loc related
-            for index in range(0, len(fileNameList)):
-                fileName = fileNameList[index]
-                loc = int(addLocList[index]) + int(delLocList[index])
-                if fileName not in mc_issue_loc_dict:
-                    mc_issue_loc_dict[fileName] = dict()
-                for issueId in issueIdList:
-                    if issueId not in mc_issue_loc_dict[fileName]:
-                        mc_issue_loc_dict[fileName][issueId] = loc
+            for index in range(0, len(file_name_list)):
+                file_name = file_name_list[index]
+                loc = int(add_loc_list[index]) + int(del_loc_list[index])
+                if file_name not in mc_issue_loc_dict:
+                    mc_issue_loc_dict[file_name] = dict()
+                for issueId in issue_id_list:
+                    if issueId not in mc_issue_loc_dict[file_name]:
+                        mc_issue_loc_dict[file_name][issueId] = loc
                     else:
-                        mc_issue_loc_dict[fileName][issueId] += loc
-    return mc_author_dict, mc_commit_times_dict, mcChangeLocDict, mc_issue_count_dict, mc_issue_loc_dict
+                        mc_issue_loc_dict[file_name][issueId] += loc
+    return mc_author_dict, mc_commit_times_dict, mc_change_loc_dict, mc_issue_count_dict, mc_issue_loc_dict
 
 
 def search_author_count(mc_author_dict, file_name):
     if file_name in mc_author_dict:
-        return len(list(mc_author_dict[file_name].keys())), mc_author_dict[file_name].keys()
+        return len(list(mc_author_dict[file_name].keys())), list(mc_author_dict[file_name].keys())
     else:
         return 0, list()
 
@@ -148,38 +148,38 @@ def search_issue_loc(mc_issue_loc_dict, file_name):
         return 0
 
 
-def change_bug_proness_compute(causes_entities, mc_author_dict, mc_commit_times_dict, mc_change_loc_dict,
+def change_bug_proness_compute(file_list_java, mc_author_dict, mc_commit_times_dict, mc_change_loc_dict,
                                mc_issue_count_dict, mc_issue_loc_dict):
-    all_entities_mc_list = list()
-    all_entities_mc_dic = dict()
+    all_files_mc_list = list()
+    all_files_mc_dic = dict()
 
-    for index in range(0, len(causes_entities)):
-        file_name = causes_entities[index]
-        author_count, author_id = search_author_count(mc_author_dict, file_name)
+    for index in range(0, len(file_list_java)):
+        file_name = file_list_java[index].replace('/', '\\')
+        author_count, authors_id = search_author_count(mc_author_dict, file_name)
         cmt_count, cmt_id = search_cmt_count(mc_commit_times_dict, file_name)
         change_loc = search_count(mc_change_loc_dict, file_name)
         [issue_count, issue_id, issue_cmt_count, issue_cmt_id] = search_issue_count(mc_issue_count_dict, file_name)
         issue_loc = search_issue_loc(mc_issue_loc_dict, file_name)
-        if len(author_id) != 0 or len(cmt_id) != 0 or change_loc != 0 or len(issue_id) != 0 or len(issue_cmt_id) != 0 or issue_loc != 0:
-            all_entities_mc_list.append(
-                [index, file_name, author_count, cmt_count, change_loc, issue_count, issue_cmt_count, issue_loc])
-            all_entities_mc_dic[file_name] = {'author_id': author_id, 'cmt_id': cmt_id,
-                                              'change_loc': change_loc, 'issue_id': issue_id,
-                                              'issue_cmt_id': issue_cmt_id, 'issue_loc': issue_loc}
-    return all_entities_mc_list, all_entities_mc_dic
+        # if len(authors_id) != 0 or len(cmt_id) != 0 or change_loc != 0 or len(issue_id) != 0 or len(issue_cmt_id) != 0 or issue_loc != 0:
+        all_files_mc_list.append(
+            [index, file_name, author_count, cmt_count, change_loc, issue_count, issue_cmt_count, issue_loc])
+        all_files_mc_dic[file_name] = {'author_id': authors_id, 'cmt_id': cmt_id,
+                                          'change_loc': change_loc, 'issue_id': issue_id,
+                                          'issue_cmt_id': issue_cmt_id, 'issue_loc': issue_loc}
+    return all_files_mc_list, all_files_mc_dic
 
 
-def changeProness(causes_entities, mc_file, outfile):
+def changeProness(file_list_java, mc_file, outfile):
     [mc_author_dict, mc_commit_times_dict, mc_change_loc_dict, mc_issue_count_dict, mc_issue_loc_dict] = read_mc_file(
         mc_file)
-    change_bug_cost_list, all_entities_mc_dic = change_bug_proness_compute(causes_entities, mc_author_dict,
+    all_files_mc_list, all_files_mc_dic = change_bug_proness_compute(file_list_java, mc_author_dict,
                                                                            mc_commit_times_dict,
                                                                            mc_change_loc_dict, mc_issue_count_dict,
                                                                            mc_issue_loc_dict)
     title = ['id', 'filename', '#author', '#cmt', '#changeloc', '#issue', '#issue-cmt', 'issueLoc']
     final = list()
     final.append(title)
-    final.extend(change_bug_cost_list)
+    final.extend(all_files_mc_list)
     write_to_csv(final, outfile)
 
-    return all_entities_mc_dic
+    return all_files_mc_dic

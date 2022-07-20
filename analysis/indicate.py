@@ -13,7 +13,7 @@ def gen_xlsx(file_path, metric_change, modules_name, result):
 
 def _gen_change_sheet(workbook, bold, metric_change, modules_name):
     worksheet1 = workbook.add_worksheet('变化幅度')
-    headings1 = ["module_name", "scoh", "scop", "odd", "idd", "DSM"]
+    headings1 = ["module_name", "scoh", "scop", "odd", "idd", "spread", "focus", "rei", "icf", "ecf", "DSM"]
     worksheet1.write_row('A1', headings1, bold)
     for index1 in range(0, len(metric_change)):
         worksheet1.write_string('A' + str(index1 + 2), modules_name[index1])
@@ -23,7 +23,7 @@ def _gen_change_sheet(workbook, bold, metric_change, modules_name):
 
 def _gen_hotmap_sheet(workbook, bold, metric_change, modules_name):
     worksheet1 = workbook.add_worksheet('演化趋势')
-    headings1 = ["module_name", "scoh", "scop", "odd", "idd", "DSC"]
+    headings1 = ["module_name", "scoh", "scop", "odd", "idd", "spread", "focus", "rei", "icf", "ecf", "DSM"]
     worksheet1.write_row('A1', headings1, bold)
 
     max = np.amax(metric_change, axis=0)
@@ -31,20 +31,24 @@ def _gen_hotmap_sheet(workbook, bold, metric_change, modules_name):
     for index1 in range(0, len(metric_change)):
         worksheet1.write_string('A' + str(index1 + 2), modules_name[index1])
         for index2 in range(0, len(metric_change[index1])):
-            if index2 == 0:
-                norm_value = float(
-                    format((metric_change[index1][index2] - min[index2]) / (max[index2] - min[index2]), '.4f'))
+            if max[index2] - min[index2] == 0:
+                norm_value = 0
             else:
-                norm_value = float(
-                    format((max[index2] - metric_change[index1][index2]) / (max[index2] - min[index2]), '.4f'))
+                if index2 == 0 or index2 == 5 or index2 == 7:
+                    norm_value = float(
+                        format((metric_change[index1][index2] - min[index2]) / (max[index2] - min[index2]), '.4f'))
+                else:
+                    norm_value = float(
+                        format((max[index2] - metric_change[index1][index2]) / (max[index2] - min[index2]), '.4f'))
             worksheet1.write_number(index1 + 1, index2 + 1, norm_value)
-    worksheet1.conditional_format(1, 1, len(metric_change) + 1, 6,
+    worksheet1.conditional_format(1, 1, len(metric_change) + 1, 11,
                                   {'type': '3_color_scale', 'min_color': '#F08080', 'max_color': '#006400'})
 
 
 def _gen_diff_sheet(workbook, bold, result):
     worksheet2 = workbook.add_worksheet('class_diff_result')
-    headings2 = ["module_name", "scoh", "scop", "odd", "idd", "DSM", "class_name", "c_chm", "c_chd", "CBC",
+    headings2 = ["module_name", "scoh", "scop", "odd", "idd", "spread", "focus", "rei", "icf", "ecf", "DSM",
+                 "class_name", "c_chm", "c_chd", "CBC",
                  "IDCC", "IODD", "IIDD",
                  "EDCC", "c_FAN_IN", "c_FAN_OUT", "NAC", "NDC↓", "NOP", "NOI", "NOID", "RFC", "NOSI", "CTM", "NOM",
                  "NOVM", "CIS", "privateMethodsQty", "protectedMethodsQty", "staticMethodsQty", 'defaultMethodsQty',
@@ -69,6 +73,11 @@ def _gen_diff_sheet(workbook, bold, result):
         scop = result[module_name]['scop']
         odd = result[module_name]['odd']
         idd = result[module_name]['idd']
+        spread = result[module_name]['spread']
+        focus = result[module_name]['focus']
+        rei = result[module_name]['rei']
+        icf = result[module_name]['icf']
+        ecf = result[module_name]['ecf']
         DSM = result[module_name]['DSM']
         for class_name in result[module_name]['classes']:
             c_chm = result[module_name]['classes'][class_name]['c_chm']
@@ -116,7 +125,7 @@ def _gen_diff_sheet(workbook, bold, result):
             status = '' if 'status' not in result[module_name]['classes'][class_name] else \
                 result[module_name]['classes'][class_name]['status']
             worksheet2.write_row(index1, 0,
-                                 [module_name, scoh, scop, odd, idd, DSM, class_name,
+                                 [module_name, scoh, scop, odd, idd, spread, focus, rei, icf, ecf, DSM, class_name,
                                   c_chm, c_chd, CBC, IDCC, IODD, IIDD, EDCC, c_FAN_IN, c_FAN_OUT, NAC,
                                   NDC, NOP, NOI, NOID, RFC, NOSI, CTM, NOM, NOVM, CIS, privateMethodsQty,
                                   protectedMethodsQty,

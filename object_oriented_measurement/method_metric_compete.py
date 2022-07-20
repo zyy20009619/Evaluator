@@ -1,5 +1,4 @@
 from util.modifier import get_modifiers
-from util.common import *
 
 
 def del_method_dep(call, called, contain, override, overrided, parameter, method_define_var, id, NOP, CTM, RFC, NOSI,
@@ -59,26 +58,26 @@ def del_method_dep(call, called, contain, override, overrided, parameter, method
     # overrided
     if id in overrided:
         for methods_id in overrided[id]:
+            if methods_id not in method_class:
+                continue
             Overrided.append(method_class[methods_id])
             _append_FAN_IN_or_OUT(methods_id, method_class, FAN_IN, c)
             _append_IDMC_or_EDMC(methods_id, method_class, contain, EDMC, IDMC, c)
-
-    method_value = [variables[id]['location']['startLine'],
-                    len(set(FAN_IN)) + len(set(FAN_OUT)),
-                    len(set(FAN_IN)),
-                    len(set(FAN_OUT)),
-                    len(set(IDMC)),
-                    len(set(EDMC)),
-                    IsOverride,
-                    len(set(Overrided)),
-                    methodsInvokedQty,
-                    methodsInvokedLocalQty,
-                    methodsInvokedIndirectLocalQty,
-                    var_num,
-                    parm_num,
-                    get_modifiers(variables[id])]
-    method_metric = dict(zip(METHOD_METRICS, method_value))
-    method_dic[variables[c]['qualifiedName']] = method_metric
+    method_dic[variables[id]['qualifiedName'] + '/' + str(parm_num)] = {
+        'startLine': variables[id]['location']['startLine'],
+        'CBM': len(set(FAN_IN)) + len(set(FAN_OUT)),
+        'm_FAN_IN': len(set(FAN_IN)),
+        'm_FAN_OUT': len(set(FAN_OUT)),
+        'IDMC': len(set(IDMC)),
+        'EDMC': len(set(EDMC)),
+        'IsOverride': IsOverride,
+        'OverridedQty': len(set(Overrided)),
+        'methodsInvokedQty': methodsInvokedQty,
+        'methodsInvokedLocalQty': methodsInvokedLocalQty,
+        'methodsInvokedIndirectLocalQty': methodsInvokedIndirectLocalQty,
+        'm_variablesQty': var_num,
+        'parametersQty': parm_num,
+        'm_modifier': get_modifiers(variables[id])}
     return NOP
 
 

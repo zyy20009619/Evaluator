@@ -8,14 +8,14 @@ from module_measurement.moduarity.chameleon import getCoChangeCluster
 def get_spread_and_focus(cmt_path, module_info, variables):
     # create coChangeGraph
     commit, module_classes = read_commit(cmt_path, module_info, variables)
-    co_change_graph, vertexes = _get_co_change_graph(commit)
+    # co_change_graph, vertexes = _get_co_change_graph(commit)
     # get coChangeCluster
-    co_change_cluster = getCoChangeCluster(co_change_graph)
+    # co_change_cluster = getCoChangeCluster(co_change_graph)
     # transfer pathname to qualifiedName
-    co_change_cluster = _deduplication(co_change_cluster, vertexes)
+    # co_change_cluster = _deduplication(co_change_cluster, vertexes)
     # compete focus and spread
-    focus, spread = _compete_spread_and_focus(co_change_cluster, module_classes)
-    focus_dic, spread_dic = _get_focus_and_spread_dict(focus, spread, list(module_classes.keys()))
+    # focus, spread = _compete_spread_and_focus(co_change_cluster, module_classes)
+    focus_dic, spread_dic = _get_focus_and_spread_dict(list(), list(), list(module_classes.keys()))
 
     return focus_dic, spread_dic, module_classes, commit
 
@@ -25,8 +25,10 @@ def get_module_classes(module_info, variables, all_classes):
     for module_id in module_info:
         result[variables[module_id]['qualifiedName']] = list()
         for class_id in module_info[module_id]:
-            # if variables[class_id]['File'] in all_classes:
-            result[variables[module_id]['qualifiedName']].append(variables[class_id]['File'])
+            for class_path in all_classes:
+                if trans_to_path(variables[class_id]['qualifiedName']) in class_path:
+                    result[variables[module_id]['qualifiedName']].append(class_path)
+                    break
     return result
 
 
@@ -34,10 +36,10 @@ def _get_focus_and_spread_dict(focus, spread, modules):
     focus_dic = dict()
     spread_dic = dict()
     for index in range(0, len(modules)):
-        focus_dic[modules[index]] = focus[index]
-        spread_dic[modules[index]] = spread[index]
-        # focus_dic[modules[index]] = 0
-        # spread_dic[modules[index]] = 0
+        # focus_dic[modules[index]] = focus[index]
+        # spread_dic[modules[index]] = spread[index]
+        focus_dic[modules[index]] = 0
+        spread_dic[modules[index]] = 0
 
     return focus_dic, spread_dic
 
@@ -122,8 +124,6 @@ def read_commit(file_name, module_info, variables):
         reader = csv.reader(fp)
         for each in reader:
             [class1, class2, commit] = each
-            class1 = class1.replace('\\', '/')
-            class2 = class2.replace('\\', '/')
             if class1 not in commit_dic:
                 commit_dic[class1] = dict()
                 all_classes.append(class1)

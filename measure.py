@@ -1,75 +1,59 @@
-import os
 import argparse
-from function_file import measure_package_metrics, compare_diff, measure_module_metrics, measure_multi_version
+from function_file import measure_package_metrics, compare_diff, measure_module_metrics
 from detect_algo.detect_root_cause import analyse_data
 
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='')  # single version measure/multi-version measure/compare
-    parser.add_argument('-pro', help='project path', default='')
-    parser.add_argument('-ver', help='project version', default='')
-    parser.add_argument('-dep', help='dependency file path', default=r'')
-    parser.add_argument('-mp', help='mapping between module and packages', default='')
-    parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
-    parser.add_argument('-c1', help='the measure result path of the previous version', default='')
-    parser.add_argument('-c2', help='the measure result path of the later version', default='')
-    parser.add_argument('-diff', help='the folder path of diff result', default='')
-    parser.add_argument('-out', help='the folder path of output', default='')
+    parser.add_argument('-d', '--dep', help='dependency file path')
+    parser.add_argument('-cmt', '--cmt', help='cmt file path')
+    parser.add_argument('-mp', '--mpmapping', help='mapping between module and packages')
+    parser.add_argument('-pp', '--ppmapping', help='mapping between old package name and new package name')
+    parser.add_argument('-c1', '--com1', help='the folder path of measure result and dep file of the previous version')
+    parser.add_argument('-c2', '--com2', help='the folder path of measure result and dep file of the later version')
+    parser.add_argument('-df', '--diff', help='the folder path of diff result')
+    parser.add_argument('-pro', '--project', help='the folder path of project')
 
     args = parser.parse_args()
-    opt = args.opt
-    pro = args.pro
-    ver = args.ver
-    dep = args.dep
-    mpmapping = args.mp
-    ppmapping = args.pp
-    com1 = args.c1
-    com2 = args.c2
-    diff = args.diff
-    output = args.out
-
-    if opt == '':
-        print('please input function option!!')
-        return
-    if opt != 'com' and pro == '':
-        print('please input project path!!')
-        return
-    if opt != 'com' and dep == '':
-        print('please input dep path!!')
-        return
-    if opt != 'com' and not os.path.exists(dep):
-        print('The file path is not exist, please input correct path!!!')
-        return
-    if output == '' or not os.path.exists(output):
-        output = '../result'
-    if opt == 'sv' and ver == '':
-        print('Please input version!!!')
-        return
-
-    if opt == 'sv':
-        if not mpmapping:
-            if measure_package_metrics(pro, dep, output, ver, dict(), 'sv'):
-                print('Measure finished!!!')
+    dep_path = args.dep
+    cmt_path = args.cmt
+    mpmapping = args.mpmapping
+    ppmapping = args.ppmapping
+    com1_path = args.com1
+    com2_path = args.com2
+    diff_path = args.diff
+    project_path = args.project
+    # dep_path = r'D:\codes\test_data\OmniROM_base\base-out(android-11).json'
+    # cmt_path = r'D:\codes\test_data\OmniROM_base\cmt(android-11).csv'
+    if dep_path and not mpmapping:
+        if measure_package_metrics(dep_path, cmt_path):
+            print('Measure finished!!!')
         else:
-            if measure_module_metrics(pro, dep, output, mpmapping, 'sv'):
-                print('Measure finished!!!')
-    elif opt == 'mv':
-        if not mpmapping:
-            measure_multi_version(pro, dep, output, 'mv')
-            print('Measure multi versions finished!!!')
-    else:
-        if com1 and com2:
-            if compare_diff(com1, com2, ppmapping, output):
-                print('Compare finished!!!')
-            else:
-                print('The file path is not exist!')
-        # if diff:
-        #     if analyse_data(diff, output):
-        #         print('Analyse finished!!!')
-        #     else:
-        #         print('The file path is not exist!')
+            print('The file path is not exist!')
+    if dep_path and mpmapping:
+        if measure_module_metrics(dep_path, cmt_path, mpmapping):
+            print('Measure finished!!!')
+        else:
+            print('The file path is not exist!')
+    # com1_path = r'D:\codes\test_data\OmniROM_base\android-10'
+    # com2_path = r'D:\codes\test_data\OmniROM_base\android-11'
+    if com1_path and com2_path:
+        if compare_diff(com1_path, com2_path, ppmapping):
+            print('Compare finished!!!')
+        else:
+            print('The file path is not exist!')
+
+    diff_path = r'C:\Users\20465\Desktop\codes\test_data\microservice\apollo-enre-out\diff'
+    project_path = r'C:\Users\20465\Desktop\data\gitcodes\apollo'
+    if diff_path and project_path:
+        if analyse_data(diff_path, project_path):
+            print('Analyse finished!!!')
+        else:
+            print('The file path is not exist!')
 
 
 if __name__ == '__main__':
+    # print(os.getcwd())
+    # print(sys.path)
+    # sys.path.append(os.getcwd())
     command()

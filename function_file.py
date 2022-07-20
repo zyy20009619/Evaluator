@@ -1,86 +1,44 @@
-import os
-import shutil
-import matplotlib.pyplot as plt
-import numpy as np
 from module_measurement.module_metric_compete import get_module_metric
 from analysis.indicate import gen_xlsx
 from util.rel_data import get_rel_info
 from util.csv_operator import write_result_to_csv
 from util.json_operator import read_file, write_result_to_json, read_folder
-from util.path_operator import create_file_path
-from util.common import *
-
-GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
 
-def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
+def measure_module_metrics(dep_path, cmt_path, mapping_path):
+    dep_dic = read_file(dep_path)
     mapping_dic = read_file(mapping_path)
-    if mapping_dic:
-        measure_package_metrics(project_path, dep_path, output, '', mapping_dic, opt)
+    if dep_dic and mapping_dic:
+        module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
+            dep_dic, mapping_dic)
+        module_dic = get_module_metric(dep_dic['variables'], module_info, inherit, descendent, method_class, dep, call,
+                                       called, override, overrided, import_val, imported_val, parameter,
+                                       method_define_var, method_use_field,
+                                       cmt_path, 'module')
+        write_result_to_json('measure_result.json', module_dic)
+        write_result_to_csv('measure_result_class.csv', 'measure_result_method.csv', module_dic)
         return True
     return False
 
 
-def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
-    if ver != '':
-        os.chdir(project_path)
-        os.system("git checkout " + ver)
-        os.system(GIT_COMMAND)
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
-        os.system(execute)
-        os.makedirs(output, exist_ok=True)
-        if not os.path.exists(os.path.join(output, 'cmt.csv')):
-            shutil.move(os.path.join(project_path, 'cmt.csv'), output)
-
-    module_data = list()
-    if not opt == 'mv':
-        dep_dic = read_file(os.path.join(dep_path, os.listdir(dep_path)[0]))
-    else:
-        dep_dic = read_file(dep_path)
+def measure_package_metrics(dep_path, cmt_path):
+    dep_dic = read_file(dep_path)
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-            dep_dic, mapping_dic, output)
+            dep_dic, dict())
         package_dic = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
-                                        call, called, override, overrided, import_val, imported_val, parameter,
-                                        method_define_var,
-                                        method_use_field, 'package', module_data, os.path.join(output, 'cmt.csv'))
-        write_result_to_json(create_file_path(output + '\\measureResult', 'measure_result.json'), package_dic)
-        write_result_to_csv(create_file_path(output + '\\measureResult', 'measure_result_class.csv'),
-                            create_file_path(output + '\\measureResult', 'measure_result_method.csv'), package_dic)
-    return module_data
+                                        call, called, override, overrided, import_val, imported_val, parameter, method_define_var,
+                                        method_use_field, cmt_path, 'package')
+        write_result_to_json('measure_result.json', package_dic)
+        write_result_to_csv('measure_result_class.csv', 'measure_result_method.csv', package_dic)
+        return True
+    return False
 
 
-def measure_multi_version(project_path, dep_path, output, opt):
-    project_list = list()
-    version_list = os.listdir(dep_path)
-    for ver in version_list:
-        current_path = os.path.join(dep_path, ver)
-        mapping_dic = dict()
-        if len(os.listdir(current_path)) > 1:
-            mapping_file = [file for f in current_path if 'mapping' in f][0]
-            mapping_dic = read_file(mapping_file)
-        dep_file = os.listdir(current_path)[0]
-        module_data = measure_package_metrics(project_path, os.path.join(current_path, dep_file), os.path.join(output, ver), ver, mapping_dic, opt)
-        tmp_pro = np.array(module_data).mean(axis=0).tolist()
-        project_list.append(tmp_pro)
-
-    project_list = np.around(project_list, 4)
-    draw_line_chart(version_list, project_list, output)
-
-
-def draw_line_chart(version_list, project_list, output):
-    plt.title('change curve')
-    plt.plot(version_list, project_list, label=PROJECT_METRICS)
-    plt.legend()
-    plt.xlabel('version')
-    plt.ylabel('quality score')
-    plt.savefig(output + '/change.jpg')
-
-
-def compare_diff(folder_path1, folder_path2, mapping, output):
+def compare_diff(folder_path1, folder_path2, mapping):
     measure_json_dict1, dep_json_dict1 = read_folder(folder_path1, 'measure_result.json', 'dep.json')
     measure_json_dict2, dep_json_dict2 = read_folder(folder_path2, 'measure_result.json', 'dep.json')
+    print('module len', len(measure_json_dict2))
     if mapping:
         pp_mapping = read_file(mapping)
         # convert result1's packages' old name to new name
@@ -93,9 +51,9 @@ def compare_diff(folder_path1, folder_path2, mapping, output):
     modules_name = list()
     _get_measure_diff(measure_json_dict1, measure_json_dict2, measure_diff, modules_name, metric_change)
     _get_dep_diff(dep_json_dict1, dep_json_dict2, dep_diff)
-    write_result_to_json(create_file_path(output + '\\diffResult', 'measure_diff.json'), measure_diff)
-    write_result_to_json(create_file_path(output + '\\diffResult', 'dep_diff.json'), dep_diff)
-    gen_xlsx(create_file_path(output + '\\diffResult', 'diff_result.xlsx'), metric_change, modules_name, measure_diff)
+    write_result_to_json('measure_diff.json', measure_diff)
+    write_result_to_json('dep_diff.json', dep_diff)
+    gen_xlsx('diff_result.xlsx', metric_change, modules_name, measure_diff)
     return True
 
 
@@ -108,12 +66,26 @@ def _get_measure_diff(measure_json_dict1, measure_json_dict2, measure_diff, modu
                                          'scop': float(format(module_result2['scop'] - module_result1['scop'], '.4f')),
                                          'odd': float(format(module_result2['odd'] - module_result1['odd'], '.4f')),
                                          'idd': float(format(module_result2['idd'] - module_result1['idd'], '.4f')),
+                                         'spread': float(
+                                             format(module_result2['spread'] - module_result1['spread'], '.4f')),
+                                         'focus': float(
+                                             format(module_result2['focus'] - module_result1['focus'], '.4f')),
+                                         'rei': float(
+                                             format(float(module_result2['rei']) - float(module_result1['rei']),
+                                                    '.4f')),
+                                         'icf': float(format(module_result2['icf'] - module_result1['icf'], '.4f')),
+                                         'ecf': float(format(module_result2['ecf'] - module_result1['ecf'], '.4f')),
                                          'DSM': float(module_result2['DSM'] - module_result1['DSM'])}
             modules_name.append(module_name)
             metric_change.append([float(format(module_result2['scoh'] - module_result1['scoh'], '.4f')),
                                   float(format(module_result2['scop'] - module_result1['scop'], '.4f')),
                                   float(format(module_result2['odd'] - module_result1['odd'], '.4f')),
                                   float(format(module_result2['idd'] - module_result1['idd'], '.4f')),
+                                  float(format(module_result2['spread'] - module_result1['spread'], '.4f')),
+                                  float(format(module_result2['focus'] - module_result1['focus'], '.4f')),
+                                  float(format(float(module_result2['rei']) - float(module_result1['rei']), '.4f')),
+                                  float(format(module_result2['icf'] - module_result1['icf'], '.4f')),
+                                  float(format(module_result2['ecf'] - module_result1['ecf'], '.4f')),
                                   float(module_result2['DSM'] - module_result1['DSM'])])
             classes = dict()
             # 11->12 changed and added classes
@@ -190,8 +162,7 @@ def _convert_old_to_new(old_name_ver_data, mapping):
                 break
         new_name_ver_data[new_name] = {'scoh': old_name_ver_data[module]['scoh'],
                                        'scop': old_name_ver_data[module]['scop'],
-                                       'idd': old_name_ver_data[module]['idd'],
-                                       'odd': old_name_ver_data[module]['odd'],
+                                       'idd': old_name_ver_data[module]['idd'], 'odd': old_name_ver_data[module]['odd'],
                                        'DSM': old_name_ver_data[module]['DSM']}
         new_classes = dict()
         for class_name in old_name_ver_data[module]['classes']:

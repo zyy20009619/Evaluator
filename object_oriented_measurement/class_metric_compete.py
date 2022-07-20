@@ -1,15 +1,16 @@
 from object_oriented_measurement.method_metric_compete import del_method_dep
 from util.modifier import get_modifiers, judge_modifier_type
 from object_oriented_measurement.cohesion.com_functionality import com_chm, com_chd
-from util.common import *
 
 
 def class_and_method_metric_compete(variables, contain, inherit, descendent, parameter, method_define_var,
                                     method_use_field, method_class, call, called, idcc_list,
                                     edcc_list, override, overrided, import_val, imported_val,
                                     fan_in, fan_out, iodd, iidd):
+    print('begin to compete class-level metrics!')
     class_dic = dict()
     for c in contain:
+        print('current class:', c)
         dic_id = contain[c]
         cis = 0
         # ctm/nosi: invoke how many (static) methods
@@ -72,33 +73,56 @@ def class_and_method_metric_compete(variables, contain, inherit, descendent, par
                     final_var_num, synchronized_var_num, 0)
 
         # deal indirect invoke(call tree in the class)
-        method_invocations_indirect_local = _get_invoke_indirect_local(methods_id, invoke_local_methods)
+        # method_invocations_indirect_local = _get_invoke_indirect_local(methods_id, invoke_local_methods)
         # get info of visible methods
-        _get_all_accessed_fields(visible_methods_id, all_accessed_fields, method_use_field,
-                                  method_invocations_indirect_local)
-        direct_connections, indirect_connections = _get_methods_conn(all_accessed_fields, visible_methods_id)
-        tcc = _com_tcc_or_lcc(direct_connections, list(), len(visible_methods_id))
-        lcc = _com_tcc_or_lcc(direct_connections, indirect_connections, len(visible_methods_id))
+        # _get_all_accessed_fields(visible_methods_id, all_accessed_fields, method_use_field,
+        #                           method_invocations_indirect_local)
+        # direct_connections, indirect_connections = _get_methods_conn(all_accessed_fields, visible_methods_id)
+        # tcc = _com_tcc_or_lcc(direct_connections, list(), len(visible_methods_id))
+        # lcc = _com_tcc_or_lcc(direct_connections, indirect_connections, len(visible_methods_id))
         nac = find_node_num(inherit, c, variables, 1)
         ndc = find_node_num(descendent, c, variables, 0)
-        lcom = _com_lcom(methods_id, current_method_use_field)
-        locm_normalized = _com_locm_normalized(len(methods_id), fields, current_method_use_field)
+        # lcom = _com_lcom(methods_id, current_method_use_field)
+        # locm_normalized = _com_locm_normalized(len(methods_id), fields, current_method_use_field)
         c_chm = com_chm(methods_id, parameter, variables)
         c_chd = com_chd(methods_id, parameter, variables)
-        class_value = [cis, len(methods_id), nop, nac, ndc, _get_number_of_import(import_val, c),
-                       _get_number_of_import(imported_val, c), len(set(ctm)), idcc_list[c], iodd[c], iidd[c],
-                       edcc_list[c], fan_in[c], fan_out[c], fan_in[c] + fan_out[c], format(c_chm, '.4f'),
-                       format(c_chd, '.4f'), len(set(c_var)),
-                       private_methods_num, protected_methods_num, static_methods_num, default_methods_num,
-                       abstract_methods_num, final_methods_num, synchronized_methods_num,
-                       public_var_num, private_var_num, protected_var_num, static_var_num, default_var_num,
-                       final_var_num,
-                       synchronized_var_num, len(set(rfc)),
-                       len(fields), len(visible_methods_id), len(set(nosi)), 0, 0, 0, 0, len(methods_id),
-                       get_modifiers(variables[c])]
-        class_metric = dict(zip(CLASS_METRICS, class_value))
-        class_metric['methods'] = method_dic
-        class_dic[variables[c]['qualifiedName']] = class_metric
+        class_dic[variables[c]['qualifiedName']] = {'CIS': cis, 'NOM': len(methods_id), 'NOP': nop, 'NAC': nac,
+                                                    'NDC': ndc, 'NOI': _get_number_of_import(import_val, c),
+                                                    'NOID': _get_number_of_import(imported_val, c),
+                                                    'CTM': len(set(ctm)), 'IDCC': idcc_list[c], 'IODD': iodd[c],
+                                                    'IIDD': iidd[c],
+                                                    'EDCC': edcc_list[c],
+                                                    'c_FAN_IN': fan_in[c], 'c_FAN_OUT': fan_out[c],
+                                                    'CBC': fan_in[c] + fan_out[c],
+                                                    'c_chm': format(c_chm, '.4f'),
+                                                    'c_chd': format(c_chd, '.4f'),
+                                                    'c_variablesQty': len(set(c_var)),
+                                                    'privateMethodsQty': private_methods_num,
+                                                    'protectedMethodsQty': protected_methods_num,
+                                                    'staticMethodsQty': static_methods_num,
+                                                    'defaultMethodsQty': default_methods_num,
+                                                    'abstractMethodsQty': abstract_methods_num,
+                                                    'finalMethodsQty': final_methods_num,
+                                                    'synchronizedMethodsQty': synchronized_methods_num,
+                                                    'publicFieldsQty': public_var_num,
+                                                    'privateFieldsQty': private_var_num,
+                                                    'protectedFieldsQty': protected_var_num,
+                                                    'staticFieldsQty': static_var_num,
+                                                    'defaultFieldsQty': default_var_num,
+                                                    'finalFieldsQty': final_var_num,
+                                                    'synchronizedFieldsQty': synchronized_var_num,
+                                                    'RFC': len(set(rfc)),
+                                                    'NOF': len(fields),
+                                                    'NOVM': len(visible_methods_id),
+                                                    'NOSI': len(set(nosi)),
+                                                    'TCC': 0,
+                                                    'LCC': 0,
+                                                    'LCOM': 0,
+                                                    'LOCM*': 0,
+                                                    'WMC': len(methods_id),
+                                                    'c_modifiers': get_modifiers(variables[c]),
+                                                    'methods': method_dic
+                                                    }
     return class_dic
 
 
@@ -267,3 +291,11 @@ def find_node_num(rel_dic, class_id, variables, count):
         for parent_id in rel_dic[class_id]:
             find_node_num(rel_dic, parent_id, variables, count)
     return count
+
+#
+# if __name__ == '__main__':
+#     test = set()
+#     test.add((1, 2,3))
+#     test.add((4, 5,6))
+#
+#     print(test)
