@@ -13,40 +13,34 @@ from util.common import *
 GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
 
-def measure_module_metrics(dep_path, output, mapping_path):
-    dep_dic = read_file(dep_path)
+def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
     mapping_dic = read_file(mapping_path)
-    if dep_dic and mapping_dic:
-        module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-            dep_dic, mapping_dic, output)
-        module_dic = get_module_metric(dep_dic['variables'], module_info, inherit, descendent, method_class, dep, call,
-                                       called, override, overrided, import_val, imported_val, parameter,
-                                       method_define_var, method_use_field,
-                                       'module')
-        write_result_to_json(create_file_path(output + '\\measureResult', 'measure_result.json'), module_dic)
-        write_result_to_csv(create_file_path(output + '\\measureResult', 'measure_result_class.csv'),
-                            create_file_path(output + '\\measureResult', 'measure_result_method.csv'), module_dic)
+    if mapping_dic:
+        measure_package_metrics(project_path, dep_path, output, '', mapping_dic, opt)
         return True
     return False
 
 
-def measure_package_metrics(project_path, dep_path, output, ver):
-    os.chdir(project_path)
-    os.system("git checkout " + ver)
-    os.system(GIT_COMMAND)
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
-    os.system(execute)
-    os.makedirs(output, exist_ok=True)
-    if not os.path.exists(os.path.join(output, 'cmt.csv')):
-        shutil.move(os.path.join(project_path, 'cmt.csv'), output)
-
+def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
+    if ver != '':
+        os.chdir(project_path)
+        os.system("git checkout " + ver)
+        os.system(GIT_COMMAND)
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+        os.system(execute)
+        os.makedirs(output, exist_ok=True)
+        if not os.path.exists(os.path.join(output, 'cmt.csv')):
+            shutil.move(os.path.join(project_path, 'cmt.csv'), output)
 
     module_data = list()
-    dep_dic = read_file(dep_path)
+    if not opt == 'mv':
+        dep_dic = read_file(os.path.join(dep_path, os.listdir(dep_path)[0]))
+    else:
+        dep_dic = read_file(dep_path)
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-            dep_dic, dict(), output)
+            dep_dic, mapping_dic, output)
         package_dic = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
                                         call, called, override, overrided, import_val, imported_val, parameter,
                                         method_define_var,
@@ -57,13 +51,17 @@ def measure_package_metrics(project_path, dep_path, output, ver):
     return module_data
 
 
-def measure_multi_version(project_path, dep_path, output):
+def measure_multi_version(project_path, dep_path, output, opt):
     project_list = list()
     version_list = os.listdir(dep_path)
     for ver in version_list:
         current_path = os.path.join(dep_path, ver)
+        mapping_dic = dict()
+        if len(os.listdir(current_path)) > 1:
+            mapping_file = [file for f in current_path if 'mapping' in f][0]
+            mapping_dic = read_file(mapping_file)
         dep_file = os.listdir(current_path)[0]
-        module_data = measure_package_metrics(project_path, os.path.join(current_path, dep_file), os.path.join(output, ver), ver)
+        module_data = measure_package_metrics(project_path, os.path.join(current_path, dep_file), os.path.join(output, ver), ver, mapping_dic, opt)
         tmp_pro = np.array(module_data).mean(axis=0).tolist()
         project_list.append(tmp_pro)
 
@@ -78,7 +76,6 @@ def draw_line_chart(version_list, project_list, output):
     plt.xlabel('version')
     plt.ylabel('quality score')
     plt.savefig(output + '/change.jpg')
-    # plt.show()
 
 
 def compare_diff(folder_path1, folder_path2, mapping, output):
