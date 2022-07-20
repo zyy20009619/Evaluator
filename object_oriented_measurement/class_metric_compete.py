@@ -1,6 +1,7 @@
 from object_oriented_measurement.method_metric_compete import del_method_dep
 from util.modifier import get_modifiers, judge_modifier_type
 from object_oriented_measurement.cohesion.com_functionality import com_chm, com_chd
+from util.common import *
 
 
 def class_and_method_metric_compete(variables, contain, inherit, descendent, parameter, method_define_var,
@@ -84,43 +85,20 @@ def class_and_method_metric_compete(variables, contain, inherit, descendent, par
         locm_normalized = _com_locm_normalized(len(methods_id), fields, current_method_use_field)
         c_chm = com_chm(methods_id, parameter, variables)
         c_chd = com_chd(methods_id, parameter, variables)
-        class_dic[variables[c]['qualifiedName']] = {'CIS': cis, 'NOM': len(methods_id), 'NOP': nop, 'NAC': nac,
-                                                    'NDC': ndc, 'NOI': _get_number_of_import(import_val, c),
-                                                    'NOID': _get_number_of_import(imported_val, c),
-                                                    'CTM': len(set(ctm)), 'IDCC': idcc_list[c], 'IODD': iodd[c],
-                                                    'IIDD': iidd[c],
-                                                    'EDCC': edcc_list[c],
-                                                    'c_FAN_IN': fan_in[c], 'c_FAN_OUT': fan_out[c],
-                                                    'CBC': fan_in[c] + fan_out[c],
-                                                    'c_chm': format(c_chm, '.4f'),
-                                                    'c_chd': format(c_chd, '.4f'),
-                                                    'c_variablesQty': len(set(c_var)),
-                                                    'privateMethodsQty': private_methods_num,
-                                                    'protectedMethodsQty': protected_methods_num,
-                                                    'staticMethodsQty': static_methods_num,
-                                                    'defaultMethodsQty': default_methods_num,
-                                                    'abstractMethodsQty': abstract_methods_num,
-                                                    'finalMethodsQty': final_methods_num,
-                                                    'synchronizedMethodsQty': synchronized_methods_num,
-                                                    'publicFieldsQty': public_var_num,
-                                                    'privateFieldsQty': private_var_num,
-                                                    'protectedFieldsQty': protected_var_num,
-                                                    'staticFieldsQty': static_var_num,
-                                                    'defaultFieldsQty': default_var_num,
-                                                    'finalFieldsQty': final_var_num,
-                                                    'synchronizedFieldsQty': synchronized_var_num,
-                                                    'RFC': len(set(rfc)),
-                                                    'NOF': len(fields),
-                                                    'NOVM': len(visible_methods_id),
-                                                    'NOSI': len(set(nosi)),
-                                                    'TCC': tcc,
-                                                    'LCC': lcc,
-                                                    'LCOM': lcom,
-                                                    'LOCM*': locm_normalized,
-                                                    'WMC': len(methods_id),
-                                                    'c_modifiers': get_modifiers(variables[c]),
-                                                    'methods': method_dic
-                                                    }
+        class_value = [cis, len(methods_id), nop, nac, ndc, _get_number_of_import(import_val, c),
+                       _get_number_of_import(imported_val, c), len(set(ctm)), idcc_list[c], iodd[c], iidd[c],
+                       edcc_list[c], fan_in[c], fan_out[c], fan_in[c] + fan_out[c], format(c_chm, '.4f'),
+                       format(c_chd, '.4f'), len(set(c_var)),
+                       private_methods_num, protected_methods_num, static_methods_num, default_methods_num,
+                       abstract_methods_num, final_methods_num, synchronized_methods_num,
+                       public_var_num, private_var_num, protected_var_num, static_var_num, default_var_num,
+                       final_var_num,
+                       synchronized_var_num, len(set(rfc)),
+                       len(fields), len(visible_methods_id), len(set(nosi)), 0, 0, 0, 0, len(methods_id),
+                       get_modifiers(variables[c])]
+        class_metric = dict(zip(CLASS_METRICS, class_value))
+        class_metric['methods'] = method_dic
+        class_dic[variables[c]['qualifiedName']] = class_metric
     return class_dic
 
 

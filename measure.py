@@ -6,8 +6,9 @@ from detect_algo.detect_root_cause import analyse_data
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options', default='')  # single version measure/multi-version measure/compare
-    parser.add_argument('-dep', help='dependency file path', default='')
+    parser.add_argument('-opt', help='function options', default='mv')  # single version measure/multi-version measure/compare
+    parser.add_argument('-pro', help='project path', default=r'C:\Users\20465\Desktop\data\testpros\gitcodes\apollo')
+    parser.add_argument('-dep', help='dependency file path', default=r'C:\Users\20465\Desktop\codes\test_data\microservice\apollo')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
     parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
     parser.add_argument('-c1', help='the measure result path of the previous version', default='')
@@ -26,6 +27,7 @@ def command():
 
     args = parser.parse_args()
     opt = args.opt
+    pro = args.pro
     dep = args.dep
     mpmapping = args.mp
     ppmapping = args.pp
@@ -36,6 +38,9 @@ def command():
 
     if opt == '':
         print('please input function option!!')
+        return
+    if pro == '':
+        print('please input project path!!')
         return
     if dep == '':
         print('please input dep path!!')
@@ -55,7 +60,7 @@ def command():
                 print('Measure finished!!!')
     elif opt == 'mv':
         if not mpmapping:
-            measure_multi_version(dep, output)
+            measure_multi_version(pro, dep, output)
     else:
         if com1 and com2:
             if compare_diff(com1, com2, ppmapping, output):
