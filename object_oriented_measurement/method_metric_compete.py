@@ -1,5 +1,5 @@
 from util.modifier import get_modifiers
-from util.common import *
+from util.metrics import *
 
 
 def del_method_dep(call, called, contain, override, overrided, parameter, method_define_var, id, NOP, CTM, RFC, NOSI,

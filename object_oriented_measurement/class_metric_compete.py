@@ -1,7 +1,7 @@
 from object_oriented_measurement.method_metric_compete import del_method_dep
 from util.modifier import get_modifiers, judge_modifier_type
 from object_oriented_measurement.cohesion.com_functionality import com_chm, com_chd
-from util.common import *
+from util.metrics import *
 
 
 def class_and_method_metric_compete(variables, contain, inherit, descendent, parameter, method_define_var,

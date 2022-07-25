@@ -8,7 +8,7 @@ from util.rel_data import get_rel_info
 from util.csv_operator import write_result_to_csv
 from util.json_operator import read_file, write_result_to_json, read_folder
 from util.path_operator import create_file_path
-from util.common import *
+from util.metrics import *
 
 GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
@@ -27,7 +27,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         os.system("git checkout " + ver)
         os.system(GIT_COMMAND)
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+        execute = "java -jar commit.jar {}".format(project_path)
         os.system(execute)
         os.makedirs(output, exist_ok=True)
         if not os.path.exists(os.path.join(output, 'cmt.csv')):
@@ -45,10 +45,22 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
                                         call, called, override, overrided, import_val, imported_val, parameter,
                                         method_define_var,
                                         method_use_field, 'package', module_data, os.path.join(output, 'cmt.csv'))
-        write_result_to_json(create_file_path(output + '\\measureResult', 'measure_result.json'), package_dic)
-        write_result_to_csv(create_file_path(output + '\\measureResult', 'measure_result_class.csv'),
-                            create_file_path(output + '\\measureResult', 'measure_result_method.csv'), package_dic)
-    return module_data
+
+        result = list()
+        for item in module_data:
+            temp = [item[0] - item[1]]
+            temp.extend(item[2: 9: 1])
+            result.append(temp)
+        tmp_pro = np.around(np.array(result).mean(axis=0).tolist(), 4)
+        project_dic = dict()
+        project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
+        project_metric['modules'] = package_dic
+        project_dic[ver] = project_metric
+
+        write_result_to_json(create_file_path(os.path.join(output, ver) + '\\measureResult', 'measure_result.json'), project_dic)
+        write_result_to_csv(create_file_path(os.path.join(output, ver) + '\\measureResult', 'measure_result_class.csv'),
+                            create_file_path(os.path.join(output, ver) + '\\measureResult', 'measure_result_method.csv'), ver, project_dic)
+    return tmp_pro
 
 
 def measure_multi_version(project_path, dep_path, output, opt):
@@ -61,8 +73,7 @@ def measure_multi_version(project_path, dep_path, output, opt):
             mapping_file = [file for f in current_path if 'mapping' in f][0]
             mapping_dic = read_file(mapping_file)
         dep_file = os.listdir(current_path)[0]
-        module_data = measure_package_metrics(project_path, os.path.join(current_path, dep_file), os.path.join(output, ver), ver, mapping_dic, opt)
-        tmp_pro = np.array(module_data).mean(axis=0).tolist()
+        tmp_pro = measure_package_metrics(project_path, os.path.join(current_path, dep_file), output, ver, mapping_dic, opt)
         project_list.append(tmp_pro)
 
     project_list = np.around(project_list, 4)
