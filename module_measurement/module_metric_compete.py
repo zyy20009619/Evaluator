@@ -1,7 +1,7 @@
 import pandas as pd
 from object_oriented_measurement.class_metric_compete import class_and_method_metric_compete
 from module_measurement.compete_strcut_dep import com_struct_metric
-from util.common import *
+from util.metrics import *
 from module_measurement.moduarity.sf_measure import get_spread_and_focus
 from module_measurement.evolution.com_icf_ecf import get_icf_ecf_rei
 
@@ -25,6 +25,7 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
         module_value.extend(
             [spread_dic[package_name], focus_dic[package_name], icf_dic[package_name], ecf_dic[package_name],
              rei_dic[package_name], len(package_info[package])])
+        module_data.append(module_value[0:-1])
         module_metric = dict(zip(MODULE_METRICS, module_value))
         class_dic = class_and_method_metric_compete(variables, package_info[package], inherit, descendent, parameter,
                                                     method_define_var, method_use_field, method_class, call, called,
@@ -32,6 +33,5 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
                                                     fan_in, fan_out, iodd, iidd)
         module_metric['classes'] = class_dic
         package_dic[package_name] = module_metric
-        module_data.append(module_value[0:-1])
 
     return package_dic
