@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(
     ['measure.py'],
-    pathex=['C:\\Users\\20465\\Desktop\\codes\\Evaluator'],
+    pathex=['C:\\Users\\20463\\Desktop\\Evaluator\\Evaluator'],
     binaries=[],
     datas=[],
     hiddenimports=[],

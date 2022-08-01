@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MicroEvaluator.iml" filepath="$PROJECT_DIR$/.idea/MicroEvaluator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Evaluator.iml" filepath="$PROJECT_DIR$/.idea/Evaluator.iml" />
     </modules>
   </component>
 </project>

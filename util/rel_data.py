@@ -1,8 +1,10 @@
+import os.path
+
 from util.json_operator import write_result_to_json
 from util.path_operator import create_file_path
 
 
-def get_rel_info(json_dic, mapping_dic, output):
+def get_rel_info(json_dic, mapping_dic, base_out_path):
     cells = json_dic['cells']
     variables = json_dic['variables']
 
@@ -87,7 +89,7 @@ def get_rel_info(json_dic, mapping_dic, output):
                                    method_use_field, set_var, variables)
     # save call/called/inherit/descendent/import_val/imported_val into a dep file
     _save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
-                      variables, create_file_path(output + '\\measureResult', 'dep.json'))
+                      variables, os.path.join(base_out_path, 'dep.json'))
 
     return module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field
 

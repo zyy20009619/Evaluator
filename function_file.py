@@ -1,4 +1,6 @@
 import os
+import sys
+import itertools
 import shutil
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +11,7 @@ from util.csv_operator import write_result_to_csv
 from util.json_operator import read_file, write_result_to_json, read_folder
 from util.path_operator import create_file_path
 from util.metrics import *
+from operator import itemgetter
 
 GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
@@ -22,29 +25,33 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
 
 
 def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
+    os.makedirs(os.path.join(output, ver), exist_ok=True)
+    base_out_path = os.path.join(output, ver)
     if ver != '':
         os.chdir(project_path)
         os.system("git checkout " + ver)
         os.system(GIT_COMMAND)
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        execute = "java -jar commit.jar {}".format(project_path)
+        print(os.path.dirname(sys.executable))
+        execute = "java -jar {} {}".format(os.path.dirname(sys.executable) + '/commit.jar', project_path)
+        # execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
         os.system(execute)
         os.makedirs(output, exist_ok=True)
-        if not os.path.exists(os.path.join(output, 'cmt.csv')):
-            shutil.move(os.path.join(project_path, 'cmt.csv'), output)
+        if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
+            shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
 
     module_data = list()
-    if not opt == 'mv':
-        dep_dic = read_file(os.path.join(dep_path, os.listdir(dep_path)[0]))
-    else:
+    if opt == 'mv':
         dep_dic = read_file(dep_path)
+    else:
+        dep_dic = read_file(os.path.join(dep_path, os.listdir(dep_path)[0]))
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-            dep_dic, mapping_dic, output)
+            dep_dic, mapping_dic, base_out_path)
         package_dic = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
                                         call, called, override, overrided, import_val, imported_val, parameter,
                                         method_define_var,
-                                        method_use_field, 'package', module_data, os.path.join(output, 'cmt.csv'))
+                                        method_use_field, 'package', module_data, os.path.join(base_out_path, 'cmt.csv'))
 
         result = list()
         for item in module_data:
@@ -57,15 +64,16 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         project_metric['modules'] = package_dic
         project_dic[ver] = project_metric
 
-        write_result_to_json(create_file_path(os.path.join(output, ver) + '\\measureResult', 'measure_result.json'), project_dic)
-        write_result_to_csv(create_file_path(os.path.join(output, ver) + '\\measureResult', 'measure_result_class.csv'),
-                            create_file_path(os.path.join(output, ver) + '\\measureResult', 'measure_result_method.csv'), ver, project_dic)
+        write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
+        write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
+                            os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
     return tmp_pro
 
 
-def measure_multi_version(project_path, dep_path, output, opt):
+def measure_multi_version(project_path, dep_path, output, opt, vers):
     project_list = list()
-    version_list = os.listdir(dep_path)
+    # version_list = os.listdir(dep_path)
+    version_list = vers.split('?')
     for ver in version_list:
         current_path = os.path.join(dep_path, ver)
         mapping_dic = dict()
@@ -111,21 +119,19 @@ def compare_diff(folder_path1, folder_path2, mapping, output):
 
 
 def _get_measure_diff(measure_json_dict1, measure_json_dict2, measure_diff, modules_name, metric_change):
-    for module_name in measure_json_dict2:
-        if module_name in measure_json_dict1:
-            module_result1 = measure_json_dict1[module_name]
-            module_result2 = measure_json_dict2[module_name]
-            measure_diff[module_name] = {'scoh': float(format(module_result2['scoh'] - module_result1['scoh'], '.4f')),
-                                         'scop': float(format(module_result2['scop'] - module_result1['scop'], '.4f')),
-                                         'odd': float(format(module_result2['odd'] - module_result1['odd'], '.4f')),
-                                         'idd': float(format(module_result2['idd'] - module_result1['idd'], '.4f')),
-                                         'DSM': float(module_result2['DSM'] - module_result1['DSM'])}
+    module2_info = measure_json_dict2[list(measure_json_dict2.keys())[0]]['modules']
+    module1_info = measure_json_dict1[list(measure_json_dict1.keys())[0]]['modules']
+    for module_name in module2_info:
+        if module_name in module1_info:
+            module_result1 = module1_info[module_name]
+            module_result2 = module2_info[module_name]
+            module_value1 = list(itemgetter(*MODULE_METRICS)(module_result1))
+            module_value2 = list(itemgetter(*MODULE_METRICS)(module_result2))
+            module_diff_value = _diff_value(module_value1, module_value2)
+            module_diff_dict = dict(zip(MODULE_METRICS, module_diff_value))
+            measure_diff[module_name] = module_diff_dict
             modules_name.append(module_name)
-            metric_change.append([float(format(module_result2['scoh'] - module_result1['scoh'], '.4f')),
-                                  float(format(module_result2['scop'] - module_result1['scop'], '.4f')),
-                                  float(format(module_result2['odd'] - module_result1['odd'], '.4f')),
-                                  float(format(module_result2['idd'] - module_result1['idd'], '.4f')),
-                                  float(module_result2['DSM'] - module_result1['DSM'])])
+            metric_change.append(module_diff_value)
             classes = dict()
             # 11->12 changed and added classes
             for class_name in module_result2['classes']:
@@ -158,6 +164,13 @@ def _get_measure_diff(measure_json_dict1, measure_json_dict2, measure_diff, modu
                     classes[class_name]['status'] = 'delete'
 
             measure_diff[module_name]['classes'] = classes
+
+
+def _diff_value(list1, list2):
+    res = list()
+    for i in range(len(list1)):
+        res.append(float(list2[i]) - float(list1[i]))
+    return res
 
 
 def _get_dep_diff(dep_json_dict1, dep_json_dict2, dep_diff):
@@ -213,75 +226,19 @@ def _convert_old_to_new(old_name_ver_data, mapping):
 
 
 def _diff_classes(classes, class_name, class1, class2):
-    classes[class_name] = {'CIS': class2['CIS'] - class1['CIS'], 'NOM': class2['NOM'] - class1['NOM'],
-                           'NAC': class2['NAC'] - class1['NAC'], 'NDC': class2['NDC'] - class1['NDC'],
-                           'NOI': class2['NOI'] - class1['NOI'], 'NOID': class2['NOID'] - class1['NOID'],
-                           'CTM': class2['CTM'] - class1['CTM'],
-                           'IDCC': class2['IDCC'] - class1['IDCC'],
-                           'IODD': class2['IODD'] - class1['IODD'],
-                           'IIDD': class2['IIDD'] - class1['IIDD'],
-                           'EDCC': class2['EDCC'] - class1['EDCC'],
-                           'NOP': class2['NOP'] - class1['NOP'],
-                           'c_chm': float(class2['c_chm']) - float(class1['c_chm']),
-                           'c_chd': float(class2['c_chd']) - float(class1['c_chd']),
-                           'c_FAN_IN': class2['c_FAN_IN'] - class1['c_FAN_IN'],
-                           'c_FAN_OUT': class2['c_FAN_OUT'] - class1['c_FAN_OUT'],
-                           'CBC': class2['CBC'] - class1['CBC'],
-                           'c_variablesQty': class2['c_variablesQty'] - class1[
-                               'c_variablesQty'],
-                           'privateMethodsQty': class2['privateMethodsQty'] - class1[
-                               'privateMethodsQty'],
-                           'protectedMethodsQty': class2['protectedMethodsQty'] - class1[
-                               'protectedMethodsQty'],
-                           'staticMethodsQty': class2['staticMethodsQty'] - class1['staticMethodsQty'],
-                           'defaultMethodsQty': class2['defaultMethodsQty'] - class1[
-                               'defaultMethodsQty'],
-                           'abstractMethodsQty': class2['abstractMethodsQty'] - class1[
-                               'abstractMethodsQty'],
-                           'finalMethodsQty': class2['finalMethodsQty'] - class1['finalMethodsQty'],
-                           'synchronizedMethodsQty': class2['synchronizedMethodsQty'] - class1[
-                               'synchronizedMethodsQty'],
-                           'publicFieldsQty': class2['publicFieldsQty'] - class1['publicFieldsQty'],
-                           'privateFieldsQty': class2['privateFieldsQty'] - class1['privateFieldsQty'],
-                           'staticFieldsQty': class2['staticFieldsQty'] - class1['staticFieldsQty'],
-                           'defaultFieldsQty': class2['defaultFieldsQty'] - class1['defaultFieldsQty'],
-                           'finalFieldsQty': class2['finalFieldsQty'] - class1['finalFieldsQty'],
-                           'synchronizedFieldsQty': class2['synchronizedFieldsQty'] - class1[
-                               'synchronizedFieldsQty'],
-                           'protectedFieldsQty': class2['protectedFieldsQty'] - class1[
-                               'protectedFieldsQty'],
-                           'RFC': class2['RFC'] - class1['RFC'], 'NOF': class2['NOF'] - class1['NOF'],
-                           'NOVM': class2['NOVM'] - class1['NOVM'],
-                           'NOSI': class2['NOSI'] - class1['NOSI'],
-                           'TCC': class2['TCC'] - class1['TCC'],
-                           'LCC': class2['LCC'] - class1['LCC'],
-                           'LCOM': class2['LCOM'] - class1['LCOM'],
-                           'LOCM*': class2['LOCM*'] - class1['LOCM*'],
-                           'WMC': class2['WMC'] - class1['WMC'],
-                           'c_modifiers': class2['c_modifiers'] - class1['c_modifiers']
-                           }
+    class_value1 = list(itemgetter(*CLASS_METRICS)(class1))
+    class_value2 = list(itemgetter(*CLASS_METRICS)(class2))
+    class_diff_value = _diff_value(class_value1, class_value2)
+    class_diff_dict = dict(zip(CLASS_METRICS, class_diff_value))
+    classes[class_name] = class_diff_dict
 
 
 def _diff_methods(methods, method_name, method1_val, method2_val):
-    methods[method_name] = {'CBM': method2_val['CBM'] - method1_val['CBM'],
-                            'm_FAN_IN': method2_val['m_FAN_IN'] - method1_val['m_FAN_IN'],
-                            'm_FAN_OUT': method2_val['m_FAN_OUT'] - method1_val['m_FAN_OUT'],
-                            'm_variablesQty': method2_val['m_variablesQty'] - method1_val[
-                                'm_variablesQty'],
-                            'IDMC': method2_val['IDMC'] - method1_val['IDMC'],
-                            'EDMC': method2_val['EDMC'] - method1_val['EDMC'],
-                            'IsOverride': _get_isOverride(method1_val['IsOverride'], method2_val['IsOverride']),
-                            'OverridedQty': method2_val['OverridedQty'] - method1_val['OverridedQty'],
-                            'methodsInvokedQty': method2_val['methodsInvokedQty'] - method1_val[
-                                'methodsInvokedQty'],
-                            'methodsInvokedLocalQty': method2_val['methodsInvokedLocalQty'] -
-                                                      method1_val['methodsInvokedLocalQty'],
-                            'methodsInvokedIndirectLocalQty': method2_val[
-                                                                  'methodsInvokedIndirectLocalQty'] -
-                                                              method1_val[
-                                                                  'methodsInvokedIndirectLocalQty'],
-                            'parametersQty': method2_val['parametersQty'] - method1_val[
-                                'parametersQty']}
+    method_value1 = list(itemgetter(*METHOD_METRICS)(method1_val))
+    method_value2 = list(itemgetter(*METHOD_METRICS)(method2_val))
+    method_diff_value = _diff_value(method_value1, method_value2)
+    method_diff_dict = dict(zip(METHOD_METRICS, method_diff_value))
+    methods[method_name] = method_diff_dict
 
 
 def _get_isOverride(method1_isOveeride_val, method2_isOveeride_val):

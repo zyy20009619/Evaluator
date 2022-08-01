@@ -6,10 +6,10 @@ from function_file import measure_package_metrics, compare_diff, measure_module_
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='mv')  # single version measure/multi-version measure/compare
-    parser.add_argument('-pro', help='project path', default=r'C:\Users\20465\Desktop\data\testpros\gitcodes\apollo')
+    parser.add_argument('-opt', help='function options(sv/mv/com)', default='')  # single version measure/multi-version measure/compare
+    parser.add_argument('-pro', help='project path', default='')
     parser.add_argument('-ver', help='project version', default='')
-    parser.add_argument('-dep', help='dependency file path', default=r'C:\Users\20465\Desktop\data\test_data\microservice\apollo')
+    parser.add_argument('-dep', help='dependency file path', default='')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
     parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
     parser.add_argument('-c1', help='the measure result path of the previous version', default='')
@@ -42,21 +42,25 @@ def command():
         print('The file path is not exist, please input correct path!!!')
         return
     if output == '' or not os.path.exists(output):
-        output = '../result'
-    if opt == 'sv' and ver == '':
+        print('Please input output path!!!')
+        return
+    if opt != 'com' and ver == '':
         print('Please input version!!!')
+        return
+    if opt == 'mv' and '?' not in ver:
+        print('Please split by question mark!!!')
         return
 
     if opt == 'sv':
         if not mpmapping:
-            if measure_package_metrics(pro, dep, output, ver, dict(), 'sv'):
+            if len(measure_package_metrics(pro, dep, output, ver, dict(), 'sv')) != 0:
                 print('Measure finished!!!')
         else:
             if measure_module_metrics(pro, dep, output, mpmapping, 'sv'):
                 print('Measure finished!!!')
     elif opt == 'mv':
         if not mpmapping:
-            measure_multi_version(pro, dep, output, 'mv')
+            measure_multi_version(pro, dep, output, 'mv', ver)
             print('Measure multi versions finished!!!')
     else:
         if com1 and com2:
