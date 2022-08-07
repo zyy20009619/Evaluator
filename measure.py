@@ -6,7 +6,7 @@ from function_file import measure_package_metrics, compare_diff, measure_module_
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='')  # single version measure/multi-version measure/compare
+    parser.add_argument('-opt', help='function options(sv/mv/com)', default='sv')  # single version measure/multi-version measure/compare
     parser.add_argument('-pro', help='project path', default='')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default='')

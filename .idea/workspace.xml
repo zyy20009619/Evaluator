@@ -2,31 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2fa28c47-627c-4c7d-8bd1-46a5eab9c5f4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Evaluator.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/MicroEvaluator.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/indicate.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/indicate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/PYZ-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/PYZ-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/Tree-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Tree-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/Tree-01.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Tree-01.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/Tree-02.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Tree-02.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/measure.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/measure.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/warn-measure.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/warn-measure.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/measure/xref-measure.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/xref-measure.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commit.jar" beforeDir="false" afterPath="$PROJECT_DIR$/util/tools/commit.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/measure.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/function_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/measure.spec" beforeDir="false" afterPath="$PROJECT_DIR$/measure.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/rel_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/rel_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +24,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/measure.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
   </component>
@@ -91,6 +68,9 @@
       <workItem from="1658759536109" duration="10093000" />
       <workItem from="1658803314863" duration="1035000" />
       <workItem from="1658929322521" duration="18000" />
+      <workItem from="1659536699984" duration="700000" />
+      <workItem from="1659574241915" duration="2227000" />
+      <workItem from="1659585205600" duration="1377000" />
     </task>
     <servers />
   </component>
