@@ -8,16 +8,17 @@ from module_measurement.moduarity.chameleon import getCoChangeCluster
 def get_spread_and_focus(cmt_path, module_info, variables):
     # create coChangeGraph
     commit, module_classes = read_commit(cmt_path, module_info, variables)
-    co_change_graph, vertexes = _get_co_change_graph(commit)
-    # get coChangeCluster
-    co_change_cluster = getCoChangeCluster(co_change_graph)
-    # transfer pathname to qualifiedName
-    co_change_cluster = _deduplication(co_change_cluster, vertexes)
-    # compete focus and spread
-    focus, spread = _compete_spread_and_focus(co_change_cluster, module_classes)
-    focus_dic, spread_dic = _get_focus_and_spread_dict(focus, spread, list(module_classes.keys()))
+    # co_change_graph, vertexes = _get_co_change_graph(commit)
+    # # get coChangeCluster
+    # co_change_cluster = getCoChangeCluster(co_change_graph)
+    # # transfer pathname to qualifiedName
+    # co_change_cluster = _deduplication(co_change_cluster, vertexes)
+    # # compete focus and spread
+    # focus, spread = _compete_spread_and_focus(co_change_cluster, module_classes)
+    # focus_dic, spread_dic = _get_focus_and_spread_dict(focus, spread, list(module_classes.keys()))
 
-    return focus_dic, spread_dic, module_classes, commit
+    # return focus_dic, spread_dic, module_classes, commit
+    return dict(), dict(), module_classes, commit
 
 
 def get_module_classes(module_info, variables, all_classes):
