@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from util.json_operator import read_folder, write_result_to_json
 from util.path_operator import create_file_path
 from detect_algo.arch_debt.measure_arch import measure_maintenance
-from detect_algo.arch_debt.regression_model.model_selector import model_selector
+# from detect_algo.arch_debt.regression_model.model_selector import model_selector
 
 
 def analyse_data(diff_folder_path, output):

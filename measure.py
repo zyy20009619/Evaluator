@@ -1,21 +1,21 @@
 import os
 import argparse
 from function_file import measure_package_metrics, compare_diff, measure_module_metrics, measure_multi_version
-# from detect_algo.detect_root_cause import analyse_data
+from detect_algo.detect_root_cause import analyse_data
 
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='sv')  # single version measure/multi-version measure/compare
+    parser.add_argument('-opt', help='function options(sv/mv/com)', default='com')  # single version measure/multi-version measure/compare
     parser.add_argument('-pro', help='project path', default='')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default='')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
     parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
-    parser.add_argument('-c1', help='the measure result path of the previous version', default='')
-    parser.add_argument('-c2', help='the measure result path of the later version', default='')
-    parser.add_argument('-diff', help='the folder path of diff result', default='')
-    parser.add_argument('-out', help='the folder path of output', default='')
+    parser.add_argument('-c1', help='the measure result path of the previous version', default=r'')
+    parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
+    parser.add_argument('-diff', help='the folder path of diff result', default=r'F:\research\毕设进展相关\实验\实验结果\lineage-18.1\diffResult')
+    parser.add_argument('-out', help='the folder path of output', default=r'F:\research\毕设进展相关\实验\实验结果\lineage-18.1')
 
     args = parser.parse_args()
     opt = args.opt
@@ -68,11 +68,11 @@ def command():
                 print('Compare finished!!!')
             else:
                 print('The file path is not exist!')
-        # if diff:
-        #     if analyse_data(diff, output):
-        #         print('Analyse finished!!!')
-        #     else:
-        #         print('The file path is not exist!')
+        if diff:
+            if analyse_data(diff, output):
+                print('Analyse finished!!!')
+            else:
+                print('The file path is not exist!')
 
 
 if __name__ == '__main__':

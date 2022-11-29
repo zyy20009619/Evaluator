@@ -1,5 +1,7 @@
 import os.path
 
+from collections import defaultdict
+
 from util.json_operator import write_result_to_json
 from util.path_operator import create_file_path
 
