@@ -4,7 +4,7 @@ import numpy as np
 
 
 # 传入指标矩阵和权重数组，计算最后的综合评分
-def _get_score(index_matrix, weight, type_names, project_name, version, plan_num, owner):
+def get_score(index_matrix, weight, type_names):
     # max_feature：越大越好；min_feature:越小越好
     max_feature = {'chm', 'chd', 'icf', 'scoh', 'ccoh', 'focus'}
     min_feature = {'ifn', 'rei', 'idd', 'odd', 'ecf', 'scop', 'ccop', 'DSM', 'spread'}
@@ -47,4 +47,4 @@ def _get_score(index_matrix, weight, type_names, project_name, version, plan_num
     score_result = np.dot(normalized_result, weight)
     # 给予每个微服务相同的权重，并将最终结果存入数据库
     score = sum(score_result) / len(score_result)
-    return [normalized_result, score_result]
+    return [normalized_result,  [i[0] for i in score_result]]
