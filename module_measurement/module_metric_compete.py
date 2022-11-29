@@ -23,7 +23,7 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
                                                                                                     package_info,
                                                                                                     struct_dep)
         module_value.extend(
-            [icf_dic[package_name], ecf_dic[package_name],
+            [spread_dic[package_name], focus_dic[package_name], icf_dic[package_name], ecf_dic[package_name],
              rei_dic[package_name], len(package_info[package])])
         module_data.append(module_value[0:-1])
         module_metric = dict(zip(MODULE_METRICS, module_value))
