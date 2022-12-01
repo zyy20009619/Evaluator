@@ -31,7 +31,6 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         os.chdir(project_path)
         os.system("git checkout -f " + ver)
         os.system(GIT_COMMAND)
-<<<<<<< HEAD
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         # print(sys.path[0])
         # print(sys.argv[0])
@@ -39,11 +38,6 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
         execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
         # execute = "java -jar {} {}".format('./commit.jar', project_path)
-=======
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
-        # execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
->>>>>>> a2630a02a4915361f3518d56c1788e06985d0b13
         os.system(execute)
         os.makedirs(output, exist_ok=True)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
