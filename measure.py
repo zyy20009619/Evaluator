@@ -1,4 +1,6 @@
+# coding=gbk
 import os
+import sys
 import argparse
 from function_file import measure_package_metrics, compare_diff, measure_module_metrics, measure_multi_version
 from detect_algo.detect_root_cause import analyse_data
@@ -6,16 +8,16 @@ from detect_algo.detect_root_cause import analyse_data
 
 def command():
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='com')  # single version measure/multi-version measure/compare
-    parser.add_argument('-pro', help='project path', default='')
-    parser.add_argument('-ver', help='project version', default='')
-    parser.add_argument('-dep', help='dependency file path', default='')
+    parser.add_argument('-opt', help='function options(sv/mv/com)', default='mv')  # single version measure/multi-version measure/compare
+    parser.add_argument('-pro', help='project path', default=r'F:\research\毕设进展相关\实验\数据集\MicroServices\projects\apollo')
+    parser.add_argument('-ver', help='project version', default='v0.4.0?v0.5.0')
+    parser.add_argument('-dep', help='dependency file path', default=r'F:\research\毕设进展相关\实验\实验结果\Apollo')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
     parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
     parser.add_argument('-c1', help='the measure result path of the previous version', default=r'')
     parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
-    parser.add_argument('-diff', help='the folder path of diff result', default=r'F:\research\姣曡杩涘睍鐩稿叧\瀹為獙\瀹為獙缁撴灉\lineage-18.1\diffResult')
-    parser.add_argument('-out', help='the folder path of output', default=r'F:\research\姣曡杩涘睍鐩稿叧\瀹為獙\瀹為獙缁撴灉\lineage-18.1')
+    parser.add_argument('-diff', help='the folder path of diff result', default=r'')
+    parser.add_argument('-out', help='the folder path of output', default=r'F:\research\毕设进展相关\实验\实验结果\Apollo')
 
     args = parser.parse_args()
     opt = args.opt
@@ -75,5 +77,12 @@ def command():
                 print('The file path is not exist!')
 
 
+def app_path():
+    if hasattr(sys, 'frozen'):
+        return os.path.dirname(sys.executable)  # 使用pyinstaller打包后的exe目录
+    return os.path.dirname(__file__)  # 没打包前的py目录
+
+
 if __name__ == '__main__':
+    # app_path()
     command()

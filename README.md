@@ -173,3 +173,9 @@ python measure.py -opt com -c1 [com_path1] -c2 [com_path2] -pp [ppmapping_path] 
 
 输出xlsx格式文件，其中包含一个演化趋势sheet页，对两个版本在演化过程中的指标变化幅度进行归一化处理，并根据演化的趋势进行指示(越绿代表演化状态越好，越红代表演化状态越差)，示例如下：
 ![img.png](./image/hotmap.png)
+
+## 打包为可执行文件
+  ```python
+  pip install Pyinstaller
+  Pyinstaller -F measure.py -p 项目路径 
+  ```
