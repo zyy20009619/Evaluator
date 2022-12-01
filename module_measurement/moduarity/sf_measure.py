@@ -18,6 +18,7 @@ def get_spread_and_focus(cmt_path, module_info, variables):
     focus_dic, spread_dic = _get_focus_and_spread_dict(focus, spread, list(module_classes.keys()))
 
     return focus_dic, spread_dic, module_classes, commit
+    # return dict(), dict(), module_classes, commit
 
 
 def get_module_classes(module_info, variables, all_classes):
