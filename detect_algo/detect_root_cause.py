@@ -3,14 +3,10 @@ import matplotlib.pyplot as plt
 from util.json_operator import read_folder, write_result_to_json
 from util.path_operator import create_file_path
 from detect_algo.arch_debt.measure_arch import measure_maintenance
-<<<<<<< HEAD
 # from detect_algo.arch_debt.regression_model.model_selector import model_selector
-=======
-from detect_algo.arch_debt.regression_model.model_selector import model_selector
 from score_compete.index_measure import get_score
 from util.metrics import MODULE_METRICS
 import numpy as np
->>>>>>> a2630a02a4915361f3518d56c1788e06985d0b13
 
 
 def analyse_data(diff_folder_path, output):
