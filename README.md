@@ -5,14 +5,14 @@
 - ***单版本度量功能：根据项目功能依赖文件度量项目质量***
 
      ```python
-     python measure.py -opt sv -pro [project_path] -ver [version] -dep [dep_path] <-out [out_path]>  #以package为粒度计算，version为当前需要度量的版本号，dep_path为只存在依赖文件的文件夹路径
-     python measure.py -opt sv -pro [project_path] -ver [version] -dep [dep_path] -mp [mpmapping_path] <-out [out_path]>   #以用户定义的粒度计算
+     python measure.py -opt sv -pro [project_path] -ver [version] -dep [dep_path] -out [out_path]  #以package为粒度计算，version为当前需要度量的版本号，dep_path为只存在依赖文件的文件夹路径
+     python measure.py -opt sv -pro [project_path] -ver [version] -dep [dep_path] -mp [mpmapping_path] -out [out_path]   #以用户定义的粒度计算
      ```
 
 + ***多版本度量功能：根据多版本依赖结果度量每个项目质量，并给出项目整体质量变化趋势图***
 
   ```python
-  python measure.py -opt mv -pro [project_path] -dep [dep_path] <-out [out_path]>   #以package为粒度计算，dep_path为所有版本依赖结果文件夹，同时该文件夹下包含以版本号命名的文件夹
+  python measure.py -opt mv -pro [project_path] -ver [version] -dep [dep_path] -out [out_path]   #以package为粒度计算，dep_path为所有版本依赖结果文件夹，同时该文件夹下包含以版本号命名的文件夹;不同version之间使用英文状态下的?进行分隔
   ```
 
   **dep_path示例如下：**
@@ -22,8 +22,8 @@
 + ***对度量结果进行对比***
 
 ```python
-python measure.py -opt com -c1 [com_path1] -c2 [com_path2] <-out [out_path]>    #对两个不同版本的度量结果进行对比(以最新版本的度量结果为基准)，com_path为度量生成的包含dep.json和measure_result.json的结果路径
-python measure.py -opt com -c1 [com_path1] -c2 [com_path2] -pp [ppmapping_path]  <-out [out_path]>   #若新版本中的package name有变动，给出变动映射
+python measure.py -opt com -c1 [old_path] -c2 [new_path] -out [out_path]    #对两个不同版本的度量结果进行对比(以最新版本的度量结果为基准)，old_path为旧版本度量生成的包含dep.json和measure_result.json的结果路径，new_path为新版本度量生成的包含dep.json和measure_result.json的结果路径
+python measure.py -opt com -c1 [old_path] -c2 [new_path] -pp [ppmapping_path]  -out [out_path]   #若新版本中的package name有变动，给出变动映射
 ```
 
   package name映射文件格式示例：

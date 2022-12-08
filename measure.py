@@ -1,4 +1,4 @@
-# coding=gbk
+# coding: utf-8
 import os
 import sys
 import argparse
@@ -12,7 +12,8 @@ def command():
     print("begin_time:" + str(current_time))
 
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
-    parser.add_argument('-opt', help='function options(sv/mv/com)', default='')  # single version measure/multi-version measure/compare
+    parser.add_argument('-opt', help='function options(sv/mv/com)',
+                        default='')  # single version measure/multi-version measure/compare
     parser.add_argument('-pro', help='project path', default=r'')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')

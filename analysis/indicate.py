@@ -5,7 +5,7 @@ from operator import itemgetter
 
 
 def gen_xlsx(file_path, metric_change, modules_name, result):
-    workbook = xlsxwriter.Workbook(file_path)
+    workbook = xlsxwriter.Workbook(file_path, {'nan_inf_to_errors': True})
     bold = workbook.add_format({'bold': 1})
     _gen_change_sheet(workbook, bold, metric_change, modules_name)
     _gen_hotmap_sheet(workbook, bold, metric_change, modules_name)
