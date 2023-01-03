@@ -41,7 +41,11 @@ def _scan_problems(diff_folder_path, measure_diff, dep_diff, output):
         module_name.append(diff_module_name)
     [normalized_result, score_result] = get_score(change_list,
                                                   [[0.125], [0.125], [0.125], [0.125], [0.125], [0.125], [0.125],
+<<<<<<< HEAD
                                                    [0.125], [0.125], [0.125]],
+=======
+                                                   [0.125]],
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
                                                   MODULE_METRICS)
     module_score = np.array(list(zip(module_name, score_result)))
     module_score = module_score[np.lexsort(module_score.T)]
@@ -52,8 +56,13 @@ def _scan_problems(diff_folder_path, measure_diff, dep_diff, output):
         ['module_name', 'score', 'ranking', 'phenomenon', 'src', 'src_no_aosp', 'dest', 'dest_no_aosp', 'type'])
     index = 1
     for item in module_score:
+<<<<<<< HEAD
         if index > 100:
             break
+=======
+        # if index > 100:
+        #     break
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
         diff_module_name = item[0]
         # TODO: 暂时将逻辑修改为定位本身质量topX问题原因
         phenomenons = dict()

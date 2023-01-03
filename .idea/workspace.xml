@@ -4,16 +4,23 @@
     <list default="true" id="2fa28c47-627c-4c7d-8bd1-46a5eab9c5f4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/analysis/indicate.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/indicate.py" afterDir="false" />
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
       <change beforePath="$PROJECT_DIR$/build/measure/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Analysis-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/EXE-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/PKG-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/PYZ-00.pyz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/PYZ-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/PYZ-00.toc" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/build/measure/Tree-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Tree-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/Tree-01.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Tree-01.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/Tree-02.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/Tree-02.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/base_library.zip" afterDir="false" />
+=======
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
       <change beforePath="$PROJECT_DIR$/build/measure/measure.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/measure.pkg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/warn-measure.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/warn-measure.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/measure/xref-measure.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/measure/xref-measure.html" afterDir="false" />
@@ -22,7 +29,10 @@
       <change beforePath="$PROJECT_DIR$/function_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_file.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.spec" beforeDir="false" afterPath="$PROJECT_DIR$/measure.spec" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/util/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/metrics.py" afterDir="false" />
+=======
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,10 +40,24 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="update" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/util/metrics.py" root0="FORCE_HIGHLIGHTING" />
+<<<<<<< HEAD
     <setting file="file://$PROJECT_DIR$/detect_algo/detect_root_cause.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/module_measurement/module_metric_compete.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/measure.py" root0="FORCE_HIGHLIGHTING" />
@@ -41,6 +65,15 @@
     <setting file="file://$PROJECT_DIR$/function_file.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/detect_algo/arch_debt/regression_model/model_selector.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/module_measurement/moduarity/sf_measure.py" root0="FORCE_HIGHLIGHTING" />
+=======
+    <setting file="file://$PROJECT_DIR$/detect_algo/arch_debt/regression_model/model_selector.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/measure.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/module_measurement/module_metric_compete.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/detect_algo/detect_root_cause.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/module_measurement/moduarity/sf_measure.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/util/json_operator.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/function_file.py" root0="FORCE_HIGHLIGHTING" />
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
   </component>
   <component name="ProjectId" id="2CRJasxE94MkP8FwBKALqgWvhGp" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -53,13 +86,18 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+<<<<<<< HEAD
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../MicroEvaluator/backend" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/dist" />
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="File.Encoding" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\20465\Desktop\codes\evaluator1\Evaluator\dist" />
       <recent name="F:\research\codes\Evaluator" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -75,7 +113,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="D:\python\python.exe" />
+      <option name="SDK_HOME" value="D:\python3\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -116,7 +154,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -127,6 +177,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+<<<<<<< HEAD
           <url>file://$PROJECT_DIR$/analysis/indicate.py</url>
           <line>86</line>
           <option name="timeStamp" value="10" />
@@ -137,6 +188,8 @@
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+=======
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
           <url>file://$PROJECT_DIR$/util/json_operator.py</url>
           <line>24</line>
           <option name="timeStamp" value="15" />
@@ -147,6 +200,7 @@
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+<<<<<<< HEAD
           <url>file://$PROJECT_DIR$/function_file.py</url>
           <line>28</line>
           <option name="timeStamp" value="17" />
@@ -160,6 +214,21 @@
           <url>file://$PROJECT_DIR$/function_file.py</url>
           <line>49</line>
           <option name="timeStamp" value="20" />
+=======
+          <url>file://$PROJECT_DIR$/detect_algo/detect_root_cause.py</url>
+          <line>178</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/detect_root_cause.py</url>
+          <line>313</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/measure.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="25" />
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

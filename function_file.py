@@ -35,8 +35,13 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         # print(sys.argv[0])
         # print(os.path.realpath(sys.executable))
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
+<<<<<<< HEAD
         # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
         execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+=======
+        execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
+        # execute = "java -jar {} {}".format('./dist/commit.jar', project_path)
+>>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
         os.system(execute)
         os.makedirs(output, exist_ok=True)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
