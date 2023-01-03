@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # MicroEvaluator工具介绍
 
 ## 功能
@@ -18,7 +17,7 @@
 
   **dep_path示例如下：**
 
-  ![image-20220720113705869](./image/dep_path.png)
+  ![image-20220720113705869](.\image\dep_path.png)
 
 + ***对度量结果进行对比***
 
@@ -211,7 +210,7 @@ python measure.py -opt com -c1 [old_path] -c2 [new_path] -pp [ppmapping_path]  -
 
   package name映射文件格式示例：
 
-![image-20220314102614421](./image/ppmapping.png)
+![image-20220314102614421](.\image\ppmapping.png)
 
 ## 命令说明
 
@@ -362,4 +361,3 @@ python measure.py -opt com -c1 [old_path] -c2 [new_path] -pp [ppmapping_path]  -
   pip install Pyinstaller
   Pyinstaller -F measure.py -p 项目路径 
   ```
->>>>>>> 65cf1f20225a031e514319598974bf7affdb2544
