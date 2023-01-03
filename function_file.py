@@ -1,6 +1,5 @@
 import os
 import sys
-import itertools
 import shutil
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,7 +24,7 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
 
 
 def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
-    os.makedirs(os.path.join(output, ver), exist_ok=True)
+    # os.makedirs(os.path.join(output, ver), exist_ok=True)
     base_out_path = os.path.join(output, ver)
     if ver != '':
         os.chdir(project_path)
@@ -36,8 +35,8 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         # print(sys.argv[0])
         # print(os.path.realpath(sys.executable))
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
-        execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
-        # execute = "java -jar {} {}".format('./commit.jar', project_path)
+        # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
+        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
         os.system(execute)
         os.makedirs(output, exist_ok=True)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
@@ -47,7 +46,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
     if opt == 'mv':
         dep_dic = read_file(dep_path)
     else:
-        dep_dic = read_file(os.path.join(dep_path, os.listdir(dep_path)[0]))
+        dep_dic = read_file(os.path.join(base_out_path, os.listdir(dep_path)[0]))
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
             dep_dic, mapping_dic, base_out_path)

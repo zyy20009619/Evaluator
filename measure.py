@@ -1,6 +1,5 @@
-# coding=gbk
+# -*- coding:utf-8 -*-
 import os
-import sys
 import argparse
 import datetime
 from function_file import measure_package_metrics, compare_diff, measure_module_metrics, measure_multi_version
@@ -74,7 +73,7 @@ def command():
                 print('Compare finished!!!')
             else:
                 print('The file path is not exist!')
-        if diff:
+        elif diff:
             if analyse_data(diff, output):
                 print('Analyse finished!!!')
             else:
