@@ -11,6 +11,10 @@ CLASS_METRICS = ['CIS', 'NOM', 'NOP', 'NAC', 'NDC', 'NOI', 'NOID', 'CTM', 'IDCC'
                  'staticFieldsQty', 'defaultFieldsQty', 'finalFieldsQty', 'synchronizedFieldsQty', 'RFC', 'NOF', 'NOVM',
                  'NOSI', 'TCC', 'LCC', 'LCOM', 'LOCM*', 'WMC', 'c_modifiers']
 
-METHOD_METRICS = ['startLine', 'CBM', 'm_FAN_IN', 'm_FAN_OUT', 'IDMC', 'EDMC', 'IsOverride', 'OverridedQty',
+METHOD_METRICS = ['startLine', 'CBM', 'm_FAN_IN', 'm_FAN_OUT', 'IDMC', 'EDMC', 'OverridedQty',
                   'methodsInvokedQty', 'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'm_variablesQty',
                   'parametersQty', 'm_modifier']
+
+# METHOD_METRICS = ['startLine', 'CBM', 'm_FAN_IN', 'm_FAN_OUT', 'IDMC', 'EDMC', 'IsOverride', 'OverridedQty',
+#                   'methodsInvokedQty', 'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'm_variablesQty',
+#                   'parametersQty', 'm_modifier']

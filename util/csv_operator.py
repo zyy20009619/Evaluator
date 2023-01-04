@@ -1,5 +1,16 @@
+import os
 import csv
 from .metrics import *
+import pandas as pd
+
+
+def read_csv_folder(file_folder, class_aosp, class_not_aosp, method_aosp, method_not_aosp, ownership):
+    class_aosp_res = pd.read_csv(os.path.join(file_folder, class_aosp))
+    class_not_aosp_res = pd.read_csv(os.path.join(file_folder, class_not_aosp))
+    method_aosp_res = pd.read_csv(os.path.join(file_folder, method_aosp))
+    method_not_aosp_res = pd.read_csv(os.path.join(file_folder, method_not_aosp))
+    ownership_res = pd.read_csv(os.path.join(file_folder, ownership))
+    return class_aosp_res, class_not_aosp_res, method_aosp_res, method_not_aosp_res, ownership_res
 
 
 def write_to_csv(result_list, file_path):
