@@ -21,6 +21,7 @@ def command():
     parser.add_argument('-c1', help='the measure result path of the previous version', default=r'')
     parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
     parser.add_argument('-diff', help='the folder path of diff result', default=r'')
+    parser.add_argument('-det', help='detected files path', default=r'')
     parser.add_argument('-out', help='the folder path of output', default=r'')
 
     args = parser.parse_args()
@@ -33,6 +34,7 @@ def command():
     com1 = args.c1
     com2 = args.c2
     diff = args.diff
+    det = args.det
     output = args.out
 
     if opt == '':
@@ -79,6 +81,12 @@ def command():
                 print('Analyse finished!!!')
             else:
                 print('The file path is not exist!')
+        elif det:
+            if analyse_data(diff, output):
+                print('Analyse finished!!!')
+            else:
+                print('The file path is not exist!')
+
 
     current_time = datetime.datetime.now()
     print("end_time:" + str(current_time))
