@@ -13,21 +13,23 @@ def command():
 
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
     parser.add_argument('-opt', help='function options(sv/mv/com/det)',
-                        default='det')  # single version measure/multi-version measure/compare
+                        default='com')  # single version measure/multi-version measure/compare
     parser.add_argument('-pro', help='project path', default=r'')
+    parser.add_argument('-obj', help='object(aosp/others)', default=r'others')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
     parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
     parser.add_argument('-c1', help='the measure result path of the previous version', default=r'')
     parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
-    parser.add_argument('-diff', help='the folder path of diff result', default=r'')
-    parser.add_argument('-det', help='detected files path', default=r'G:\实验结果\lineage-out\d56f59389212df5462b342be7600c1974d27c0d5\detect')
-    parser.add_argument('-out', help='the folder path of output', default=r'G:\实验结果\lineage-out\d56f59389212df5462b342be7600c1974d27c0d5\detect')
+    parser.add_argument('-diff', help='the folder path of diff result', default=r'G:\实验结果\microservice\apollo-out\diffResult')
+    parser.add_argument('-det', help='detected files path', default=r'')
+    parser.add_argument('-out', help='the folder path of output', default=r'G:\实验结果\microservice\apollo-out')
 
     args = parser.parse_args()
     opt = args.opt
     pro = args.pro
+    obj = args.obj
     ver = args.ver
     dep = args.dep
     mpmapping = args.mp
@@ -78,7 +80,7 @@ def command():
             else:
                 print('The file path is not exist!')
         elif diff:
-            if analyse_data(diff, output):
+            if analyse_data(diff, output, obj):
                 print('Analyse finished!!!')
             else:
                 print('The file path is not exist!')

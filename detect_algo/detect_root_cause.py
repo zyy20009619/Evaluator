@@ -11,15 +11,15 @@ from util.csv_operator import write_to_csv
 import numpy as np
 
 
-def analyse_data(diff_folder_path, output):
+def analyse_data(diff_folder_path, output, obj):
     measure_diff, dep_diff = read_folder(diff_folder_path, 'measure_diff.json', 'dep_diff.json')
     if not (measure_diff or dep_diff):
         return False
-    _scan_problems(diff_folder_path, measure_diff, dep_diff, output)
+    _scan_problems(diff_folder_path, measure_diff, dep_diff, output, obj)
     return True
 
 
-def _scan_problems(diff_folder_path, measure_diff, dep_diff, output):
+def _scan_problems(diff_folder_path, measure_diff, dep_diff, output, obj):
     all_causes = dict()
     # 计算module
     # coupling_dic = dict()
@@ -57,11 +57,12 @@ def _scan_problems(diff_folder_path, measure_diff, dep_diff, output):
         diff_module_name = item[0]
         # TODO: 暂时将逻辑修改为定位本身质量topX问题原因
         phenomenons = dict()
-        # 先读取项目中所有实体以及其对应的数据类型，然后为每条问题依赖扫描是伴生对伴生的依赖 or 原生对原生依赖 or 伴生对伴生依赖
-        reader = csv.DictReader(open(os.path.join(output, 'final_ownership.csv')))
         no_aosp = dict()
-        for row in reader:
-            no_aosp[row['qualifiedName']] = row['not_aosp']
+        if obj == 'aosp':
+            # 先读取项目中所有实体以及其对应的数据类型，然后为每条问题依赖扫描是伴生对伴生的依赖 or 原生对原生依赖 or 伴生对伴生依赖
+            reader = csv.DictReader(open(os.path.join(output, 'final_ownership.csv')))
+            for row in reader:
+                no_aosp[row['qualifiedName']] = row['not_aosp']
         if float(measure_diff[diff_module_name]['scoh']) < 0:
             phenomenon = 'Violation of the high cohesion principle(scoh declining)'
             phenomenons[phenomenon] = _find_low_cohesion_causes(
@@ -176,11 +177,12 @@ def _scan_causes_of_cohesion(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['inherit'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['inherit'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'inherit'])
+                    elif dest_name in no_aosp and not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                             [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
-                             dest_name,
-                             no_aosp[dest_name], 'inherit'])
+                             dest_name, no_aosp[dest_name], 'inherit'])
                     # causes_entities.append(class_name)
                     # if 'coupling' not in causes_to_entities:
                     #     causes_to_entities['coupling'] = list()
@@ -193,7 +195,9 @@ def _scan_causes_of_cohesion(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['descendent'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['descendent'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'descendent'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                             [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                              dest_name,
@@ -217,7 +221,9 @@ def _scan_causes_of_cohesion(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['import'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['import'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'import'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                     [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                      dest_name,no_aosp[dest_name], 'import'])
@@ -233,7 +239,9 @@ def _scan_causes_of_cohesion(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['imported'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['imported'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'imported'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                     [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                      dest_name, no_aosp[dest_name], 'imported'])
@@ -257,11 +265,12 @@ def _scan_causes_of_cohesion(classes_dic, dep_diff, causes, count, no_aosp, phen
                             dest_name = dep_diff['call'][class_name][0]['name']
                         else:
                             dest_name = dep_diff['call'][class_name][0]
-                        if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                        if class_name not in no_aosp:
                             cause_list.append(
-                        [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
-                         dest_name,
-                         no_aosp[dest_name], 'call'])
+                                [item[0], item[1], index, phenomenon, class_name, dest_name, 'call'])
+                        elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                            cause_list.append([item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
+                         dest_name, no_aosp[dest_name], 'call'])
                         # causes_entities.append(class_name)
                         # if 'coupling' not in causes_to_entities:
                         #     causes_to_entities['coupling'] = list()
@@ -277,7 +286,10 @@ def _scan_causes_of_cohesion(classes_dic, dep_diff, causes, count, no_aosp, phen
                             dest_name = dep_diff['called'][class_name][0]['name']
                         else:
                             dest_name = dep_diff['called'][class_name][0]
-                        if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                        if class_name not in no_aosp:
+                            cause_list.append(
+                                [item[0], item[1], index, phenomenon, class_name, dest_name, 'called'])
+                        elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                             cause_list.append(
                         [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                          dest_name,
@@ -300,8 +312,7 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
         if 'cause2' not in causes:
             causes['cause2'] = dict()
             causes['cause2']['cause'] = 'Decreasing number of dependency'
-        if classes_dic[class_name]['CBC'] > 0 and classes_dic[class_name]['EDCC'] > 0.8 * classes_dic[class_name][
-            'CBC']:
+        if classes_dic[class_name]['CBC'] > 0 and classes_dic[class_name]['EDCC'] > 0.3 * classes_dic[class_name]['CBC']:
             # root cause1: by inherit
             if classes_dic[class_name]['c_FAN_OUT'] > 0 and classes_dic[class_name]['NAC'] > 0:
                 if class_name in dep_diff['inherit']:
@@ -311,7 +322,9 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['inherit'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['inherit'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'inherit'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                             [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                              dest_name, no_aosp[dest_name],
@@ -328,7 +341,9 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['descendent'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['descendent'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'descendent'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                             [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                              dest_name, no_aosp[dest_name],
@@ -351,7 +366,9 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['import'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['import'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'import'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                             [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                              dest_name, no_aosp[dest_name],
@@ -368,7 +385,9 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
                         dest_name = dep_diff['imported'][class_name][0]['name']
                     else:
                         dest_name = dep_diff['imported'][class_name][0]
-                    if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                    if class_name not in no_aosp:
+                        cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'imported'])
+                    elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                         cause_list.append(
                             [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                              dest_name, no_aosp[dest_name],
@@ -395,7 +414,9 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
                             dest_name = dep_diff['call'][class_name][0]['name']
                         else:
                             dest_name = dep_diff['call'][class_name][0]
-                        if class_name in no_aosp and dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                        if class_name not in no_aosp:
+                            cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'call'])
+                        elif dest_name in no_aosp and  not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                             cause_list.append(
                                 [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                                  dest_name, no_aosp[dest_name],
@@ -415,7 +436,9 @@ def _scan_causes_of_coupling(classes_dic, dep_diff, causes, count, no_aosp, phen
                             dest_name = dep_diff['called'][class_name][0]['name']
                         else:
                             dest_name = dep_diff['called'][class_name][0]
-                        if class_name in no_aosp and dest_name in no_aosp and not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
+                        if class_name not in no_aosp:
+                            cause_list.append([item[0], item[1], index, phenomenon, class_name, dest_name, 'called'])
+                        elif dest_name in no_aosp and not (no_aosp[class_name] == '0' and no_aosp[dest_name] == '0'):
                             cause_list.append(
                                 [item[0], item[1], index, phenomenon, class_name, no_aosp[class_name],
                                  dest_name, no_aosp[dest_name],
