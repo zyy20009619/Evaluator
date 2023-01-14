@@ -1,9 +1,8 @@
 import re
 import subprocess
 import os
-from pathlib import Path
 from util.csv_operator import write_to_csv
-from detect_algo.arch_debt.maintenance_cost_measurement.basedata import *
+from arch_debt.maintenance_cost_measurement.basedata import *
 
 
 def generateLog(project_path, version):

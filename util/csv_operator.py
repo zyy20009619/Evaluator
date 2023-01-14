@@ -4,6 +4,15 @@ from .metrics import *
 import pandas as pd
 
 
+def read_csv(file_path, file_name):
+    res = list()
+    with open(os.path.join(file_path, file_name)) as f:
+        reader = csv.reader(f)
+        for row in reader:
+            res.append(row)
+    return res
+
+
 def read_csv_folder(file_folder, class_aosp, class_not_aosp, method_aosp, method_not_aosp, ownership):
     class_aosp_res = pd.read_csv(os.path.join(file_folder, class_aosp))
     class_not_aosp_res = pd.read_csv(os.path.join(file_folder, class_not_aosp))
@@ -17,6 +26,13 @@ def write_to_csv(result_list, file_path):
     with open(file_path, "w", newline="", encoding='utf-8') as fp:
         writer = csv.writer(fp, delimiter=",")
         writer.writerows(result_list)
+
+
+def write_to_one_line(result_list, file_path):
+    with open(file_path, "w", newline="", encoding='utf-8') as fp:
+        writer = csv.writer(fp, delimiter=",")
+        for res in result_list:
+            writer.writerow(res)
 
 
 def write_result_to_csv(class_file_path, method_file_path, ver, content):
