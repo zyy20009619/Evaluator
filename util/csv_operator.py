@@ -13,12 +13,16 @@ def read_csv(file_path, file_name):
     return res
 
 
+def read_csv_to_pd(file_folder, file_name):
+    return pd.read_csv(os.path.join(file_folder, file_name))
+
+
 def read_csv_folder(file_folder, class_aosp, class_not_aosp, method_aosp, method_not_aosp, ownership):
-    class_aosp_res = pd.read_csv(os.path.join(file_folder, class_aosp))
-    class_not_aosp_res = pd.read_csv(os.path.join(file_folder, class_not_aosp))
-    method_aosp_res = pd.read_csv(os.path.join(file_folder, method_aosp))
-    method_not_aosp_res = pd.read_csv(os.path.join(file_folder, method_not_aosp))
-    ownership_res = pd.read_csv(os.path.join(file_folder, ownership))
+    class_aosp_res = read_csv_to_pd(file_folder, class_aosp)
+    class_not_aosp_res = read_csv_to_pd(file_folder, class_not_aosp)
+    method_aosp_res = read_csv_to_pd(file_folder, method_aosp)
+    method_not_aosp_res = read_csv_to_pd(file_folder, method_not_aosp)
+    ownership_res = read_csv_to_pd(file_folder, ownership)
     return class_aosp_res, class_not_aosp_res, method_aosp_res, method_not_aosp_res, ownership_res
 
 

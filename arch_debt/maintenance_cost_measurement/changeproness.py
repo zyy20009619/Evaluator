@@ -148,38 +148,37 @@ def search_issue_loc(mc_issue_loc_dict, file_name):
         return 0
 
 
-def change_bug_proness_compute(causes_entities, mc_author_dict, mc_commit_times_dict, mc_change_loc_dict,
+def change_bug_proness_compute(file_list_java, mc_author_dict, mc_commit_times_dict, mc_change_loc_dict,
                                mc_issue_count_dict, mc_issue_loc_dict):
-    all_entities_mc_list = list()
-    all_entities_mc_dic = dict()
+    all_files_mc_list = list()
+    all_files_mc_dic = dict()
 
-    for index in range(0, len(causes_entities)):
-        file_name = causes_entities[index]
-        author_count, author_id = search_author_count(mc_author_dict, file_name)
+    for index in range(0, len(file_list_java)):
+        file_name = file_list_java[index].replace('/', '\\')
+        author_count, authors_id = search_author_count(mc_author_dict, file_name)
         cmt_count, cmt_id = search_cmt_count(mc_commit_times_dict, file_name)
         change_loc = search_count(mc_change_loc_dict, file_name)
         [issue_count, issue_id, issue_cmt_count, issue_cmt_id] = search_issue_count(mc_issue_count_dict, file_name)
         issue_loc = search_issue_loc(mc_issue_loc_dict, file_name)
-        if len(author_id) != 0 or len(cmt_id) != 0 or change_loc != 0 or len(issue_id) != 0 or len(issue_cmt_id) != 0 or issue_loc != 0:
-            all_entities_mc_list.append(
-                [index, file_name, author_count, cmt_count, change_loc, issue_count, issue_cmt_count, issue_loc])
-            all_entities_mc_dic[file_name] = {'author_id': author_id, 'cmt_id': cmt_id,
-                                              'change_loc': change_loc, 'issue_id': issue_id,
-                                              'issue_cmt_id': issue_cmt_id, 'issue_loc': issue_loc}
-    return all_entities_mc_list, all_entities_mc_dic
+        all_files_mc_list.append(
+            [index, file_name, author_count, cmt_count, change_loc, issue_count, issue_cmt_count, issue_loc])
+        all_files_mc_dic[file_name] = {'author_id': authors_id, 'cmt_id': cmt_id,
+                                       'change_loc': change_loc, 'issue_id': issue_id,
+                                       'issue_cmt_id': issue_cmt_id, 'issue_loc': issue_loc}
+    return all_files_mc_list, all_files_mc_dic
 
 
-def changeProness(causes_entities, mc_file, outfile):
+def changeProness(file_list_java, mc_file, outfile):
     [mc_author_dict, mc_commit_times_dict, mc_change_loc_dict, mc_issue_count_dict, mc_issue_loc_dict] = read_mc_file(
         mc_file)
-    change_bug_cost_list, all_entities_mc_dic = change_bug_proness_compute(causes_entities, mc_author_dict,
-                                                                           mc_commit_times_dict,
-                                                                           mc_change_loc_dict, mc_issue_count_dict,
-                                                                           mc_issue_loc_dict)
+    all_files_mc_list, all_files_mc_dic = change_bug_proness_compute(file_list_java, mc_author_dict,
+                                                                     mc_commit_times_dict,
+                                                                     mc_change_loc_dict, mc_issue_count_dict,
+                                                                     mc_issue_loc_dict)
     title = ['id', 'filename', '#author', '#cmt', '#changeloc', '#issue', '#issue-cmt', 'issueLoc']
     final = list()
     final.append(title)
-    final.extend(change_bug_cost_list)
+    final.extend(all_files_mc_list)
     write_to_csv(final, outfile)
 
-    return all_entities_mc_dic
+    return all_files_mc_dic
