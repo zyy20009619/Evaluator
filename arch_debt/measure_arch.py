@@ -6,7 +6,7 @@ from util.csv_operator import write_to_csv, read_csv, read_csv_to_pd
 def com_mc(project_path, vers, cause_path, out_path):
     # causes_entities = read_csv(cause_path, 'causes_entities.csv')
     causes_entities = read_csv_to_pd(cause_path, 'causes_entities.csv')
-    measure_maintenance(project_path, list(set(causes_entities.icol(1))), vers, out_path)
+    measure_maintenance(project_path, list(set(causes_entities.iloc[:, -1])), vers, out_path)
 
 
 def measure_maintenance(project_path, causes_entities, vers, out_path):
@@ -25,10 +25,11 @@ def measure_maintenance(project_path, causes_entities, vers, out_path):
     issue_cmt_list = list()
     issue_loc_list = list()
 
-    for version in vers.split('?'):
+    versions = vers.split('?')
+    for version in versions:
         os.system('git checkout -f ' + version)
         # all commits infos
-        mc_file, file_list_java, file_loc_dict = gitlog(project_path, version)
+        mc_file, file_list_java, file_loc_dict = gitlog(project_path, version, out_path)
         # all files mc
         out_file = out_path + '/mc/' + version + '/file-mc.csv'
         all_files_mc_dic = changeProness(file_list_java, mc_file, out_file)
@@ -39,12 +40,12 @@ def measure_maintenance(project_path, causes_entities, vers, out_path):
                                   causes_issue_cmt_mc_list, causes_issue_loc_mc_list, cmt_list, change_loc_list,
                                   author_list,
                                   issue_list, issue_cmt_list, issue_loc_list)
-    write_to_csv(cmt_list, out_path + '/mc/' + version + '/causes_cmt.csv')
-    write_to_csv(change_loc_list, out_path + '/mc/' + version + '/causes_change_loc.csv')
-    write_to_csv(author_list, out_path + '/mc/' + version + '/causes_author.csv')
-    write_to_csv(issue_list, out_path + '/mc/' + version + '/causes_issue.csv')
-    write_to_csv(issue_cmt_list, out_path + '/mc/' + version + '/causes_issue_cmt.csv')
-    write_to_csv(issue_loc_list, out_path + '/mc/' + version + '/causes_issue_loc.csv')
+    write_to_csv(cmt_list, out_path + '/mc/causes_cmt.csv')
+    write_to_csv(change_loc_list, out_path + '/mc/causes_change_loc.csv')
+    write_to_csv(author_list, out_path + '/mc/causes_author.csv')
+    write_to_csv(issue_list, out_path + '/mc/causes_issue.csv')
+    write_to_csv(issue_cmt_list, out_path + '/mc/causes_issue_cmt.csv')
+    write_to_csv(issue_loc_list, out_path + '/mc/causes_issue_loc.csv')
     # return author_list, cmt_list, change_loc_list, issue_list
 
 
@@ -93,16 +94,22 @@ def com_causes_mc(all_files_mc_dic, file_loc_dict, causes_entities, causes_cmt_m
             causes_entities_issue_loc += all_files_mc_dic[cause_entity]['issue_loc']
             causes_entities_issue.extend(all_files_mc_dic[cause_entity]['issue_id'])
 
-    issue_list.append([len(list(set(causes_entities_issue))) / causes_entity_loc_num,
-                       len(list(set(non_causes_entities_issue))) / non_causes_entity_loc_num])
-    cmt_list.append([len(list(set(causes_entities_cmt))) / causes_entity_loc_num,
-                     len(list(set(non_causes_entities_cmt))) / non_causes_entity_loc_num])
+    issue_list.append(['causes_mc', 'no_causes_mc'])
+    issue_list.append([len(set(causes_entities_issue)) / causes_entity_loc_num,
+                       len(set(non_causes_entities_issue)) / non_causes_entity_loc_num])
+    cmt_list.append(['causes_mc', 'no_causes_mc'])
+    cmt_list.append([len(set(causes_entities_cmt)) / causes_entity_loc_num,
+                     len(set(non_causes_entities_cmt)) / non_causes_entity_loc_num])
+    change_loc_list.append(['causes_mc', 'no_causes_mc'])
     change_loc_list.append([causes_entities_change_loc / causes_entity_loc_num,
                             non_causes_entities_change_loc / non_causes_entity_loc_num])
-    author_list.append([len(list(set(causes_entities_author))) / causes_entity_loc_num,
-                        len(list(set(non_causes_entities_author))) / non_causes_entity_loc_num])
-    issue_cmt_list.append([len(list(set(causes_entities_issue_cmt))) / causes_entity_loc_num,
-                           len(list(set(non_causes_entities_issue_cmt))) / non_causes_entity_loc_num])
+    author_list.append(['causes_mc', 'no_causes_mc'])
+    author_list.append([len(set(causes_entities_author)) / causes_entity_loc_num,
+                        len(set(non_causes_entities_author)) / non_causes_entity_loc_num])
+    issue_cmt_list.append(['causes_mc', 'no_causes_mc'])
+    issue_cmt_list.append([len(set(causes_entities_issue_cmt)) / causes_entity_loc_num,
+                           len(set(non_causes_entities_issue_cmt)) / non_causes_entity_loc_num])
+    issue_loc_list.append(['causes_mc', 'no_causes_mc'])
     issue_loc_list.append([causes_entities_issue_loc / causes_entity_loc_num,
                            non_causes_entities_issue_loc / non_causes_entity_loc_num])
     #

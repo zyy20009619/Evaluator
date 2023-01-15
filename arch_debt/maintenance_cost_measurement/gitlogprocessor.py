@@ -5,8 +5,8 @@ from util.csv_operator import write_to_csv
 from arch_debt.maintenance_cost_measurement.basedata import *
 
 
-def generateLog(project_path, version):
-    mc_dir = project_path + "//mc//" + version
+def generateLog(project_path, version, out_path):
+    mc_dir = out_path + "//mc//" + version
 
     # if not os.path.exists(mc_dir):
     #     os.makedirs(mc_dir)
@@ -123,15 +123,15 @@ def saveCommitCollection(commit_collection):
     return res_list
 
 
-def gitlog(project_path, version):
-    git_log_file, git_loc_file = generateLog(project_path, version)
+def gitlog(project_path, version, out_path):
+    git_log_file, git_loc_file = generateLog(project_path, version, out_path)
     file_list_java = get_all_files_by_filter(project_path)
     # all loc infos
     file_loc_dict = git_loc(project_path, git_loc_file, file_list_java)
     commit_collection_java = processGitLog(git_log_file, file_list_java)
 
     res_list = saveCommitCollection(commit_collection_java)
-    mc_file = project_path + '//mc//' + version + '//history-java.csv'
+    mc_file = out_path + '//mc//' + version + '//history-java.csv'
     write_to_csv(res_list, mc_file)
 
     return mc_file, file_list_java, file_loc_dict
@@ -150,6 +150,7 @@ def git_loc(project_path, git_loc_file, file_list_java):
         if file_name in file_list_java:
             file_loc_dic[file_name] = loc
     return file_loc_dic
+
 
 def get_all_files_by_filter(project_path):
     file_list_java = list()
