@@ -24,6 +24,12 @@ def measure_maintenance(project_path, causes_entities, vers, out_path):
     issue_list = list()
     issue_cmt_list = list()
     issue_loc_list = list()
+    issue_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
+    cmt_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
+    change_loc_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
+    author_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
+    issue_cmt_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
+    issue_loc_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
 
     versions = vers.split('?')
     for version in versions:
@@ -94,22 +100,16 @@ def com_causes_mc(all_files_mc_dic, file_loc_dict, causes_entities, causes_cmt_m
             causes_entities_issue_loc += all_files_mc_dic[cause_entity]['issue_loc']
             causes_entities_issue.extend(all_files_mc_dic[cause_entity]['issue_id'])
 
-    issue_list.append(['causes_mc', 'no_causes_mc'])
     issue_list.append([len(set(causes_entities_issue)) / causes_entity_loc_num,
                        len(set(non_causes_entities_issue)) / non_causes_entity_loc_num])
-    cmt_list.append(['causes_mc', 'no_causes_mc'])
     cmt_list.append([len(set(causes_entities_cmt)) / causes_entity_loc_num,
                      len(set(non_causes_entities_cmt)) / non_causes_entity_loc_num])
-    change_loc_list.append(['causes_mc', 'no_causes_mc'])
     change_loc_list.append([causes_entities_change_loc / causes_entity_loc_num,
                             non_causes_entities_change_loc / non_causes_entity_loc_num])
-    author_list.append(['causes_mc', 'no_causes_mc'])
     author_list.append([len(set(causes_entities_author)) / causes_entity_loc_num,
                         len(set(non_causes_entities_author)) / non_causes_entity_loc_num])
-    issue_cmt_list.append(['causes_mc', 'no_causes_mc'])
     issue_cmt_list.append([len(set(causes_entities_issue_cmt)) / causes_entity_loc_num,
                            len(set(non_causes_entities_issue_cmt)) / non_causes_entity_loc_num])
-    issue_loc_list.append(['causes_mc', 'no_causes_mc'])
     issue_loc_list.append([causes_entities_issue_loc / causes_entity_loc_num,
                            non_causes_entities_issue_loc / non_causes_entity_loc_num])
     #
