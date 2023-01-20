@@ -1,20 +1,14 @@
-PROJECT_METRICS = ['SMQ', 'ODD', 'IDD', 'SPREAD', 'FOUCUS', 'ICF', 'ECF', 'REI']
-# PROJECT_METRICS = ['SMQ', 'ODD', 'IDD', 'ICF', 'ECF', 'REI']
+PROJECT_METRICS = ['score', 'SMQ', 'ODD', 'IDD', 'SPREAD', 'FOUCUS', 'ICF', 'ECF', 'REI', 'CHM', 'CHD']
 
-MODULE_METRICS = ['scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'DSM']
-# MODULE_METRICS = ['scoh', 'scop', 'odd', 'idd', 'icf', 'ecf', 'rei', 'DSM']
+MODULE_METRICS = ['scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm', 'chd', 'DSM']
 
-CLASS_METRICS = ['CIS', 'NOM', 'NOP', 'NAC', 'NDC', 'NOI', 'NOID', 'CTM', 'IDCC', 'IODD', 'IIDD', 'EDCC', 'c_FAN_IN',
-                 'c_FAN_OUT', 'CBC', 'c_chm', 'c_chd', 'c_variablesQty', 'privateMethodsQty', 'protectedMethodsQty',
+CLASS_METRICS = ['c_chm', 'c_chd', 'CBC', 'c_FAN_IN', 'c_FAN_OUT', 'IDCC', 'IODD', 'IIDD', 'EDCC', 'NOP', 'NAC', 'NDC', 'NOI', 'NOID',
+                 'RFC', 'NOSI', 'CTM', 'c_variablesQty', 'NOM', 'WMC', 'privateMethodsQty',  'NOVM', 'CIS', 'protectedMethodsQty',
                  'staticMethodsQty', 'defaultMethodsQty', 'abstractMethodsQty', 'finalMethodsQty',
-                 'synchronizedMethodsQty', 'publicFieldsQty', 'privateFieldsQty', 'protectedFieldsQty',
-                 'staticFieldsQty', 'defaultFieldsQty', 'finalFieldsQty', 'synchronizedFieldsQty', 'RFC', 'NOF', 'NOVM',
-                 'NOSI', 'TCC', 'LCC', 'LCOM', 'LOCM*', 'WMC', 'c_modifiers']
+                 'synchronizedMethodsQty', 'NOF','publicFieldsQty', 'privateFieldsQty', 'protectedFieldsQty',
+                 'staticFieldsQty', 'defaultFieldsQty', 'finalFieldsQty', 'synchronizedFieldsQty',
+                 'TCC', 'LCC', 'LCOM', 'LOCM*', 'c_modifiers']
 
-METHOD_METRICS = ['startLine', 'CBM', 'm_FAN_IN', 'm_FAN_OUT', 'IDMC', 'EDMC', 'OverridedQty',
+METHOD_METRICS = ['startLine', 'CBM', 'm_FAN_IN', 'm_FAN_OUT', 'IDMC', 'EDMC',
                   'methodsInvokedQty', 'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'm_variablesQty',
                   'parametersQty', 'm_modifier']
-
-# METHOD_METRICS = ['startLine', 'CBM', 'm_FAN_IN', 'm_FAN_OUT', 'IDMC', 'EDMC', 'IsOverride', 'OverridedQty',
-#                   'methodsInvokedQty', 'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'm_variablesQty',
-#                   'parametersQty', 'm_modifier']

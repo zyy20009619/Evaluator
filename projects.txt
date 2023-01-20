@@ -1,0 +1,4 @@
+G:\dataset1\sv\Spring5Microservices,spring5microservices,main
+G:\dataset1\sv\Realtime-Streaming-DataMicroservices-AppMicroservices,realtime-streaming-datamicroservices-appmicroservices,main
+G:\dataset1\sv\McPaspaoTakeAway,mcpaspaotakeaway,main
+G:\dataset1\sv\MicroService,microservice1,main

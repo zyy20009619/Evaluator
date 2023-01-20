@@ -23,34 +23,46 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
     return False
 
 
-def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
-    # os.makedirs(os.path.join(output, ver), exist_ok=True)
+def measure_package_metrics(pro_name, project_path, output, ver, mapping_dic, opt):
     base_out_path = os.path.join(output, ver)
+    os.makedirs(base_out_path, exist_ok=True)
     if ver != '':
         os.chdir(project_path)
         os.system("git checkout -f " + ver)
         os.system(GIT_COMMAND)
+
+        loc_count = os.popen('cloc .').read()
+        tmp_loc = loc_count.split('\n')
+        tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+        loc = tmp_loc1[len(tmp_loc1) - 1]
+
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         # print(sys.path[0])
         # print(sys.argv[0])
         # print(os.path.realpath(sys.executable))
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
         # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
+        # # 抽取结构依赖
+        os.system('java -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + pro_name)
+        if not os.path.exists(os.path.join(base_out_path, pro_name + '-out.json')):
+            shutil.move(pro_name + '-enre-out/' + pro_name + '-out.json', base_out_path)
+            shutil.rmtree(pro_name + '-enre-out')
+        # # 抽取历史依赖
         execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
         os.system(execute)
-        os.makedirs(output, exist_ok=True)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
             shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
 
     module_data = list()
     if opt == 'mv':
-        dep_dic = read_file(dep_path)
+        dep_dic = read_file(output)
     else:
-        dep_dic = read_file(os.path.join(base_out_path, os.listdir(dep_path)[0]))
+        # dep_dic = read_file(os.path.join(base_out_path, os.listdir(dep_path)[0]))
+        dep_dic = read_file(os.path.join(base_out_path, pro_name + '-out.json'))
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
             dep_dic, mapping_dic, base_out_path)
-        package_dic = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
+        package_dic, score, c_count, m_count = get_module_metric(dep_dic['variables'], package_info, inherit, descendent, method_class, dep,
                                         call, called, override, overrided, import_val, imported_val, parameter,
                                         method_define_var,
                                         method_use_field, 'package', module_data, os.path.join(base_out_path, 'cmt.csv'))
@@ -58,10 +70,11 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         result = list()
         for item in module_data:
             temp = [item[0] - item[1]]
-            temp.extend(item[2: 9: 1])
+            temp.extend(item[2: 11: 1])
             result.append(temp)
         tmp_pro = np.around(np.array(result).mean(axis=0).tolist(), 4)
         project_dic = dict()
+        tmp_pro = np.insert(tmp_pro, 0, score)
         project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
         project_metric['modules'] = package_dic
         project_dic[ver] = project_metric
@@ -69,7 +82,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
         write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
                             os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
-    return tmp_pro
+    return score, loc, len(module_data), c_count, m_count
 
 
 def measure_multi_version(project_path, dep_path, output, opt, vers):
@@ -117,7 +130,7 @@ def compare_diff(folder_path1, folder_path2, mapping, output):
     write_result_to_json(create_file_path(output + '\\diffResult', 'measure_diff.json'), measure_diff)
     write_result_to_json(create_file_path(output + '\\diffResult', 'dep_diff.json'), dep_diff)
     gen_xlsx(create_file_path(output + '\\diffResult', 'diff_result.xlsx'), metric_change, modules_name, measure_diff)
-    return True
+    return output + '\\diffResult'
 
 
 def _get_measure_diff(measure_json_dict1, measure_json_dict2, measure_diff, modules_name, metric_change):

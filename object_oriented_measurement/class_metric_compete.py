@@ -9,6 +9,9 @@ def class_and_method_metric_compete(variables, contain, inherit, descendent, par
                                     edcc_list, override, overrided, import_val, imported_val,
                                     fan_in, fan_out, iodd, iidd):
     class_dic = dict()
+    c_chm_list = list()
+    c_chd_list = list()
+    m_count = 0
     for c in contain:
         dic_id = contain[c]
         cis = 0
@@ -85,21 +88,21 @@ def class_and_method_metric_compete(variables, contain, inherit, descendent, par
         locm_normalized = _com_locm_normalized(len(methods_id), fields, current_method_use_field)
         c_chm = com_chm(methods_id, parameter, variables)
         c_chd = com_chd(methods_id, parameter, variables)
-        class_value = [cis, len(methods_id), nop, nac, ndc, _get_number_of_import(import_val, c),
-                       _get_number_of_import(imported_val, c), len(set(ctm)), idcc_list[c], iodd[c], iidd[c],
-                       edcc_list[c], fan_in[c], fan_out[c], fan_in[c] + fan_out[c], format(c_chm, '.4f'),
-                       format(c_chd, '.4f'), len(set(c_var)),
-                       private_methods_num, protected_methods_num, static_methods_num, default_methods_num,
+        c_chm_list.append(c_chm)
+        c_chd_list.append(c_chd)
+        class_value = [format(c_chm, '.4f'), format(c_chd, '.4f'), fan_in[c] + fan_out[c], fan_in[c], fan_out[c],
+                       idcc_list[c], iodd[c], iidd[c], edcc_list[c], nop, nac, ndc, _get_number_of_import(import_val, c),
+                       _get_number_of_import(imported_val, c),  len(set(rfc)), len(set(nosi)), len(set(ctm)), len(set(c_var)),
+                       len(methods_id), len(methods_id),
+                       private_methods_num, len(visible_methods_id), cis, protected_methods_num, static_methods_num, default_methods_num,
                        abstract_methods_num, final_methods_num, synchronized_methods_num,
-                       public_var_num, private_var_num, protected_var_num, static_var_num, default_var_num,
-                       final_var_num,
-                       synchronized_var_num, len(set(rfc)),
-                       len(fields), len(visible_methods_id), len(set(nosi)), 0, 0, 0, 0, len(methods_id),
-                       get_modifiers(variables[c])]
+                       len(fields), public_var_num, private_var_num, protected_var_num, static_var_num, default_var_num,
+                       final_var_num, synchronized_var_num, 0, 0, 0, 0, get_modifiers(variables[c])]
         class_metric = dict(zip(CLASS_METRICS, class_value))
+        m_count += len(method_dic)
         class_metric['methods'] = method_dic
         class_dic[variables[c]['qualifiedName']] = class_metric
-    return class_dic
+    return class_dic, c_chm_list, c_chd_list, m_count
 
 
 def _get_invoke_indirect_local(methods_id, invoke_local_methods):
