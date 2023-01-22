@@ -33,7 +33,7 @@ def evaluate(content, writer):
         vers = con[2].replace('\n', '').split('?')
         base_path = './data/' + pro_name + '-enre-out'
         os.makedirs(base_path, exist_ok=True)
-        for index in range(0, 1):
+        for index in range(0, 2):
             # 可维护性评估
             score, loc, m_num, c_num, me_num = measure_package_metrics(pro_name, pro_path,
                                                                        base_path, vers[index],
@@ -56,7 +56,7 @@ def identify(info, identify_res):
 
 
 def com_count(count_list, causes_to_entities):
-    df = pd.DataFrame(causes_to_entities, columns=['type', 'module_name', 'class_name', 'method_name'])
+    df = pd.DataFrame(causes_to_entities, columns=['type', 'reason', 'module_name', 'class_name', 'method_name'])
     coupling_df = df.loc[df['type'] == 'coupling']
     coupling_module_count = len(
         coupling_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
@@ -102,14 +102,19 @@ if __name__ == '__main__':
         writer = csv.writer(file1)
         writer.writerow(['project name', 'version', 'score', 'loc', '#modules', '#classes', '#methods'])
         info = evaluate(content, writer)
-    # with open('./identify.csv.', 'w', encoding='UTF8', newline='') as file2:
-    #     writer = csv.writer(file2)
-    #     writer.writerow(
-    #         ['project name', 'version', '#coupling-probelm-modules',
-    #          '#coupling-probelm-classes', '#coupling-probelm-methods', '#cohesion-probelm-modules',
-    #          '#cohesion-probelm-classes', '#cohesion-probelm-methods', '#functionality-probelm-modules',
-    #          '#functionality-probelm-classes', '#complexity-probelm-modules', '#evolution-probelm-modules',
-    #          '#all-probelm-modules', '#all-probelm-classes', '#all-probelm-methods'])
-    #     identify_res = list()
-    #     identify(info, identify_res)
-    #     writer.writerows(identify_res)
+    with open('./identify.csv.', 'w', encoding='UTF8', newline='') as file2:
+        writer = csv.writer(file2)
+        writer.writerow(
+            ['project name', 'version', '#coupling-probelm-modules',
+             '#coupling-probelm-classes', '#coupling-probelm-methods', '#cohesion-probelm-modules',
+             '#cohesion-probelm-classes', '#cohesion-probelm-methods', '#functionality-probelm-modules',
+             '#functionality-probelm-classes', '#complexity-probelm-modules', '#evolution-probelm-modules',
+             '#all-probelm-modules', '#all-probelm-classes', '#all-probelm-methods'])
+        identify_res = list()
+        # info = list()
+        # info.append([r'G:\实验结果\android\lineage-out',
+        #              ['d56f59389212df5462b342be7600c1974d27c0d5', 'f5600fff5c1fe764b568c7c885eb1aee022a81ca'],
+        #              r'G:\dataset1\AOSP\projects\LineageOS\base',
+        #              'LineageOS'])
+        identify(info, identify_res)
+        writer.writerows(identify_res)

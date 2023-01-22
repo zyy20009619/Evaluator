@@ -40,14 +40,9 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
         module_metric = dict(zip(MODULE_METRICS, module_value))
         module_metric['classes'] = class_dic
         module_list.append([module_metric['scoh'], module_metric['scop'],
-                            module_metric['odd'], module_metric['idd'],
-                            module_metric['spread'], module_metric['focus'],
-                            module_metric['icf'], module_metric['ecf'],
-                            module_metric['rei'],module_metric['chm'],
-                            module_metric['chd'], module_metric['DSM']])
+                            module_metric['odd'], module_metric['idd']])
         package_dic[package_name] = module_metric
     [normalized_result, score_result] = get_score(module_list,
-                                                  [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08],
-                                                   [0.08], [0.08], [0.08], [0.08], [0.08]],
+                                                  [[0.25], [0.25], [0.25], [0.25]],
                                                   MODULE_METRICS)
     return package_dic, np.mean(score_result), c_count, m_num

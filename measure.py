@@ -14,7 +14,7 @@ def command():
 
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
     parser.add_argument('-opt', help='function options(sv/mv/com/det/cmc)',
-                        default='cmc')  # single version measure/multi-version measure/compare
+                        default='com')  # single version measure/multi-version measure/compare
     parser.add_argument('-pro', help='project path', default=r'G:\数据集\MicroServices\projects\apollo')
     parser.add_argument('-obj', help='object(aosp/others)', default=r'')
     parser.add_argument('-ver', help='project version', default='v0.6.0?0.6.2?v0.6.3?v0.7.0?v0.8.0?v0.9.0?v0.9.1?v0.10.0?v0.10.1?v0.10.2?v0.11.0?v1.0.0?v1.1.0?v1.1.1?v1.1.2?v1.2.0?v1.3.0?v1.4.0?v1.5.0?v1.5.1?v1.6.0?v1.6.1?v1.6.2?v1.7.0?v1.7.1?v1.7.2?v1.8.0?v1.8.1?v1.8.2?v1.9.0?v1.9.1?v1.9.2?v2.0.0-RC1')
