@@ -92,7 +92,6 @@ def _compete_spread_and_focus(co_change_cluster, module_classes):
             temp_focus = temp_focus + (temp_count / len(module_classes[module_name])) * (temp_count / len(cluster))
         focus.append(float(format(temp_focus, '.4f')))
         spread.append(float(format(temp_spread / len(module_classes), '.4f')))
-    # 对spread值进行归一化
     # spreadResult = spreadNormalized(spread)
     return focus, spread
 
@@ -107,10 +106,8 @@ def spreadNormalized(tempSpread):
     max = np.max(tempSpread)
 
     for spread in tempSpread:
-        # 如果spread为0或1代表质量很好;2-5之间归一化到0.5;大于5直接归一化到0
         if max - min == 0 and max < 2:
             temp.append(1)
-        # spread越小越好
         temp.append((max - spread) / (max - min))
 
     return temp

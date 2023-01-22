@@ -2,7 +2,8 @@
 import os
 import shutil
 import csv
-import pandas as pd
+import subprocess
+# import pandas as pd
 from function_file import measure_package_metrics, compare_diff
 from detect_algo.detect_root_cause import analyse_data
 from arch_debt.measure_arch import com_mc
@@ -56,65 +57,99 @@ def identify(info, identify_res):
 
 
 def com_count(count_list, causes_to_entities):
-    df = pd.DataFrame(causes_to_entities, columns=['type', 'reason', 'module_name', 'class_name', 'method_name'])
-    coupling_df = df.loc[df['type'] == 'coupling']
-    coupling_module_count = len(
-        coupling_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
-    coupling_class_count = len(
-        coupling_df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
-    coupling_method_count = len(
-        coupling_df.drop_duplicates(subset='method_name', keep='first', inplace=False, ignore_index=False))
-    cohesion_df = df.loc[df['type'] == 'cohesion']
-    cohesion_module_count = len(
-        cohesion_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
-    cohesion_class_count = len(
-        cohesion_df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
-    cohesion_method_count = len(
-        cohesion_df.drop_duplicates(subset='method_name', keep='first', inplace=False, ignore_index=False))
-    functionality_df = df.loc[df['type'] == 'functionality']
-    functionality_module_count = len(
-        functionality_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
-    functionality_class_count = len(
-        functionality_df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
-    complexity_df = df.loc[df['type'] == 'complexity']
-    complexity_module_count = len(
-        complexity_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
-    evolution_df = df.loc[df['type'] == 'evolution']
-    evolution_module_count = len(
-        evolution_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    pass
+    # df = pd.DataFrame(causes_to_entities, columns=['type', 'reason', 'module_name', 'class_name', 'method_name'])
+    # coupling_df = df.loc[df['type'] == 'coupling']
+    # coupling_module_count = len(
+    #     coupling_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    # coupling_class_count = len(
+    #     coupling_df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
+    # coupling_method_count = len(
+    #     coupling_df.drop_duplicates(subset='method_name', keep='first', inplace=False, ignore_index=False))
+    # cohesion_df = df.loc[df['type'] == 'cohesion']
+    # cohesion_module_count = len(
+    #     cohesion_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    # cohesion_class_count = len(
+    #     cohesion_df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
+    # cohesion_method_count = len(
+    #     cohesion_df.drop_duplicates(subset='method_name', keep='first', inplace=False, ignore_index=False))
+    # functionality_df = df.loc[df['type'] == 'functionality']
+    # functionality_module_count = len(
+    #     functionality_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    # functionality_class_count = len(
+    #     functionality_df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
+    # complexity_df = df.loc[df['type'] == 'complexity']
+    # complexity_module_count = len(
+    #     complexity_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    # evolution_df = df.loc[df['type'] == 'evolution']
+    # evolution_module_count = len(
+    #     evolution_df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    #
+    # all_module_count = len(
+    #     df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
+    # all_class_count = len(
+    #     df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
+    # all_method_count = len(
+    #     df.drop_duplicates(subset='method_name', keep='first', inplace=False, ignore_index=False))
+    # count_list.extend([coupling_module_count, coupling_class_count, coupling_method_count, cohesion_module_count,
+    #                    cohesion_class_count, cohesion_method_count, functionality_module_count,
+    #                    functionality_class_count, complexity_module_count, evolution_module_count, all_module_count,
+    #                    all_class_count, all_method_count])
 
-    all_module_count = len(
-        df.drop_duplicates(subset='module_name', keep='first', inplace=False, ignore_index=False))
-    all_class_count = len(
-        df.drop_duplicates(subset='class_name', keep='first', inplace=False, ignore_index=False))
-    all_method_count = len(
-        df.drop_duplicates(subset='method_name', keep='first', inplace=False, ignore_index=False))
-    count_list.extend([coupling_module_count, coupling_class_count, coupling_method_count, cohesion_module_count,
-                       cohesion_class_count, cohesion_method_count, functionality_module_count,
-                       functionality_class_count, complexity_module_count, evolution_module_count, all_module_count,
-                       all_class_count, all_method_count])
+
+def count_file_loc_commit():
+    with open('./projects.txt', encoding='utf-8') as file:
+        content = file.readlines()
+    with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
+        writer = csv.writer(file1)
+        writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
+        for line in content:
+            project_path = line[0]
+            pro_name = line[1]
+            ver = line[2]
+            os.chdir(project_path)
+            os.system("git checkout -f " + ver)
+
+            # 统计代码行和文件数
+            loc_count = os.popen('cloc .').read()
+            tmp_loc = loc_count.split('\n')
+            tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+            loc = tmp_loc1[len(tmp_loc1) - 1]
+            file = tmp_loc1[len(tmp_loc1) - 1]
+            # 统计commit
+            log = subprocess.Popen('git log --numstat --date=iso', shell=True, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+            log_out = log.communicate()[0].decode().split('\n')
+            commit_num = 0
+            for log_len in log_out:
+                if "commit" in str(log_len):
+                    commit_num = commit_num + 1
+
+            os.chdir(os.path.dirname(os.path.abspath(__file__)))
+            writer.writerow([pro_name, ver, loc, file, commit_num])
 
 
 if __name__ == '__main__':
-    with open('./projects.txt', encoding='utf-8') as file:
-        content = file.readlines()
-    with open('./evaluate.csv.', 'w', encoding='UTF8', newline='') as file1:
-        writer = csv.writer(file1)
-        writer.writerow(['project name', 'version', 'score', 'loc', '#modules', '#classes', '#methods'])
-        info = evaluate(content, writer)
-    with open('./identify.csv.', 'w', encoding='UTF8', newline='') as file2:
-        writer = csv.writer(file2)
-        writer.writerow(
-            ['project name', 'version', '#coupling-probelm-modules',
-             '#coupling-probelm-classes', '#coupling-probelm-methods', '#cohesion-probelm-modules',
-             '#cohesion-probelm-classes', '#cohesion-probelm-methods', '#functionality-probelm-modules',
-             '#functionality-probelm-classes', '#complexity-probelm-modules', '#evolution-probelm-modules',
-             '#all-probelm-modules', '#all-probelm-classes', '#all-probelm-methods'])
-        identify_res = list()
-        # info = list()
-        # info.append([r'G:\实验结果\android\lineage-out',
-        #              ['d56f59389212df5462b342be7600c1974d27c0d5', 'f5600fff5c1fe764b568c7c885eb1aee022a81ca'],
-        #              r'G:\dataset1\AOSP\projects\LineageOS\base',
-        #              'LineageOS'])
-        identify(info, identify_res)
-        writer.writerows(identify_res)
+    count_file_loc_commit()
+    # with open('./projects.txt', encoding='utf-8') as file:
+    #     content = file.readlines()
+    # with open('./evaluate.csv.', 'w', encoding='UTF8', newline='') as file1:
+    #     writer = csv.writer(file1)
+    #     writer.writerow(['project name', 'version', 'score', 'loc', '#modules', '#classes', '#methods'])
+    #     info = evaluate(content, writer)
+    # with open('./identify.csv.', 'w', encoding='UTF8', newline='') as file2:
+    #     writer = csv.writer(file2)
+    #     writer.writerow(
+    #         ['project name', 'version', '#coupling-probelm-modules',
+    #          '#coupling-probelm-classes', '#coupling-probelm-methods', '#cohesion-probelm-modules',
+    #          '#cohesion-probelm-classes', '#cohesion-probelm-methods', '#functionality-probelm-modules',
+    #          '#functionality-probelm-classes', '#complexity-probelm-modules', '#evolution-probelm-modules',
+    #          '#all-probelm-modules', '#all-probelm-classes', '#all-probelm-methods'])
+    #     identify_res = list()
+    #     # info = list()
+    #     # info.append([r'G:\实验结果\android\lineage-out',
+    #     #              ['d56f59389212df5462b342be7600c1974d27c0d5', 'f5600fff5c1fe764b568c7c885eb1aee022a81ca'],
+    #     #              r'G:\dataset1\AOSP\projects\LineageOS\base',
+    #     #              'LineageOS'])
+    #     identify(info, identify_res)
+    #     writer.writerows(identify_res)

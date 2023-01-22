@@ -4,12 +4,11 @@ import math
 
 
 class Chameleon:
-    W = None # weight矩阵(方阵)
-    Conn = None # 连接矩阵(方阵)
+    W = None
+    Conn = None
     clusters = None
-    MI = 0 # 综合指数
- 
-    # 构造函数，初始化变量
+    MI = 0
+
     def __init__(self, datanum, mi):
         self.W = np.ones((datanum, datanum))
         self.Conn = np.zeros((datanum, datanum))
@@ -17,8 +16,7 @@ class Chameleon:
         self.clusters = []
         self.MI = mi
         self.inter_EC = None
-    
-    # 构造weight矩阵。根据两点间距离的倒数计算两点的相似度，作为连接权重
+
     def buildWeightMatrix(self, data):
         for i in range(data.shape[0]):
             row = data[i]
@@ -27,10 +25,9 @@ class Chameleon:
             temp = np.sum(temp, axis=1)
             self.W[i] = 1 / np.sqrt(temp)
             self.W[i][i] = 1.0
- 
-    # CHAMELEON第一阶段，按照K(包括自己)最邻近建立较小的子簇
+
     def buildSmallCluster(self):
-        K = 2  # 2最邻近，这里面包括它自己
+        K = 2
         for i in range(self.W.shape[0]):
             row = self.W[i]
             index = np.argsort(row)
@@ -38,8 +35,7 @@ class Chameleon:
             index = list(index)
             self.Conn[i, index] = 1
             self.Conn[i][i] = 0
-        
-        # 根据连接矩阵构造连通子图
+
         nodes = []
         edges = []
         for i in range(len(self.Conn)):
@@ -51,8 +47,7 @@ class Chameleon:
         G = nx.Graph()
         G.add_nodes_from(nodes)
         G.add_edges_from(edges)
- 
-        # 极大连通子图
+
         C = sorted(nx.connected_components(G), key=len, reverse=True)
         for c in C:
             cluster = []
@@ -60,14 +55,11 @@ class Chameleon:
                 cluster.append(node)
             self.clusters.append(cluster)
 
-    # 打印子簇
     def printClusters(self):
         for i in range(len(self.clusters)):
-            print("以下数据点属于第" + str(i) + "簇：")
             item = self.clusters[i]
             print(item)
-  
-    # CHAMELEON第二阶段，合并相对互联度RI和相对紧密度RC都较高的簇
+
     def cluster(self):
         self.interConnectivity()
         l = len(self.clusters)
@@ -94,7 +86,6 @@ class Chameleon:
                     break
                 j = j + 1
             i = i + 1
-        # 递归合并子簇
         if not end:
             self.cluster()
         return self.clusters
@@ -107,8 +98,7 @@ class Chameleon:
             for j in range(len(vec)):
                 for k in range(len(vec)):
                     self.inter_EC[i] += self.W[vec[j]][vec[k]]
- 
-    # 把簇b合并到簇a里面去
+
     def mergeClusters(self, a, b):
         item = self.clusters[b]
         self.clusters.pop(b)
