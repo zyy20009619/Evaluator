@@ -34,7 +34,7 @@ def evaluate(content, writer):
         vers = con[2].replace('\n', '').split('?')
         base_path = './data/' + pro_name + '-enre-out'
         os.makedirs(base_path, exist_ok=True)
-        for index in range(0, 2):
+        for index in range(0, 1):
             # 可维护性评估
             score, loc, m_num, c_num, me_num = measure_package_metrics(pro_name, pro_path,
                                                                        base_path, vers[index],
@@ -104,18 +104,19 @@ def count_file_loc_commit():
         writer = csv.writer(file1)
         writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
         for line in content:
-            project_path = line[0]
-            pro_name = line[1]
-            ver = line[2]
+            tmp = line.split(',')
+            project_path = tmp[0]
+            pro_name = tmp[1]
+            ver = tmp[2]
             os.chdir(project_path)
             os.system("git checkout -f " + ver)
 
             # 统计代码行和文件数
-            loc_count = os.popen('cloc .').read()
-            tmp_loc = loc_count.split('\n')
-            tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
-            loc = tmp_loc1[len(tmp_loc1) - 1]
-            file = tmp_loc1[len(tmp_loc1) - 1]
+            # loc_count = os.popen('cloc .').read()
+            # tmp_loc = loc_count.split('\n')
+            # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+            # loc = tmp_loc1[len(tmp_loc1) - 1]
+            # file = tmp_loc1[len(tmp_loc1) - 1]
             # 统计commit
             log = subprocess.Popen('git log --numstat --date=iso', shell=True, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT)
@@ -126,17 +127,17 @@ def count_file_loc_commit():
                     commit_num = commit_num + 1
 
             os.chdir(os.path.dirname(os.path.abspath(__file__)))
-            writer.writerow([pro_name, ver, loc, file, commit_num])
+            writer.writerow([pro_name, ver, 'loc', 'file', commit_num])
 
 
 if __name__ == '__main__':
-    count_file_loc_commit()
-    # with open('./projects.txt', encoding='utf-8') as file:
-    #     content = file.readlines()
-    # with open('./evaluate.csv.', 'w', encoding='UTF8', newline='') as file1:
-    #     writer = csv.writer(file1)
-    #     writer.writerow(['project name', 'version', 'score', 'loc', '#modules', '#classes', '#methods'])
-    #     info = evaluate(content, writer)
+    # count_file_loc_commit()
+    with open('./projects.txt', encoding='utf-8') as file:
+        content = file.readlines()
+    with open('./evaluate.csv', 'w', encoding='UTF8', newline='') as file1:
+        writer = csv.writer(file1)
+        writer.writerow(['project name', 'version', 'score', 'loc', '#modules', '#classes', '#methods'])
+        info = evaluate(content, writer)
     # with open('./identify.csv.', 'w', encoding='UTF8', newline='') as file2:
     #     writer = csv.writer(file2)
     #     writer.writerow(

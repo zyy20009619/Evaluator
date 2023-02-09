@@ -24,15 +24,20 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
         else:
             package_name = variables[package]['qualifiedName']
         module_value, idcc_list, edcc_list, fan_in, fan_out, iodd, iidd = com_struct_metric(package,
-                                                                                                    package_info,
-                                                                                                    struct_dep)
+                                                                                            package_info,
+                                                                                            struct_dep)
         module_value.extend(
             [spread_dic[package_name], focus_dic[package_name], icf_dic[package_name], ecf_dic[package_name],
              rei_dic[package_name]])
-        class_dic, c_chm_list, c_chd_list, m_count = class_and_method_metric_compete(variables, package_info[package], inherit, descendent, parameter,
-                                                    method_define_var, method_use_field, method_class, call, called,
-                                                    idcc_list, edcc_list, override, overrided, import_val, imported_val,
-                                                    fan_in, fan_out, iodd, iidd)
+        class_dic, c_chm_list, c_chd_list, m_count = class_and_method_metric_compete(variables, package_info[package],
+                                                                                     inherit, descendent, parameter,
+                                                                                     method_define_var,
+                                                                                     method_use_field, method_class,
+                                                                                     call, called,
+                                                                                     idcc_list, edcc_list, override,
+                                                                                     overrided, import_val,
+                                                                                     imported_val,
+                                                                                     fan_in, fan_out, iodd, iidd)
         c_count += len(class_dic)
         m_num += m_count
         module_value.extend([np.mean(c_chm_list), np.mean(c_chd_list), len(package_info[package])])
@@ -44,5 +49,5 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
         package_dic[package_name] = module_metric
     [normalized_result, score_result] = get_score(module_list,
                                                   [[0.25], [0.25], [0.25], [0.25]],
-                                                  MODULE_METRICS)
+                                                  ['scoh', 'scop', 'odd', 'idd'])
     return package_dic, np.mean(score_result), c_count, m_num
