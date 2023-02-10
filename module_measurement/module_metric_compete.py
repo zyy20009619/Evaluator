@@ -12,8 +12,8 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
                       module_data, cmt_path):
     package_dic = dict()
     # measure history dep
-    focus_dic, spread_dic, module_classes, commit = get_spread_and_focus(cmt_path, package_info, variables)
-    icf_dic, ecf_dic, rei_dic = get_icf_ecf_rei(module_classes, commit)
+    # focus_dic, spread_dic, module_classes, commit = get_spread_and_focus(cmt_path, package_info, variables)
+    # icf_dic, ecf_dic, rei_dic = get_icf_ecf_rei(module_classes, commit)
     # measure structure dep
     module_list = list()
     c_count = 0
@@ -26,9 +26,10 @@ def get_module_metric(variables, package_info, inherit, descendent, method_class
         module_value, idcc_list, edcc_list, fan_in, fan_out, iodd, iidd = com_struct_metric(package,
                                                                                             package_info,
                                                                                             struct_dep)
-        module_value.extend(
-            [spread_dic[package_name], focus_dic[package_name], icf_dic[package_name], ecf_dic[package_name],
-             rei_dic[package_name]])
+        # module_value.extend(
+        #     [spread_dic[package_name], focus_dic[package_name], icf_dic[package_name], ecf_dic[package_name],
+        #      rei_dic[package_name]])
+        module_value.extend([0, 0, 0, 0, 0])
         class_dic, c_chm_list, c_chd_list, m_count = class_and_method_metric_compete(variables, package_info[package],
                                                                                      inherit, descendent, parameter,
                                                                                      method_define_var,
