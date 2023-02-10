@@ -42,12 +42,12 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         # print(sys.argv[0])
         # print(os.path.realpath(sys.executable))
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
-        # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
+        execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
         # os.system('java -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + pro_name)
         # if not os.path.exists(os.path.join(base_out_path, pro_name + '-out.json')):
         #     shutil.move(pro_name + '-enre-out/' + pro_name + '-out.json', base_out_path)
         #     shutil.rmtree(pro_name + '-enre-out')
-        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+        # execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
         os.system(execute)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
             shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)

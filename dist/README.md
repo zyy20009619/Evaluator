@@ -12,12 +12,8 @@
 + ***多版本度量功能：根据多版本依赖结果度量每个项目质量，并给出项目整体质量变化趋势图***
 
   ```python
-  python measure.py -opt mv -pro [project_path] -ver [version] -dep [dep_path] -out [out_path]   #以package为粒度计算，dep_path为所有版本依赖结果文件夹，同时该文件夹下包含以版本号命名的文件夹;不同version之间使用英文状态下的?进行分隔
+  python measure.py -opt mv -pro [project_path] -ver [version] -dep [dep_path] -out [out_path]   #以package为粒度计算，dep_path为只存在依赖文件的文件夹路径；如有多个项目、版本或dep路径，使用?分隔连接
   ```
-
-  **dep_path示例如下：**
-
-  ![image-20220720113705869](./image/dep_path.png)
 
 + ***对度量结果进行对比***
 
