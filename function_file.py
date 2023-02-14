@@ -18,12 +18,12 @@ GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription
 def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
     mapping_dic = read_file(mapping_path)
     if mapping_dic:
-        measure_package_metrics(project_path, dep_path, output, '', mapping_dic, opt)
+        measure_package_metrics('', project_path, dep_path, output, '', mapping_dic, opt)
         return True
     return False
 
 
-def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
+def measure_package_metrics(project_name, project_path, dep_path, output, ver, mapping_dic, opt):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
     if ver != '':
@@ -43,21 +43,24 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         # print(os.path.realpath(sys.executable))
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
         # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
-        # os.system('java -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + pro_name)
-        # if not os.path.exists(os.path.join(base_out_path, pro_name + '-out.json')):
-        #     shutil.move(pro_name + '-enre-out/' + pro_name + '-out.json', base_out_path)
-        #     shutil.rmtree(pro_name + '-enre-out')
-        # execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
-        # os.system(execute)
-        # if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
-        #     shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
+        if not project_name == '':
+            os.system('java -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + project_name)
+            if not os.path.exists(os.path.join(base_out_path, project_name + '-out.json')):
+                shutil.move(project_name + '-enre-out/' + project_name + '-out.json', base_out_path)
+                shutil.rmtree(project_name + '-enre-out')
+        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+        os.system(execute)
+        if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
+            shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
 
     module_data = list()
     # if opt == 'mv':
     #     dep_dic = read_file(output)
     # else:
-    dep_dic = read_file(dep_path)
-        # dep_dic = read_file(os.path.join(base_out_path, pro_name + '-out.json'))
+    if not project_name == '':
+        dep_dic = read_file(os.path.join(base_out_path, project_name + '-out.json'))
+    else:
+        dep_dic = read_file(dep_path)
     if dep_dic:
         package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
             dep_dic, mapping_dic, base_out_path)
@@ -81,7 +84,8 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
         write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
                             os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
-    # return score, loc, len(module_data), c_count, m_count
+    if not project_name == '':
+        return score, loc, len(module_data), c_count, m_count
     return tmp_pro
 
 
@@ -100,7 +104,7 @@ def measure_multi_version(project_path, dep_path, output, opt, vers):
         #     mapping_dic = read_file(mapping_file)
         # dep_file = os.listdir(current_path)[0]
         dep_file = os.listdir(dep_list[index])[0]
-        tmp_pro = measure_package_metrics(pro_list[index], os.path.join(dep_list[index], dep_file), output, ver, mapping_dic, opt)
+        tmp_pro = measure_package_metrics('', pro_list[index], os.path.join(dep_list[index], dep_file), output, ver, mapping_dic, opt)
         project_list.append(tmp_pro)
         index += 1
 

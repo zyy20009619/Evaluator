@@ -1,0 +1,9 @@
+G:\dataset1\others\apollo,apollo,v0.4.0?v0.5.0
+G:\dataset1\others\argouml,argouml,VERSION_0_18_1?VERSION_0_20
+G:\dataset1\others\AxonFramework,AxonFramework,axon-3.2?axon-3.3
+G:\dataset1\others\bus,bus,5.0.0?5.1.0
+G:\dataset1\others\junit4,junit4,r4.11?r4.12-beta-1
+G:\dataset1\others\Jupiter,Jupiter,1.1.0.Final?1.1.1.Final
+G:\dataset1\others\Sentinel,Sentinel,0.1.0?0.1.1
+G:\dataset1\others\servicecomb-java-chassis,servicecomb-java-chassis,1.1.0?1.2.0
+G:\dataset1\others\train-ticket,train-ticket,0.0.1?0.0.2

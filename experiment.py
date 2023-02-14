@@ -36,7 +36,7 @@ def evaluate(content, writer):
         os.makedirs(base_path, exist_ok=True)
         for index in range(0, 1):
             # 可维护性评估
-            score, loc, m_num, c_num, me_num = measure_package_metrics(pro_name, pro_path,
+            score, loc, m_num, c_num, me_num = measure_package_metrics(pro_name, pro_path, '',
                                                                        base_path, vers[index],
                                                                        dict(), 'sv')
             writer.writerow([pro_name, vers[index], score, loc, m_num, c_num, me_num])
