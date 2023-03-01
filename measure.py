@@ -20,8 +20,8 @@ def command():
     parser.add_argument('-pro', help='project path', default=r'')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')
-    parser.add_argument('-mp', help='mapping between module and packages', default='')
-    parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
+    # parser.add_argument('-mp', help='mapping between module and packages', default='')
+    # parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
     parser.add_argument('-c1', help='the measure result path of the previous version', default=r'')
     parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
     parser.add_argument('-diff', help='the folder path of diff result', default=r'')
@@ -52,7 +52,7 @@ def command():
             if obj == '':
                 print('please input data object!!')
                 return
-            elif pro == '':
+            elif opt != 'det' and pro == '':
                 print('please input project path!!')
                 return
             elif opt != 'det' and ver == '':

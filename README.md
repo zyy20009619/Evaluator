@@ -2,47 +2,48 @@
 
 ## 功能
 
-- ***单版本度量功能：根据项目功能依赖文件度量项目质量***
+- **单版本度量功能：根据项目功能依赖文件度量项目质量**
 
      ```python
-     python measure.py -opt sv -obj [object] -pro [project_path] -ver [version] <-dep [dep_path]> -out [out_path]  #object为此次度量的项目类型；version为当前需要度量的版本号(若仅为单版本，输入main作为版本号)；dep_path若不输入系统会自动提取，若输入路径如示例所示；out_path必须输入
+     python measure.py -opt sv -obj [object] -pro [project_path] -ver [version] <-dep [dep_path]> -out [out_path]
      ```
 
-+ ***多版本度量功能：根据多版本依赖结果度量每个项目质量，并给出项目整体质量变化趋势图***
++ **多版本度量功能：根据多版本依赖结果度量每个项目质量，并给出项目生长曲线图**
 
   ```python
-  python measure.py -opt mv -obj [object] -pro [project_path] -ver [version] <-dep [dep_path]> -out [out_path]   #object为此次度量的项目类型；version为当前需要度量的版本号(若仅为单版本，输入main作为版本号)；dep_path若不输入系统会自动提取，若输入路径如示例所示；out_path必须输
+  python measure.py -opt mv -obj [object] -pro [project_path] -ver [version] <-dep [dep_path]> -out [out_path]
   ```
 
-+ ***对度量结果进行对比***
++ **对度量结果进行对比：根据两个版本度量结果对比，给出模块质量腐化热点图(diff_result.xlsx)**
 
-```python
-python measure.py -opt com -c1 [old_path] -c2 [new_path] -out [out_path]    #对两个不同版本的度量结果进行对比(以最新版本的度量结果为基准)，old_path为旧版本度量生成的包含dep.json和measure_result.json的结果路径，new_path为新版本度量生成的包含dep.json和measure_result.json的结果路径
-```
+  ```
+  python measure.py -opt com -c1 [old_path] -c2 [new_path] -out [out_path]
+  ```
 
-- ***定位可维护性问题根因***
+- **定位可维护性问题根因：根据模块腐化情况，定位导致腐化的根因**
 
-  
+  ```
+  python measure.py -opt det -diff [diff_path] -out [out_path]
+  ```
 
 ## 命令说明
 
  ```python
- usage: measure.py [-h] [-opt OPT] [-pro PRO] [-dep DEP] [-mp MP] [-pp PP] [-c1 C1] [-c2 C2] [-diff DIFF] [-out OUT]
+ usage: measure.py [-h] [-opt OPT] [-obj OBJ] [-ver VER] [-pro PRO] [-dep DEP] [-c1 C1] [-c2 C2] [-diff DIFF] [-out OUT]
      
    -h, --help  show this help message and exit
-   -opt OPT    必选参数，功能选项。提供sv/mv/com/det四种选择
-   -obj OBJ    可选参数，处理对象。提供aosp/honor/micro/others四种场景
-   -pro PRO    可选参数，项目路径
-   -dep DEP    可选依赖文件的路径，若不输入系统会自动提取到输出，若输入路径如示例所示
-   -mp MP      mapping between module and packages
-   -pp PP      mapping between old package name and new package name
-   -c1 C1      the measure result path of the previous version
-   -c2 C2      the measure result path of the later version
-   -diff DIFF  the folder path of diff result
-   -out OUT    the folder path of output
+   -opt OPT    必选参数，功能选项，提供sv/mv/com/det四种选择
+   -obj OBJ    处理对象，目前提供aosp/honor/others三种场景(除com功能，其他功能下此选项为必选参数)
+   -ver VER    处理版本，若为单版本度量不存在版本号请输入main作为版本号，若为多版本使用?连接不同版本号
+   -pro PRO    项目路径(除com/det功能，其他功能下此选项为必选参数)
+   -dep DEP    可选参数，依赖文件路径，若输入应遵循示例所示格式，若不输入工具会自动生成依赖文件到out_path
+   -c1 C1      对比功能较老版本度量结果路径，路径下需包含measure_result.json和dep.json
+   -c2 C2      对比功能较新版本度量结果路径，路径下需包含measure_result.json和dep.json
+   -diff DIFF  定位功能输入路径，路径包含measure_diff.json和dep_diff.json
+   -out OUT    必选参数，结果输出文件夹
  ```
 
-##### *dep_path示例如下：*
+##### **dep_path示例如下：**
 
 ![image-20220720113705869](.\image\dep_path.png)
 
@@ -59,7 +60,7 @@ python measure.py -opt com -c1 [old_path] -c2 [new_path] -out [out_path]    #对
    Pyinstaller -F measure.py -p 项目路径
    ```
 
-   打包完成后在dist目录下命令行执行`measure.exe -opt ...`使用（注意：不要挪动dist下jar包位置）
+   打包完成后在dist目录下执行`measure.exe -opt ...`使用（注意：不要挪动dist下jar包位置）
 
 ## 指标说明
 
@@ -185,12 +186,12 @@ python measure.py -opt com -c1 [old_path] -c2 [new_path] -out [out_path]    #对
 
 ## 参考文献
 
-[1]钟陈星, 李杉杉, 张贺,等. 限界上下文视角下的微服务粒度评估[J]. 软件学报, 2019(10).
+[1] C. Zhong, S. Li, H. Zhang, and C. Zhang, “Evaluating granularity of microservices-oriented system based on bounded context,” Journal of Software, vol. 30, no. 10, pp. 3227–3241, 2019.
 
-[2]微服务指标
+[2] W. Jin, D. Zhong, Y. Zhang, M. Yang, and T. Liu, “Microservice maintainability measurement based on multi-sourced feature space,”Journal of Software, vol. 32, no. 5, pp. 1322–1340, 2021.
 
-[3]spread and focus
+[3] L. L. Silva, M. T. Valente, and M. d. A. Maia, “Assessing modularity using co-change clusters,” in Proceedings of the 13th international conference on Modularity, pp. 49–60, 2014.
 
-[4]QMOOD
+[4] J. Bansiya and C. G. Davis, “A hierarchical model for object-oriented design quality assessment,” IEEE Transactions on software engineering,vol. 28, no. 1, pp. 4–17, 2002.
 
-[5]CK
+[5] S. R. Chidamber and C. F. Kemerer, “A metrics suite for object oriented design,” IEEE Transactions on software engineering, vol. 20, no. 6, pp. 476–493, 1994.
