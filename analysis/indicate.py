@@ -7,8 +7,8 @@ from operator import itemgetter
 def gen_xlsx(file_path, metric_change, modules_name, result):
     workbook = xlsxwriter.Workbook(file_path, {'nan_inf_to_errors': True})
     bold = workbook.add_format({'bold': 1})
-    _gen_change_sheet(workbook, bold, metric_change, modules_name)
     _gen_hotmap_sheet(workbook, bold, metric_change, modules_name)
+    _gen_change_sheet(workbook, bold, metric_change, modules_name)
     _gen_diff_sheet(workbook, bold, result)
     workbook.close()
 
@@ -42,7 +42,7 @@ def _gen_hotmap_sheet(workbook, bold, metric_change, modules_name):
                 norm_value = float(
                     format((max[index2] - metric_change[index1][index2]) / (max[index2] - min[index2]), '.4f'))
             worksheet1.write_number(index1 + 1, index2 + 1, norm_value)
-    worksheet1.conditional_format(1, 1, len(metric_change) + 1, 10,
+    worksheet1.conditional_format(1, 1, len(metric_change) + 1, 12,
                                   {'type': '3_color_scale', 'min_color': '#F08080', 'max_color': '#006400'})
 
 

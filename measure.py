@@ -108,8 +108,9 @@ def command():
 
 
 def test():
-    measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
-    # compare_diff('com1', 'com2', 'ppmapping', 'output')
+    # measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
+    # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\s', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\t', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
+    analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(s2t)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'aosp')
 
 
 if __name__ == '__main__':
