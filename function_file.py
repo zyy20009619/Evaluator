@@ -23,7 +23,7 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
     return False
 
 
-def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, opt):
+def measure_package_metrics(project_name, project_path, dep_path, output, ver, mapping_dic, opt):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
     if ver != '':
@@ -51,7 +51,6 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, op
         else:
             if not os.path.exists(os.path.join(dep_path, ver)):
                 shutil.move(os.rename(os.listdir(os.path.join(dep_path, ver))[0], project_name + '-out.json'), base_out_path)
-
         execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
         os.system(execute)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
@@ -96,19 +95,13 @@ def measure_multi_version(project_path, dep_path, output, opt, vers, obj):
         if obj == 'honor':
             pro_path = project_path[index]
             dep_path = dep_path[index]
-        # current_path = os.path.join(dep_path, ver)
         mapping_dic = dict()
-        # if len(os.listdir(current_path)) > 1:
-        #     mapping_file = [file for f in current_path if 'mapping' in f][0]
-        #     mapping_dic = read_file(mapping_file)
-        # dep_file = os.listdir(current_path)[0]
-        # dep_file = os.listdir(dep_list[index])[0]
         tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, opt)
         project_list.append(tmp_pro)
         index += 1
 
     project_list = np.around(project_list, 4)
-    draw_line_chart(version_list, project_list, output)
+    draw_line_chart(vers, project_list, output)
 
 
 def draw_line_chart(version_list, project_list, output):
