@@ -14,9 +14,10 @@ def command():
 
     parser = argparse.ArgumentParser(description='Measure architecture quality.')
     parser.add_argument('-opt', help='function options(sv/mv/com/det/cmc)',
-                        default='')  # single version measure/multi-version measure/compare
+                        default='mv')  # single version measure/multi-version measure/compare
+    # for different objects
+    parser.add_argument('-obj', help='object(aosp/others/honor/micro)', default=r'aosp')
     parser.add_argument('-pro', help='project path', default=r'')
-    parser.add_argument('-obj', help='object(aosp/others)', default=r'')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')
     parser.add_argument('-mp', help='mapping between module and packages', default='')
@@ -25,8 +26,8 @@ def command():
     parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
     parser.add_argument('-diff', help='the folder path of diff result', default=r'')
     parser.add_argument('-det', help='detected files path', default=r'')
-    parser.add_argument('-cause', help='causes files path', default=r'G:\实验结果\microservice\apollo-out\analyseResult')
-    parser.add_argument('-out', help='the folder path of output', default=r'G:\实验结果\microservice\apollo-out')
+    parser.add_argument('-cause', help='causes files path', default=r'')
+    parser.add_argument('-out', help='the folder path of output', default=r'')
 
     args = parser.parse_args()
     opt = args.opt
@@ -46,24 +47,29 @@ def command():
     if opt == '':
         print('please input function option!!')
         return
-    # if (opt != 'com' or opt != 'det') and pro == '':
-    #     print('please input project path!!')
-    #     return
-    # if (opt != 'com' or opt != 'det') and dep == '':
-    #     print('please input dep path!!')
-    #     return
-    # if (opt != 'com' or opt != 'det') and not os.path.exists(dep):
-    #     print('The file path is not exist, please input correct path!!!')
-    #     return
-    if output == '' or not os.path.exists(output):
-        print('Please input output path!!!')
-        return
-    # if (opt != 'com' or opt != 'det') and ver == '':
-    #     print('Please input version!!!')
-    #     return
-    if opt == 'mv' and '?' not in ver:
-        print('Please split by question mark!!!')
-        return
+    else:
+        if opt != 'com':
+            if obj == '':
+                print('please input data object!!')
+                return
+            elif pro == '':
+                print('please input project path!!')
+                return
+            elif opt != 'det' and ver == '':
+                print('please input project version!!')
+                return
+        if output == '' or not os.path.exists(output):
+            print('Please input output path!!!')
+            return
+        if opt == 'mv' and '?' not in ver:
+            print('Please split by question mark!!!')
+            return
+        if opt == 'com' and (com1 == '' or com2 == ''):
+            print('Please input compared data path!!!')
+            return
+        if opt == 'det' and diff == '':
+            print('Please input diff data path!!!')
+            return
 
     if opt == 'sv':
         if not mpmapping:
@@ -74,33 +80,38 @@ def command():
                 print('Measure finished!!!')
     elif opt == 'mv':
         if not mpmapping:
-            measure_multi_version(pro, dep, output, 'mv', ver)
+            measure_multi_version(pro, dep, output, 'mv', ver, obj)
             print('Measure multi versions finished!!!')
+    elif opt == 'com':
+        if compare_diff(com1, com2, ppmapping, output):
+            print('Compare finished!!!')
+        else:
+            print('The file path is not exist!')
+    elif opt == 'det':
+        if analyse_data(diff, output, obj):
+            print('Analyse finished!!!')
+        else:
+            print('The file path is not exist!')
     elif opt == 'cmc':
         if com_mc(pro, ver, cause, output):
             print('Compete finished!!!')
         else:
             print('The file path is not exist!')
-    else:
-        if com1 and com2:
-            if compare_diff(com1, com2, ppmapping, output):
-                print('Compare finished!!!')
-            else:
-                print('The file path is not exist!')
-        elif diff:
-            if analyse_data(diff, output, obj):
-                print('Analyse finished!!!')
-            else:
-                print('The file path is not exist!')
-        elif det:
-            if detect_change(det, output):
-                print('Detect finished!!!')
-            else:
-                print('The file path is not exist!')
+    #     elif det:
+    #         if detect_change(det, output):
+    #             print('Detect finished!!!')
+    #         else:
+    #             print('The file path is not exist!')
 
     current_time = datetime.datetime.now()
     print("end_time:" + str(current_time))
 
 
+def test():
+    measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
+    # compare_diff('com1', 'com2', 'ppmapping', 'output')
+
+
 if __name__ == '__main__':
-    command()
+    test()
+
