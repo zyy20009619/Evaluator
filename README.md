@@ -45,7 +45,7 @@
 
 ##### **dep_path示例如下：**
 
-![image-20220720113705869](.\image\dep_path.png)
+![image-20220720113705869](./image/dep_path.png)
 
 ## 使用方法
 
