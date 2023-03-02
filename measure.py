@@ -113,8 +113,8 @@ def command():
 def test():
     # measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
     # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
-    analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
-
+    # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
+    detect_change(r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
 
 if __name__ == '__main__':
     test()
