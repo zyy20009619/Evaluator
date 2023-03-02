@@ -16,14 +16,14 @@ def command():
     parser.add_argument('-opt', help='function options(sv/mv/com/det/cmc)',
                         default='mv')  # single version measure/multi-version measure/compare
     # for different objects
-    parser.add_argument('-obj', help='object(aosp/others/honor/micro)', default=r'aosp')
+    parser.add_argument('-obj', help='object(extension/others)', default=r'aosp')
     parser.add_argument('-pro', help='project path', default=r'')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')
     # parser.add_argument('-mp', help='mapping between module and packages', default='')
     # parser.add_argument('-pp', help='mapping between old package name and new package name', default='')
-    parser.add_argument('-c1', help='the measure result path of the previous version', default=r'')
-    parser.add_argument('-c2', help='the measure result path of the later version', default=r'')
+    parser.add_argument('-p1', help='the measure result path of the previous version', default=r'')
+    parser.add_argument('-p2', help='the measure result path of the later version', default=r'')
     parser.add_argument('-diff', help='the folder path of diff result', default=r'')
     parser.add_argument('-det', help='detected files path', default=r'')
     parser.add_argument('-cause', help='causes files path', default=r'')
@@ -37,8 +37,8 @@ def command():
     dep = args.dep
     mpmapping = args.mp
     ppmapping = args.pp
-    com1 = args.c1
-    com2 = args.c2
+    path1 = args.p1
+    path2 = args.p2
     diff = args.diff
     det = args.det
     cause = args.cause
@@ -64,11 +64,14 @@ def command():
         if opt == 'mv' and '?' not in ver:
             print('Please split by question mark!!!')
             return
-        if opt == 'com' and (com1 == '' or com2 == ''):
+        if opt == 'com' and (path1 == '' or path2 == ''):
             print('Please input compared data path!!!')
             return
         if opt == 'det' and diff == '':
             print('Please input diff data path!!!')
+            return
+        if opt == 'det' and obj == 'extension' and (path1 == '' or path2 == ''):
+            print('Please input detected data path!!!')
             return
 
     if opt == 'sv':
@@ -83,12 +86,17 @@ def command():
             measure_multi_version(pro, dep, output, 'mv', ver, obj)
             print('Measure multi versions finished!!!')
     elif opt == 'com':
-        if compare_diff(com1, com2, ppmapping, output):
+        if compare_diff(path1, path2, ppmapping, output):
             print('Compare finished!!!')
         else:
             print('The file path is not exist!')
-    elif opt == 'det':
-        if analyse_data(diff, output, obj):
+    elif opt == 'det' and opt != 'extension':
+        if analyse_data(diff, output):
+            print('Analyse finished!!!')
+        else:
+            print('The file path is not exist!')
+    elif opt == 'det' and opt == 'extension':
+        if detect_change(path1, path2, output):
             print('Analyse finished!!!')
         else:
             print('The file path is not exist!')
@@ -97,11 +105,6 @@ def command():
             print('Compete finished!!!')
         else:
             print('The file path is not exist!')
-    #     elif det:
-    #         if detect_change(det, output):
-    #             print('Detect finished!!!')
-    #         else:
-    #             print('The file path is not exist!')
 
     current_time = datetime.datetime.now()
     print("end_time:" + str(current_time))
@@ -109,8 +112,8 @@ def command():
 
 def test():
     # measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
-    # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\s', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\t', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
-    analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(s2t)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'aosp')
+    # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
+    analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
 
 
 if __name__ == '__main__':

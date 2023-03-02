@@ -5,7 +5,7 @@ from util.metrics import *
 import pandas as pd
 
 
-def detect_change(det, output):
+def detect_change(path1, path2, output):
     class_aosp_res, class_not_aosp_res, method_aosp_res, method_not_aosp_res, ownership_res = read_csv_folder(det,
                                                                                                               'measure_result_class_aosp.csv',
                                                                                                               'measure_result_class_not_aosp.csv',

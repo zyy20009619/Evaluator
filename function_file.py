@@ -92,7 +92,7 @@ def measure_multi_version(project_path, dep_path, output, opt, vers, obj):
     for ver in vers:
         pro_path = project_path[0]
         dep_path = dep_path[0]
-        if obj == 'honor':
+        if obj == 'extension':
             pro_path = project_path[index]
             dep_path = dep_path[index]
         mapping_dic = dict()

@@ -2,10 +2,10 @@ import os
 import csv
 from util.json_operator import read_folder, write_result_to_json
 from util.path_operator import create_file_path
-# from detect_algo.arch_debt.regression_model.model_selector import model_selector
 from score_compete.index_measure import get_score
 from util.metrics import MODULE_METRICS
 from util.csv_operator import write_to_csv, write_to_one_line
+from util.json_operator import read_file
 import numpy as np
 
 
@@ -13,11 +13,11 @@ def analyse_data(diff_folder_path, output, obj):
     measure_diff, dep_diff = read_folder(diff_folder_path, 'measure_diff.json', 'dep_diff.json')
     if not (measure_diff or dep_diff):
         return False
-    cause_path, causes_to_entities = _scan_problems(measure_diff, dep_diff, output, obj)
+    cause_path, causes_to_entities = _scan_problems(measure_diff, dep_diff, output)
     return cause_path, causes_to_entities
 
 
-def _scan_problems(measure_diff, dep_diff, output, obj):
+def _scan_problems(measure_diff, dep_diff, output):
     all_causes = dict()
     # 计算module
     # coupling_dic = dict()
@@ -61,11 +61,11 @@ def _scan_problems(measure_diff, dep_diff, output, obj):
         phenomenons = dict()
         no_aosp = dict()
         tmp = dict()
-        if obj == 'honor':
-            # 先读取项目中所有实体以及其对应的数据类型，然后为每条问题依赖扫描是伴生对伴生的依赖 or 原生对原生依赖 or 伴生对伴生依赖
-            reader = csv.DictReader(open(os.path.join(output, 'final_ownership.csv')))
-            for row in reader:
-                no_aosp[row['qualifiedName']] = row['not_aosp']
+        # if obj == 'honor':
+        #     no_aosp = get_ownership(facade_path)
+            # reader = csv.DictReader(open(os.path.join(output, 'final_ownership.csv')))
+            # for row in reader:
+            #     no_aosp[row['qualifiedName']] = row['not_aosp']
         # 1.find cohesion problems at the code-level
         if float(measure_diff[diff_module_name]['scoh']) < 0:
             phenomenon = 'Violation of the high cohesion principle(scoh declining)'
@@ -90,8 +90,13 @@ def _scan_problems(measure_diff, dep_diff, output, obj):
     return output + '\\analyseResult', causes_to_entities
 
 
-def get_ownership(facade_path):
-    pass
+# def get_ownership(facade_path):
+#     entity_dict = dict()
+#     facade_json = read_file(facade_path)
+#     for facade in facade_json['res']:
+#         for item in facade_json['res'][facade]:
+#             entity_dict[item['src']['qualifiedName'] + '_' + str(item['src']['not_aosp'])] = item['src']['ownership']
+#     return entity_dict
 
 
 def _find_low_cohesion_causes(measure_diff, diff_module_name, dep_diff, no_aosp, phenomenon, cause_list, item, index, causes_to_entities):

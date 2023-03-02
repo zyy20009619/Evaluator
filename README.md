@@ -17,28 +17,31 @@
 + **对度量结果进行对比：根据两个版本度量结果对比，给出模块质量腐化热点图(diff_result.xlsx)**
 
   ```
-  python measure.py -opt com -c1 [old_path] -c2 [new_path] -out [out_path]
+  python measure.py -opt com -p1 [old_path] -p2 [new_path] -out [out_path]
   ```
 
-- **定位可维护性问题根因：根据模块腐化情况，定位导致腐化的根因**
+- **定位可维护性问题根因：定位架构在演化过程中发生可维护性问题的根因**。
 
+  **本功能可应用于两种场景：一般场景(横向演化过程中质量腐化根因识别)和安卓扩展场景(伴生项目扩展原生项目的纵向演化过程中质量腐化根因识别)**
+  
   ```
-  python measure.py -opt det -diff [diff_path] -out [out_path]
+  场景一：python measure.py -opt det -obj others -diff [diff_path] -out [out_path]
+  场景二：python measure.py -opt det -obj extension -p1 [native_project_measure_path] -p1 [extensive_project_measure_path] -out [out_path]
   ```
 
 ## 命令说明
 
  ```python
- usage: measure.py [-h] [-opt OPT] [-obj OBJ] [-ver VER] [-pro PRO] [-dep DEP] [-c1 C1] [-c2 C2] [-diff DIFF] [-out OUT]
+ usage: measure.py [-h] [-opt OPT] [-obj OBJ] [-ver VER] [-pro PRO] [-dep DEP] [-p1 P1] [-p2 P2] [-diff DIFF] [-out OUT]
      
    -h, --help  show this help message and exit
    -opt OPT    必选参数，功能选项，提供sv/mv/com/det四种选择
-   -obj OBJ    处理对象，目前提供aosp/honor/others三种场景(除com功能，其他功能下此选项为必选参数)
+   -obj OBJ    处理对象，目前提供extension/others两种场景(除com功能，其他功能下此选项为必选参数)
    -ver VER    处理版本，若为单版本度量不存在版本号请输入main作为版本号，若为多版本使用?连接不同版本号
    -pro PRO    项目路径(除com/det功能，其他功能下此选项为必选参数)
    -dep DEP    可选参数，依赖文件路径，若输入应遵循示例所示格式，若不输入工具会自动生成依赖文件到out_path
-   -c1 C1      对比功能较老版本度量结果路径，路径下需包含measure_result.json和dep.json
-   -c2 C2      对比功能较新版本度量结果路径，路径下需包含measure_result.json和dep.json
+   -p1 P1      对比功能较老版本度量结果路径，路径下需包含measure_result.json和dep.json
+   -p2 P2      对比功能较新版本度量结果路径，路径下需包含measure_result.json和dep.json
    -diff DIFF  定位功能输入路径，路径包含measure_diff.json和dep_diff.json
    -out OUT    必选参数，结果输出文件夹
  ```
