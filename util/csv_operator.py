@@ -17,13 +17,12 @@ def read_csv_to_pd(file_path):
     return pd.read_csv(file_path)
 
 
-def read_csv_folder(class_aosp, class_not_aosp, method_aosp, method_not_aosp):
-    class_aosp_res = read_csv_to_pd(class_aosp)
-    class_not_aosp_res = read_csv_to_pd(class_not_aosp)
-    method_aosp_res = read_csv_to_pd(method_aosp)
-    method_not_aosp_res = read_csv_to_pd(method_not_aosp)
-    # ownership_res = read_csv_to_pd(file_folder, ownership)
-    return class_aosp_res, class_not_aosp_res, method_aosp_res, method_not_aosp_res
+def read_csv_folder(class1, class2, method1, method2):
+    class1_res = read_csv_to_pd(class1)
+    class2_res = read_csv_to_pd(class2)
+    method1_res = read_csv_to_pd(method1)
+    method2_res = read_csv_to_pd(method2)
+    return class1_res, class2_res, method1_res, method2_res
 
 
 def write_to_csv(result_list, file_path):

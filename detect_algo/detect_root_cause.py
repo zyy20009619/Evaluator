@@ -9,6 +9,7 @@ from util.json_operator import read_file
 import numpy as np
 
 
+# 检测一般演化场景腐化问题及根因
 def analyse_data(diff_folder_path, output, obj):
     measure_diff, dep_diff = read_folder(diff_folder_path, 'measure_diff.json', 'dep_diff.json')
     if not (measure_diff or dep_diff):
