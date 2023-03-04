@@ -49,6 +49,10 @@ def detect_change(path1, path2, output, opt):
     else:
         res = detect_common_project(base_out, diff_class, diff_method, opt)
     res.to_csv(os.path.join(base_out, "detection result.csv"), index=False, sep=',')
+    # # 统计检测结果数据
+    # count_pd = pd.DataFrame()
+    #
+    # count_pd.to_csv(os.path.join(base_out, "detection count.csv"), index=False, sep=',')
 
 
 def detect_android_project(base_out, facade_data, diff_class, diff_method, opt):

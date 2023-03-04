@@ -1,22 +1,19 @@
 import re
-import subprocess
 import os
 from util.csv_operator import write_to_csv
 from arch_debt.maintenance_cost_measurement.basedata import *
+from util.path_operator import create_file_path
 
 
-def generateLog(project_path, version, out_path):
-    mc_dir = out_path + "//mc//" + version
+def generateLog(version, base_version_path):
+    os.system('git checkout -f ' + version)
 
-    # if not os.path.exists(mc_dir):
-    #     os.makedirs(mc_dir)
-    # os.chdir(project_path)
-
-    git_log_file = mc_dir + "//gitlog"
-    git_loc_file = mc_dir + "//gitloc"
-    # --numstat:count the number of code churn(add and delete)
-    # cmd = "git log --numstat --date=iso > " + git_log_file
-    # subprocess.call(cmd, shell=True)
+    git_log_file = create_file_path(base_version_path, 'gitlog')
+    git_loc_file = create_file_path(base_version_path, 'gitloc')
+    # 获取git log文件
+    os.system('git log --numstat --date=iso > ' + git_log_file)
+    # 获取git loc文件
+    # os.system('git ls-files | xargs wc -l > ' + git_loc_file)
 
     return git_log_file, git_loc_file
 
@@ -123,23 +120,22 @@ def saveCommitCollection(commit_collection):
     return res_list
 
 
-def gitlog(project_path, version, out_path):
-    git_log_file, git_loc_file = generateLog(project_path, version, out_path)
+def gitlog(version, base_version_path):
+    git_log_file, git_loc_file = generateLog(version, base_version_path)
     file_list_java = get_all_files_by_filter(project_path)
-    # all loc infos
-    file_loc_dict = git_loc(project_path, git_loc_file, file_list_java)
+    # 统计所有java文件的loc
+    file_loc_dict = git_loc(git_loc_file, file_list_java)
+    # 统计所有java文件的commit信息
     commit_collection_java = processGitLog(git_log_file, file_list_java)
+    commit_collection_res = saveCommitCollection(commit_collection_java)
+    # write_to_csv(commit_collection_res_list, create_file_path(base_version_path, 'history-java.csv'))
 
-    res_list = saveCommitCollection(commit_collection_java)
-    mc_file = out_path + '//mc//' + version + '//history-java.csv'
-    write_to_csv(res_list, mc_file)
-
-    return mc_file, file_list_java, file_loc_dict
+    return commit_collection_res, file_list_java, file_loc_dict
 
 
-def git_loc(project_path, git_loc_file, file_list_java):
+def git_loc(git_loc_file, file_list_java):
     file_loc_dic = dict()
-    os.chdir(project_path)
+    # os.chdir(project_path)
 
     # del gitloc file
     fp = open(git_loc_file, encoding="utf8", errors='ignore')
@@ -154,7 +150,6 @@ def git_loc(project_path, git_loc_file, file_list_java):
 
 def get_all_files_by_filter(project_path):
     file_list_java = list()
-
     for filename, dirs, files in os.walk(project_path, topdown=True):
         filename = filename.split(project_path)[1]
         filename = filename.replace("\\", "/")
