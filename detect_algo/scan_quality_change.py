@@ -24,45 +24,61 @@ def detect_change(path1, path2, output):
                 ownership_res.append([item['src']['qualifiedName'], item['src']['category'], item['src']['ownership']])
             if item['dest']['category'] == 'Class' or item['dest']['category'] == 'Method':
                 ownership_res.append([item['dest']['qualifiedName'], item['dest']['category'], item['dest']['ownership']])
-    # 过滤其中intrusive native和actively native的类并依据规则对产生腐化的类进行根因定位
+    # 对关注类实体进行质量扫描
     entity_pd = pd.DataFrame(ownership_res, columns=['qualifiedName', 'category', 'ownership'])
-    entity_pd.drop_duplicats(subset=['qualifiedName'], keep='first', inplace=True)
+    entity_pd.drop_duplicates(subset=['qualifiedName'], keep='first', inplace=True)
     entity_pd.to_csv(os.path.join(base_out, "ownership_data.csv"), index=False, sep=',')
+    CLASS_METRICS.append('class_name')
 
     intrusive_class = entity_pd[(entity_pd['category'] == 'Class') & (entity_pd['ownership'] == 'intrusive native')]['qualifiedName']
-    actively_class = entity_pd[(entity_pd['category'] == 'Class') & (entity_pd['ownership'] == 'actively native')]['qualifiedName']
     intrusive_class_measure = class_not_aosp_res.loc[class_not_aosp_res['class_name'].isin(intrusive_class)]
-    actively_class_measure = class_not_aosp_res.loc[class_not_aosp_res['class_name'].isin(actively_class)]
-    # 伴生修改后的质量和原生质量相对比
-    CLASS_METRICS.append('class_name')
-    METHOD_METRICS.append('method_name')
-
     merge_intrusive_class = pd.merge(class_aosp_res[CLASS_METRICS], intrusive_class_measure[CLASS_METRICS],
                                                   how='inner', left_on=['class_name'],
                                                   right_on=['class_name'], suffixes=['1', ''])
     merge_class_name = merge_intrusive_class['class_name']
     diff_intrusive_class = merge_intrusive_class.drop(['class_name'], axis=1).diff(periods=42, axis=1).iloc[:, 42:]
     diff_intrusive_class.insert(0, 'class_name', merge_class_name)
+    diff_intrusive_class.sort_values(by="CBC", inplace=True, ascending=False)
     diff_intrusive_class.to_csv(os.path.join(base_out, "diff_intrusive_class.csv"), index=False, sep=',')
+    diff_intrusive_class_
+    
 
+    actively_class = entity_pd[(entity_pd['category'] == 'Class') & (entity_pd['ownership'] == 'actively native')]['qualifiedName']
+    actively_class_measure = class_not_aosp_res.loc[class_not_aosp_res['class_name'].isin(actively_class)]
     merge_actively_class = pd.merge(class_aosp_res[CLASS_METRICS], actively_class_measure[CLASS_METRICS],
                                      how='inner', left_on=['class_name'],
                                      right_on=['class_name'], suffixes=['1', ''])
     merge_class_name = merge_actively_class['class_name']
     diff_actively_class = merge_actively_class.drop(['class_name'], axis=1).diff(periods=42, axis=1).iloc[:, 42:]
     diff_actively_class.insert(0, 'class_name', merge_class_name)
+    diff_actively_class.sort_values(by="CBC", inplace=True, ascending=False)
     diff_actively_class.to_csv(os.path.join(base_out, "diff_actively_class.csv"), index=False, sep=',')
+    # 对产生腐化的类实体进行定位（根据腐化严重程度进行输出）
 
-    # merge_intrusive_method_not_aosp_res = pd.merge(method_aosp_res[METHOD_METRICS],
-    #                                                intrusive_method_not_aosp_res[METHOD_METRICS], how='inner',
-    #                                                left_on=['method_name'],
-    #                                                right_on=['method_name'], suffixes=['1', ''])
-    # merge_method_name = merge_intrusive_method_not_aosp_res['method_name']
-    # diff_intrusive_method_not_aosp_res = merge_intrusive_method_not_aosp_res.drop(['method_name'], axis=1).diff(
-    #     periods=13,
-    #     axis=1).iloc[:, 13:]
-    # diff_intrusive_method_not_aosp_res.insert(0, 'method_name', merge_method_name)
-    # diff_intrusive_method_not_aosp_res.to_csv(os.path.join(output, "diff_intrusive_method_not_aosp_res.csv"),
-    #                                           index=False,
-    #                                           sep=',')
+    # intrusive_method = entity_pd[(entity_pd['category'] == 'Method') & (entity_pd['ownership'] == 'intrusive native')][
+    #     'qualifiedName']
+    # actively_method = entity_pd[(entity_pd['category'] == 'Method') & (entity_pd['ownership'] == 'actively native')][
+    #     'qualifiedName']
+    # intrusive_method_measure = method_not_aosp_res.loc[method_not_aosp_res['method_name'].isin(intrusive_method)]
+    # actively_method_measure = method_not_aosp_res.loc[method_not_aosp_res['method_name'].isin(actively_method)]
+    # METHOD_METRICS.append('method_name')
+    # # 对关注方法实体进行质量扫描
+    # merge_intrusive_method = pd.merge(method_aosp_res[METHOD_METRICS], intrusive_method_measure[METHOD_METRICS],
+    #                                  how='inner', left_on=['method_name'],
+    #                                  right_on=['method_name'], suffixes=['1', ''])
+    # merge_method_name = merge_intrusive_method['method_name']
+    # diff_intrusive_method = merge_intrusive_method.drop(['method_name'], axis=1).diff(periods=42, axis=1).iloc[:, 42:]
+    # diff_intrusive_method.insert(0, 'method_name', merge_method_name)
+    # diff_intrusive_method.to_csv(os.path.join(base_out, "diff_intrusive_method.csv"), index=False, sep=',')
+    #
+    # merge_actively_method = pd.merge(method_aosp_res[METHOD_METRICS], actively_method_measure[METHOD_METRICS],
+    #                                 how='inner', left_on=['method_name'],
+    #                                 right_on=['method_name'], suffixes=['1', ''])
+    # merge_method_name = merge_actively_method['method_name']
+    # diff_actively_method = merge_actively_class.drop(['method_name'], axis=1).diff(periods=42, axis=1).iloc[:, 42:]
+    # diff_actively_method.insert(0, 'method_name', merge_method_name)
+    # diff_actively_method.to_csv(os.path.join(base_out, "diff_actively_method.csv"), index=False, sep=',')
+
     return True
+
+
