@@ -114,8 +114,10 @@ def test():
     # measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
     # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
     # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
-    # detect_change(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.4.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.5.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
-    com_mc(r'D:\paper-data-and-result\data\dataset\others\apollo', 'v0.6.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\analyseResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out')
+    detect_change(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.4.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.5.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
+    # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
+    # com_mc(r'D:\paper-data-and-result\data\dataset\others\apollo', 'v0.6.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\analyseResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out')
+
 
 if __name__ == '__main__':
     test()

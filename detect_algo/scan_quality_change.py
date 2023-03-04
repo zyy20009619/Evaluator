@@ -20,20 +20,21 @@ def detect_change(path1, path2, output, opt):
         os.path.join(path1, 'measure_result_method.csv'),
         os.path.join(path2, 'measure_result_method.csv'))
     # 获取到所有粒度实体的质量diff，类和方法粒度的diff包含三种状态：add/modify/delete
-    merge_class_inner = pd.merge(class1_res, class2_res,
-                                 how='inner', left_on=['class_name'],
+    merge_class_left = pd.merge(class2_res, class1_res,
+                                 how='left', left_on=['class_name'],
                                  right_on=['class_name'], suffixes=['1', ''])
-    merge_name_inner = merge_class_inner[['module_name', 'class_name']]
-    diff_class_inner = merge_class_inner.drop(['module_name', 'module_name1', 'class_name'], axis=1).diff(periods=65,
-                                                                                                          axis=1).iloc[
-                       :, 65:]
-    diff_class = pd.concat([merge_name_inner, diff_class_inner], axis=1)
-    diff_class['status'] = 'modify'
+    merge_name_left = merge_class_left[['module_name', 'class_name']]
+    diff_class_left = merge_class_left.drop(['module_name', 'module_name1', 'class_name'], axis=1).diff(periods=65,
+                                                                                                          axis=1).iloc[:, 65:]
+    diff_class = pd.concat([merge_name_left, diff_class_left], axis=1)
+    # 只包含修改类的数据(应该包含所有类：被修改/被增加/被删除)
+    diff_class = diff_class.dropna(axis=0, how='any')
+    # diff_class['status'] = 'modify'
     # add_class =
     # delete_class =
 
-    merge_method = pd.merge(method1_res[METHOD_METRICS], method2_res[METHOD_METRICS],
-                            how='inner', left_on=['method_name'],
+    merge_method = pd.merge(method2_res[METHOD_METRICS], method1_res[METHOD_METRICS],
+                            how='left', left_on=['method_name'],
                             right_on=['method_name'], suffixes=['1', ''])
     merge_name = merge_method[['class_name', 'method_name']]
     diff_method = merge_method.drop(['class_name1', 'class_name', 'method_name'], axis=1).diff(periods=5, axis=1).iloc[
@@ -41,6 +42,8 @@ def detect_change(path1, path2, output, opt):
     method_name_and_startLine = method2_res[['method_name', 'startLine']]
     diff_method = pd.concat([merge_name, diff_method], axis=1)
     diff_method = pd.merge(method_name_and_startLine, diff_method, on='method_name')
+    # 只包含修改方法的数据(应该包含所有方法：被修改/被增加/被删除)
+    diff_method = diff_method.dropna(axis=0, how='any')
     # 分别对扩展场景和一般场景进行不同逻辑处理
     if opt == 'extension':
         # 读取耦合切面数据
@@ -77,9 +80,9 @@ def detect_android_project(base_out, facade_data, diff_class, diff_method, opt):
     diff_method.to_csv(os.path.join(base_out, "diff ownership method.csv"), index=False, sep=',')
 
     # 获取到intrusive native和actively native类实体的质量diff并对腐化实体进行根因定位
-    intrusive_res_pd = get_decay_root_cause(entity_pd, 'intrusive native', diff_class, base_out,
+    intrusive_res_pd = get_android_decay_root_cause(entity_pd, 'intrusive native', diff_class, base_out,
                                             diff_method, opt)
-    actively_res_pd = get_decay_root_cause(entity_pd, 'actively native', diff_class, base_out, diff_method, opt)
+    actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', diff_class, base_out, diff_method, opt)
     res_pd = pd.concat([intrusive_res_pd, actively_res_pd], axis=0)
     res_pd = res_pd.rename(
         columns={'CBC': 'class decay degree', 'CBM': 'method decay degree', 'ownership': 'method_ownership',
@@ -92,19 +95,10 @@ def detect_common_project(base_out, diff_class, diff_method, opt):
     diff_class.to_csv(os.path.join(base_out, "diff class.csv"), index=False, sep=',')
     # 输出所有method diff信息
     diff_method.to_csv(os.path.join(base_out, "diff method.csv"), index=False, sep=',')
-    # 对产生腐化的模块实体进行定位（根据腐化严重程度进行输出）
-    diff_class.sort_values(by="scop", inplace=True, ascending=False)
-    coupling_df = detect_coupling_problem(diff_class[diff_class['scop'] > 0], diff_method, opt)
-    diff_class.sort_values(by="scoh", inplace=True, ascending=True)
-    cohesion_df = detect_cohesion_problem(diff_class[diff_class['scoh'] < 0], diff_method, opt)
-    res_pd = pd.concat([coupling_df, cohesion_df], axis=0)
-    res_pd = res_pd.rename(
-        columns={'CBC': 'class decay degree', 'CBM': 'method decay degree',
-                 'class_name': 'problem class', 'method_name': 'problem method'})
-    return res_pd
+    return get_common_decay_root_cause(diff_class, diff_method, opt)
 
 
-def get_decay_root_cause(ownership_pd, ownership, diff_class, base_out, diff_method, opt):
+def get_android_decay_root_cause(ownership_pd, ownership, diff_class, base_out, diff_method, opt):
     ownership_class = ownership_pd[(ownership_pd['category'] == 'Class') & (ownership_pd['ownership'] == ownership)][
         'qualifiedName']
     ownership_diff_class_measure = diff_class.loc[diff_class['class_name'].isin(ownership_class)]
@@ -112,9 +106,28 @@ def get_decay_root_cause(ownership_pd, ownership, diff_class, base_out, diff_met
     ownership_diff_class_measure.to_csv(os.path.join(base_out, 'diff ' + ownership + '.csv'), index=False, sep=',')
     # 对产生腐化的类实体进行定位（根据腐化严重程度进行输出）
     coupling_df = detect_coupling_problem(diff_class, diff_method, opt)
+    del coupling_df['scop']
     cohesion_df = detect_cohesion_problem(diff_class, diff_method, opt)
+    del coupling_df['scoh']
     res_pd = pd.concat([coupling_df, cohesion_df], axis=0)
     res_pd.insert(0, 'class_ownership', ownership)
+    return res_pd
+
+
+def get_common_decay_root_cause(diff_class, diff_method, opt):
+    # 对产生腐化的模块实体进行定位（根据腐化严重程度进行输出）
+    diff_class.sort_values(by="scop", inplace=True, ascending=False)
+    coupling_df = detect_coupling_problem(diff_class[diff_class['scop'] > 0], diff_method, opt)
+    coupling_df = coupling_df.rename(
+        columns={'scop': 'module decay degree'})
+    diff_class.sort_values(by="scoh", inplace=True, ascending=True)
+    cohesion_df = detect_cohesion_problem(diff_class[diff_class['scoh'] < 0], diff_method, opt)
+    cohesion_df = cohesion_df.rename(
+        columns={'scoh': 'module decay degree'})
+    res_pd = pd.concat([coupling_df, cohesion_df], axis=0)
+    res_pd = res_pd.rename(
+        columns={'CBC': 'class decay degree', 'CBM': 'method decay degree',
+                 'class_name': 'problem class', 'method_name': 'problem method'})
     return res_pd
 
 
@@ -163,17 +176,21 @@ def detect_cohesion_problem(diff_class_measure, diff_method_measure, opt):
 
 
 def set_root_cause(diff_import_decay_class, diff_inherit_decay_class, diff_call_decay_class, opt, problem):
+    if problem == 'coupling':
+        module_metric = 'scop'
+    else:
+        module_metric = 'scoh'
     diff_import_decay_class = diff_import_decay_class.reindex(
-        columns=['root cause', 'class_name', 'CBC'], fill_value='import')
+        columns=['root cause', 'module_name', module_metric, 'class_name', 'CBC'], fill_value='import')
     diff_inherit_decay_class = diff_inherit_decay_class.reindex(
-        columns=['root cause', 'class_name', 'CBC'], fill_value='inherit')
+        columns=['root cause', 'module_name', module_metric, 'class_name', 'CBC'], fill_value='inherit')
     if opt == 'extension':
         diff_call_decay_class = diff_call_decay_class.reindex(
-            columns=['root cause', 'class_name', 'CBC', 'method_name', 'CBM', 'startLine', 'ownership'],
+            columns=['root cause', 'module_name', module_metric, 'class_name', 'CBC', 'method_name', 'CBM', 'startLine', 'ownership'],
             fill_value='call')
     else:
         diff_call_decay_class = diff_call_decay_class.reindex(
-            columns=['root cause', 'class_name', 'CBC', 'method_name', 'CBM', 'startLine'],
+            columns=['root cause', 'module_name', module_metric, 'class_name', 'CBC', 'method_name', 'CBM', 'startLine'],
             fill_value='call')
 
     coupling_df = pd.concat([diff_call_decay_class, diff_inherit_decay_class,

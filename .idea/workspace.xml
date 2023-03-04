@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/measure_arch.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/measure_arch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/detect_algo/detect_root_cause.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/detect_root_cause.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
     </list>
@@ -72,18 +70,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/detect_algo/detect_root_cause.py</url>
-          <line>99</line>
+          <line>94</line>
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>95</line>
-          <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
@@ -94,6 +82,21 @@
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
           <line>76</line>
           <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/detect_root_cause.py</url>
+          <line>37</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>118</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>152</line>
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

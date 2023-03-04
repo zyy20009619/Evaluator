@@ -33,26 +33,21 @@ def _scan_problems(measure_diff, dep_diff, output):
     module_name = list()
     for diff_module_name in measure_diff:
         change_list.append([measure_diff[diff_module_name]['scoh'], measure_diff[diff_module_name]['scop'],
-                            measure_diff[diff_module_name]['odd'], measure_diff[diff_module_name]['idd'],
-                            measure_diff[diff_module_name]['spread'], measure_diff[diff_module_name]['focus'],
-                            measure_diff[diff_module_name]['icf'], measure_diff[diff_module_name]['ecf'],
-                            measure_diff[diff_module_name]['rei'], measure_diff[diff_module_name]['chm'],
-                            measure_diff[diff_module_name]['chd'], measure_diff[diff_module_name]['DSM']])
+                           ])
         module_name.append(diff_module_name)
     [normalized_result, score_result] = get_score(change_list,
-                                                  [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08],
-                                                   [0.08], [0.08], [0.08]],
-                                                  MODULE_METRICS)
+                                                  [[0.5], [0.5]],
+                                                  ['scoh', 'scop'])
     module_score = np.array(list(zip(module_name, score_result)))
     module_score = module_score[np.lexsort(module_score.T)]
     # write_to_csv(module_score.tolist(), create_file_path(output + '\\analyseResult', 'score.csv'))
     # all_causes['score'] = module_score.tolist()
     cause_list = list()  # 放置由伴生->伴生 or  伴生->原生引起的质量变差实体
-    if obj == 'honor':
-        cause_list.append(
-            ['module_name', 'score', 'ranking', 'phenomenon', 'src', 'src_no_aosp', 'dest', 'dest_no_aosp', 'type'])
-    else:
-        cause_list.append(['module_name', 'score', 'ranking', 'phenomenon', 'src', 'dest', 'type'])
+    # if obj == 'honor':
+    #     cause_list.append(
+    #         ['module_name', 'score', 'ranking', 'phenomenon', 'src', 'src_no_aosp', 'dest', 'dest_no_aosp', 'type'])
+    # else:
+    cause_list.append(['module_name', 'score', 'ranking', 'phenomenon', 'src', 'dest', 'type'])
     index = 1
     res = dict()
     for item in module_score:
