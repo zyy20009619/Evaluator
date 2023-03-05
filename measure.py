@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
+import csv
 import argparse
 import datetime
 from function_file import measure_package_metrics, compare_diff, measure_module_metrics, measure_multi_version
@@ -16,7 +17,7 @@ def command():
     parser.add_argument('-opt', help='function options(sv/mv/com/det/cmc)',
                         default='mv')  # single version measure/multi-version measure/compare
     # for different objects
-    parser.add_argument('-obj', help='object(extension/others)', default=r'aosp')
+    parser.add_argument('-obj', help='object(extension/common)', default=r'aosp')
     parser.add_argument('-pro', help='project path', default=r'')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')
@@ -26,6 +27,7 @@ def command():
     parser.add_argument('-p2', help='the measure result path of the later version', default=r'')
     # parser.add_argument('-diff', help='the folder path of diff result', default=r'')
     parser.add_argument('-det', help='detected result files path', default=r'')
+    parser.add_argument('-th', help='detected result threshold', default=r'')
     # parser.add_argument('-cause', help='causes files path', default=r'')
     parser.add_argument('-out', help='the folder path of output', default=r'')
 
@@ -41,6 +43,7 @@ def command():
     path2 = args.p2
     # diff = args.diff
     det = args.det
+    th = args.th
     # cause = args.cause
     output = args.out
 
@@ -58,9 +61,9 @@ def command():
             elif opt != 'det' and ver == '':
                 print('please input project version!!')
                 return
-        if output == '' or not os.path.exists(output):
-            print('Please input output path!!!')
-            return
+        # if output == '' or not os.path.exists(output):
+        #     print('Please input output path!!!')
+        #     return
         if opt == 'mv' and '?' not in ver:
             print('Please split by question mark!!!')
             return
@@ -96,7 +99,7 @@ def command():
     #     else:
     #         print('The file path is not exist!')
     elif opt == 'det':
-        if detect_change(path1, path2, output, opt):
+        if detect_change(path1, path2, output, opt, th):
             print('Detect finished!!!')
         else:
             print('The file path is not exist!')
@@ -111,12 +114,47 @@ def command():
 
 
 def test():
-    # measure_multi_version(r'D:\paper-data-and-result\data\dataset\AOSP\projects\Android\base'.split('?'), ''.split('?'), r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base', 'mv', 'android-11.0.0_r35?android-12.0.0_r10'.split('?'), 'aosp')
-    # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
-    # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
-    detect_change(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.4.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.5.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
-    # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
-    # com_mc(r'D:\paper-data-and-result\data\dataset\others\apollo', 'v0.6.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\analyseResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out')
+    with open('./projects.txt', encoding='utf-8') as file:
+        content = file.readlines()
+    # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
+    #     writer = csv.writer(file1)
+    #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
+    for line in content:
+        tmp = line.split(',')
+        project_path = tmp[0]
+        pro_name = tmp[1]
+        ver = tmp[2]
+        os.chdir(project_path)
+        # os.system("git checkout -f " + ver)
+
+        # measure_multi_version(r'D:\paper-data-and-result\data\dataset\others\apollo', '', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'mv', 'v0.4.0?v0.5.0'.split('?'), 'common')
+        # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
+        # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
+        # detect_change(r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'extension', 0.4)
+        # detect_change(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.4.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\v0.5.0', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common', 0.4)
+        # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
+        com_mc(r'D:\paper-data-and-result\data\dataset\others\apollo', 'v0.6.0',
+               r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\analyseResult')
+
+        # 统计代码行和文件数
+        # loc_count = os.popen('cloc .').read()
+        # tmp_loc = loc_count.split('\n')
+        # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+        # loc = tmp_loc1[len(tmp_loc1) - 1]
+        # file = tmp_loc1[len(tmp_loc1) - 1]
+        # 统计commit
+        # log = subprocess.Popen('git log --numstat --date=iso', shell=True, stdout=subprocess.PIPE,
+        #                        stderr=subprocess.STDOUT)
+        # log_out = log.communicate()[0].decode().split('\n')
+        # commit_num = 0
+        # for log_len in log_out:
+        #     if "commit" in str(log_len):
+        #         commit_num = commit_num + 1
+        #
+        # os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        # writer.writerow([pro_name, ver, 'loc', 'file', commit_num])
+
+
 
 
 if __name__ == '__main__':

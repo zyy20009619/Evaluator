@@ -10,7 +10,9 @@ from util.csv_operator import write_to_csv, read_csv, read_csv_to_pd
 def com_mc(project_path, vers, detect_path):
     # causes_entities = read_csv(cause_path, 'causes_entities.csv')
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
-    measure_maintenance(project_path, list(set(detection_res['problem class'])), vers, detect_path)
+    measure_maintenance(project_path,
+                        list(set(detection_res[detection_res['class status'] != 'delete']['problem class'])), vers,
+                        detect_path)
 
 
 def measure_maintenance(project_path, pf_entities, vers, detect_path):
@@ -38,9 +40,9 @@ def measure_maintenance(project_path, pf_entities, vers, detect_path):
     for version in versions:
         version_mc = list()
         version_mc.append(version)
-        base_version_path = os.path.join(detect_path, 'mc/' + version)
+        base_version_path = os.path.join(os.path.dirname(detect_path), 'mc/' + version)
         # 获取到该版本的loc和log，计算版本中每个文件的维护成本
-        commit_collection_res, file_list_java, file_loc_dict = gitlog(version, base_version_path)
+        commit_collection_res, file_list_java, file_loc_dict = gitlog(project_path, version, base_version_path)
         # 计算所有文件的维护成本
         all_files_mc_pd = changeProness(file_list_java, commit_collection_res,
                                         create_file_path(base_version_path, 'file mc.csv'))
@@ -66,71 +68,66 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
     # causes_mc_result = list()
     # causes_mc_result.append(['cause', '#author', '#cmt', '#changeloc', '#issue', '#issue-cmt', 'issueLoc'])
     # test_entities = list()
-    # 求问题实体维护成本
     # TODO：本步骤可在一开始评估时，多加入一列File Path，此处即无需转换
+    # TODO:此处先使用之前的代码逻辑计算维护成本，实验全部做完之后再优化代码
+    # 求问题实体维护成本
     pf_entities = _format_file_path(all_files_mc_pd['filename'], pf_entities)
-    pf_entities_mc = all_files_mc_pd.loc[all_files_mc_pd['filename'].isin(pf_entities)]
-    pf_entities_sum_commit = pf_entities_mc['change_loc'].sum()
-    pf_entities_sum_loc = pf_entities_mc['change_loc'].sum()
-    pf_entities_sum_author = pf_entities_mc['change_loc'].sum()
-    # 求出非问题实体的维护成本
-    non_pf_entities = all_files_mc_pd['filename'] - pf_entities.keys()
-    non_pf_entities_mc = all_files_mc_pd.loc[all_files_mc_pd['filename'].isin(non_pf_entities)]
-    non_pf_entities_sum_commit = non_pf_entities_mc['change_loc'].sum()
-    non_pf_entities_sum_loc = non_pf_entities_mc['change_loc'].sum()
-    non_pf_entities_sum_author = non_pf_entities_mc['change_loc'].sum()
-    # 将问题实体和非问题实体的结果写入结果数组
-    version_mc.extend(
-        [pf_entities_sum_commit, non_pf_entities_sum_commit, pf_entities_sum_commit / non_pf_entities_sum_commit,
-         pf_entities_sum_loc, non_pf_entities_sum_loc, pf_entities_sum_loc / non_pf_entities_sum_loc,
-         pf_entities_sum_author, non_pf_entities_sum_author, pf_entities_sum_author / non_pf_entities_sum_author])
-    # non_pf_entities_cmt = list()
-    # non_causes_entities_change_loc = 0
-    # non_causes_entities_author = list()
-    # non_causes_entities_issue_cmt = list()
-    # non_causes_entities_issue_loc = 0
-    # non_causes_entities_issue = list()
-    # # non_causes_entities = set(list(all_files_mc_dic.keys())) - set(list(new_causes_entities.keys()))
-    # non_causes_entity_loc_num = 0
-    # for non_causes_entity in non_causes_entities:
-    #     if non_causes_entity.replace('\\', '/') in file_loc_dict:
-    #         non_causes_entity_loc_num += int(file_loc_dict[non_causes_entity.replace('\\', '/')])
-    #         non_causes_entities_cmt.extend(all_files_mc_dic[non_causes_entity]['cmt_id'])
-    #         non_causes_entities_change_loc += all_files_mc_dic[non_causes_entity]['change_loc']
-    #         non_causes_entities_author.extend(all_files_mc_dic[non_causes_entity]['author_id'])
-    #         non_causes_entities_issue_cmt.extend(all_files_mc_dic[non_causes_entity]['issue_cmt_id'])
-    #         non_causes_entities_issue_loc += all_files_mc_dic[non_causes_entity]['issue_loc']
-    #         non_causes_entities_issue.extend(all_files_mc_dic[non_causes_entity]['issue_id'])
-    #
-    # causes_entities_cmt = list()
-    # causes_entities_change_loc = 0
-    # causes_entities_author = list()
+    pf_entities_cmt = list()
+    pf_entities_change_loc = 0
+    pf_entities_author = list()
     # causes_entities_issue_cmt = list()
     # causes_entities_issue_loc = 0
     # causes_entities_issue = list()
-    # causes_entity_loc_num = 0
-    # for cause_entity in new_causes_entities:
-    #     if cause_entity.replace('\\', '/') in file_loc_dict:
-    #         causes_entity_loc_num += int(file_loc_dict[cause_entity.replace('\\', '/')])
-    #         causes_entities_cmt.extend(all_files_mc_dic[cause_entity]['cmt_id'])
-    #         causes_entities_change_loc += all_files_mc_dic[cause_entity]['change_loc']
-    #         causes_entities_author.extend(all_files_mc_dic[cause_entity]['author_id'])
-    #         causes_entities_issue_cmt.extend(all_files_mc_dic[cause_entity]['issue_cmt_id'])
-    #         causes_entities_issue_loc += all_files_mc_dic[cause_entity]['issue_loc']
-    #         causes_entities_issue.extend(all_files_mc_dic[cause_entity]['issue_id'])
-    #
-    # issue_list.append([len(set(causes_entities_issue)) / causes_entity_loc_num,
-    #                    len(set(non_causes_entities_issue)) / non_causes_entity_loc_num])
-    # cmt_list.append([len(set(causes_entities_cmt)) / causes_entity_loc_num,
-    #                  len(set(non_causes_entities_cmt)) / non_causes_entity_loc_num])
-    # change_loc_list.append([causes_entities_change_loc / causes_entity_loc_num,
-    #                         non_causes_entities_change_loc / non_causes_entity_loc_num])
-    # author_list.append([len(set(causes_entities_author)) / causes_entity_loc_num,
-    #                     len(set(non_causes_entities_author)) / non_causes_entity_loc_num])
-    # issue_cmt_list.append([len(set(causes_entities_issue_cmt)) / causes_entity_loc_num,
-    #                        len(set(non_causes_entities_issue_cmt)) / non_causes_entity_loc_num])
-    # issue_loc_list.append([causes_entities_issue_loc / causes_entity_loc_num,
-    #                        non_causes_entities_issue_loc / non_causes_entity_loc_num])
+    pf_entity_loc_num = 0
+    for pf_entity in pf_entities:
+        if pf_entity.replace('\\', '/') in file_loc_dict:
+            pf_entity_loc_num += int(file_loc_dict[pf_entity.replace('\\', '/')])
+            pf_entities_cmt.extend(list(all_files_mc_pd[all_files_mc_pd['filename'] == pf_entity]['cmt_id'])[0])
+            pf_entities_change_loc += list(all_files_mc_pd[all_files_mc_pd['filename'] == pf_entity]['change_loc'])[0]
+            pf_entities_author.extend(list(all_files_mc_pd[all_files_mc_pd['filename'] == pf_entity]['author_id'])[0])
+            # causes_entities_issue_cmt.extend(
+            #     all_files_mc_pd[all_files_mc_pd['filename'] == cause_entity]['issue_cmt_id'])
+            # causes_entities_issue_loc += all_files_mc_pd[all_files_mc_pd['filename'] == cause_entity]['issue_loc']
+            # causes_entities_issue.extend(all_files_mc_pd[all_files_mc_pd['filename'] == cause_entity]['issue_id'])
+
+    # pf_entities_mc = all_files_mc_pd.loc[all_files_mc_pd['filename'].isin(pf_entities)]
+    # pf_entities_sum_commit = pf_entities_mc['change_loc'].sum()
+    # pf_entities_sum_loc = pf_entities_mc['change_loc'].sum()
+    # pf_entities_sum_author = pf_entities_mc['change_loc'].sum()
+    # 求出非问题实体的维护成本(差集)
+    non_pf_entities = all_files_mc_pd[~(all_files_mc_pd['filename'].isin(pf_entities.keys()))]['filename']
+    non_pf_entities_cmt = list()
+    non_pf_entities_change_loc = 0
+    non_pf_entities_author = list()
+    # non_causes_entities_issue_cmt = list()
+    # non_causes_entities_issue_loc = 0
+    # non_causes_entities_issue = list()
+    # non_causes_entities = set(list(all_files_mc_dic.keys())) - set(list(new_causes_entities.keys()))
+    non_pf_entity_loc_num = 0
+    for non_pf_entity in non_pf_entities:
+        if non_pf_entity.replace('\\', '/') in file_loc_dict:
+            non_pf_entity_loc_num += int(file_loc_dict[non_pf_entity.replace('\\', '/')])
+            non_pf_entities_cmt.extend(list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['cmt_id'])[0])
+            non_pf_entities_change_loc += list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['change_loc'])[0]
+            non_pf_entities_author.extend(list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['author_id'])[0])
+            # non_causes_entities_issue_cmt.extend(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]]['issue_cmt_id'])
+            # non_causes_entities_issue_loc += all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]]['issue_loc']
+            # non_causes_entities_issue.extend(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]]['issue_id'])
+
+    # non_pf_entities_mc = all_files_mc_pd.loc[all_files_mc_pd['filename'].isin(non_pf_entities)]
+    # non_pf_entities_sum_commit = non_pf_entities_mc['change_loc'].sum()
+    # non_pf_entities_sum_loc = non_pf_entities_mc['change_loc'].sum()
+    # non_pf_entities_sum_author = non_pf_entities_mc['change_loc'].sum()
+    # 将问题实体和非问题实体的结果写入结果数组
+    version_mc.extend(
+        [len(set(pf_entities_cmt)) / pf_entity_loc_num, len(set(non_pf_entities_cmt)) / non_pf_entity_loc_num,
+         (len(set(pf_entities_cmt)) / pf_entity_loc_num) / (len(set(non_pf_entities_cmt)) / non_pf_entity_loc_num),
+         pf_entities_change_loc / pf_entity_loc_num, non_pf_entities_change_loc / non_pf_entity_loc_num,
+         (pf_entities_change_loc / pf_entity_loc_num) / (non_pf_entities_change_loc / non_pf_entity_loc_num),
+         len(set(pf_entities_author)) / pf_entity_loc_num, len(set(non_pf_entities_author)) / non_pf_entity_loc_num,
+         (len(set(pf_entities_author)) / pf_entity_loc_num) / (
+                 len(set(non_pf_entities_author)) / non_pf_entity_loc_num)])
+
     #
     # for cause in causes_to_entities:
     #     author = list()

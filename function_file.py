@@ -23,7 +23,7 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
     return False
 
 
-def measure_package_metrics(project_name, project_path, dep_path, output, ver, mapping_dic, opt):
+def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
     if ver != '':
@@ -88,15 +88,17 @@ def measure_package_metrics(project_name, project_path, dep_path, output, ver, m
 
 def measure_multi_version(project_path, dep_path, output, opt, vers, obj):
     project_list = list()
+    project_path_list = project_path.split('?')
+    dep_path_list = dep_path.split('?')
     index = 0
     for ver in vers:
-        pro_path = project_path[0]
-        dep_path = dep_path[0]
+        pro_path = project_path_list[0]
+        dep_path = dep_path_list[0]
         if obj == 'extension':
             pro_path = project_path[index]
             dep_path = dep_path[index]
         mapping_dic = dict()
-        tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, opt)
+        tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic)
         project_list.append(tmp_pro)
         index += 1
 

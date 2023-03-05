@@ -11,7 +11,7 @@ def generateLog(version, base_version_path):
     git_log_file = create_file_path(base_version_path, 'gitlog')
     git_loc_file = create_file_path(base_version_path, 'gitloc')
     # 获取git log文件
-    os.system('git log --numstat --date=iso > ' + git_log_file)
+    # os.system('git log --numstat --date=iso > ' + git_log_file)
     # 获取git loc文件
     # os.system('git ls-files | xargs wc -l > ' + git_loc_file)
 
@@ -120,7 +120,7 @@ def saveCommitCollection(commit_collection):
     return res_list
 
 
-def gitlog(version, base_version_path):
+def gitlog(project_path, version, base_version_path):
     git_log_file, git_loc_file = generateLog(version, base_version_path)
     file_list_java = get_all_files_by_filter(project_path)
     # 统计所有java文件的loc
