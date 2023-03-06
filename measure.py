@@ -17,7 +17,7 @@ def command():
     parser.add_argument('-opt', help='function options(sv/mv/com/det/cmc)',
                         default='mv')  # single version measure/multi-version measure/compare
     # for different objects
-    parser.add_argument('-obj', help='object(extension/common)', default=r'aosp')
+    parser.add_argument('-obj', help='object(extension/sextension/common)', default=r'aosp')
     parser.add_argument('-pro', help='project path', default=r'')
     parser.add_argument('-ver', help='project version', default='')
     parser.add_argument('-dep', help='dependency file path', default=r'')
@@ -122,45 +122,45 @@ def test():
     #     writer = csv.writer(file1)
     #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
     # 最优参数选择实验
-    base_path = r'D:\paper-data-and-result\results\2023.3.5-results'
-    for item in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]:
-        for line in content:
-            tmp = line.split(',')
-            project_path = tmp[0]
-            pro_name = tmp[1]
-            outpath = os.path.join(base_path, pro_name)
-            ver = tmp[2]
-            vers = ver.split('?')
-            # os.chdir(project_path)
-            # os.system("git checkout -f " + ver)
+    # base_path = r'D:\paper-data-and-result\results\bishe-results\android-result'
+    for line in content:
+        tmp = line.split(',')
+        # project_path = tmp[0]
+        # pro_name = tmp[0]
+        # outpath = os.path.join(base_path, pro_name)
+        ver = tmp[0]
+        vers = ver.split('?')
+        # os.chdir(project_path)
+        # os.system("git checkout -f " + ver)
 
-            measure_multi_version(project_path, '', outpath, 'mv', vers[:2], 'common')
-            # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
-            # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
-            # detect_change(r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35',
-            #               r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r',
-            #               r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'extension', item)
-            detect_change(os.path.join(outpath, vers[0]), os.path.join(outpath, vers[1]), outpath, 'common', item)
-            # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
-            com_mc(project_path, vers[2:], os.path.join(outpath, 'analyseResult' + str(item)))
+        # measure_multi_version(project_path, '', outpath, 'mv', vers[:2], 'common')
+        # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
+        # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
+        # detect_change(r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35',
+        #               r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r',
+        #               r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'extension', item)
+        # detect_change(r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.4.0', r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.5.0', 'common', 0.6)
+        detect_change(vers[0].replace('\n', ''), vers[1].replace('\n', ''), 'extension', 0.6)
+        # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
+        # com_mc(project_path, vers[2:], os.path.join(outpath, 'analyseResult' + str(1)))
 
-            # 统计代码行和文件数
-            # loc_count = os.popen('cloc .').read()
-            # tmp_loc = loc_count.split('\n')
-            # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
-            # loc = tmp_loc1[len(tmp_loc1) - 1]
-            # file = tmp_loc1[len(tmp_loc1) - 1]
-            # 统计commit
-            # log = subprocess.Popen('git log --numstat --date=iso', shell=True, stdout=subprocess.PIPE,
-            #                        stderr=subprocess.STDOUT)
-            # log_out = log.communicate()[0].decode().split('\n')
-            # commit_num = 0
-            # for log_len in log_out:
-            #     if "commit" in str(log_len):
-            #         commit_num = commit_num + 1
-            #
-            # os.chdir(os.path.dirname(os.path.abspath(__file__)))
-            # writer.writerow([pro_name, ver, 'loc', 'file', commit_num])
+        # 统计代码行和文件数
+        # loc_count = os.popen('cloc .').read()
+        # tmp_loc = loc_count.split('\n')
+        # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+        # loc = tmp_loc1[len(tmp_loc1) - 1]
+        # file = tmp_loc1[len(tmp_loc1) - 1]
+        # 统计commit
+        # log = subprocess.Popen('git log --numstat --date=iso', shell=True, stdout=subprocess.PIPE,
+        #                        stderr=subprocess.STDOUT)
+        # log_out = log.communicate()[0].decode().split('\n')
+        # commit_num = 0
+        # for log_len in log_out:
+        #     if "commit" in str(log_len):
+        #         commit_num = commit_num + 1
+        #
+        # os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        # writer.writerow([pro_name, ver, 'loc', 'file', commit_num])
 
 
 if __name__ == '__main__':

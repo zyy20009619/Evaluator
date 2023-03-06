@@ -106,7 +106,7 @@ def measure_multi_version(project_path, dep_path, output, opt, vers, obj):
             pro_path = project_path[index]
             dep_path = dep_path[index]
         mapping_dic = dict()
-        tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic)
+        tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, 'java')
         project_list.append(tmp_pro)
         index += 1
 

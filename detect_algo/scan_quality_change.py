@@ -15,8 +15,8 @@ from util.path_operator import create_file_path
 
 
 # 检测安卓扩展场景和一般场景腐化问题及根因
-def detect_change(path1, path2, output, opt, th):
-    base_out = create_file_path(os.path.join(output, 'analyseResult' + str(th)), '')
+def detect_change(path1, path2, opt, th):
+    base_out = create_file_path(os.path.join(path2, 'analyseResult' + str(th)), '')
     # 读取path1和path2数据
     class1_res, class2_res, method1_res, method2_res = read_csv_folder(
         os.path.join(path1, 'measure_result_class.csv'),
@@ -33,55 +33,84 @@ def detect_change(path1, path2, output, opt, th):
     if opt == 'extension':
         # 读取耦合切面数据
         facade_data = read_file(os.path.join(path2, 'facade.json'))
+        # 分场景扫描：原生自身演化场景和原生相对于伴生演化场景
         # 安卓场景下关注伴生相对于原生进行修改的类实体是否引起较大的腐化
         res = detect_android_project(base_out, facade_data, diff_class_inner, diff_method_all, opt, th)
         # 统计检测结果数据
-        res_count = [len(set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'coupling') & (
-                res['root cause'] == 'call')]['problem class'])),
-                     len(set(res[((res['class_ownership'] == 'intrusive native') & res['problem'] == 'coupling') & (
-                             res['root cause'] == 'inherit')]['problem class'])),
-                     len(set(res[((res['class_ownership'] == 'intrusive native') & res['problem'] == 'coupling') & (
-                             res['root cause'] == 'import')]['problem class'])),
-                     len(set(res[((res['class_ownership'] == 'intrusive native') & res['problem'] == 'coupling') & (
-                             res['root cause'] == 'call')]['problem method'])),
-                     len(set(res[((res['class_ownership'] == 'intrusive native') & res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'call')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'inherit')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'import')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'call')]['problem method'])),
-                     len(set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'coupling') & (
-                             res['root cause'] == 'call')]['problem class'])),
-                     len(set(res[((res['class_ownership'] == 'actively native') & res['problem'] == 'coupling') & (
-                             res['root cause'] == 'inherit')]['problem class'])),
-                     len(set(res[((res['class_ownership'] == 'actively native') & res['problem'] == 'coupling') & (
-                             res['root cause'] == 'import')]['problem class'])),
-                     len(set(res[((res['class_ownership'] == 'actively native') & res['problem'] == 'coupling') & (
-                             res['root cause'] == 'call')]['problem method'])),
-                     len(set(res[((res['class_ownership'] == 'actively native') & res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'call')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'inherit')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'import')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
-                             res['root cause'] == 'call')]['problem method'])),
-                     len(set(res[(res['class_ownership'] == 'intrusive native')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'intrusive native')]['problem method'])),
-                     len(set(res[(res['class_ownership'] == 'actively native')]['problem class'])),
-                     len(set(res[(res['class_ownership'] == 'actively native')]['problem method']))]
-        count_pd = pd.DataFrame(data=[res_count],
-                                columns=['#intrusive-耦合问题类(call)', '#intrusive-耦合问题类(inherit)',
-                                         '#intrusive-耦合问题类(import)',
-                                         '#intrusive-耦合问题方法(call)', '#intrusive-内聚问题类(call)',
-                                         '#intrusive-内聚问题类(inherit)',
-                                         '#intrusive-内聚问题类(import)', '#intrusive-内聚问题方法(call)',
-                                         '#actively-耦合问题类(call)', '#actively-耦合问题类(inherit)', '#actively-耦合问题类(import)',
-                                         '#actively-耦合问题方法(call)', '#actively-内聚问题类(call)', '#actively-内聚问题类(inherit)',
-                                         '#actively-内聚问题类(import)', '#actively-内聚问题方法(call)',
-                                         '#intrusive-问题类', '#intrusive-问题方法', '#actively-问题类', '#actively-问题方法'])
+        intrusive_coupling_call_class = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'call')]['problem class']))
+        intrusive_coupling_inherit_class = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'inherit')]['problem class']))
+        intrusive_coupling_import_class = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'import')]['problem class']))
+        intrusive_coupling_call_method = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'call')]['problem method']))
+        intrusive_cohesion_call_class = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'call')]['problem class']))
+        intrusive_cohesion_inherit_class = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'inherit')]['problem class']))
+        intrusive_cohesion_import_class = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'import')]['problem class']))
+        intrusive_cohesion_call_method = len(
+            set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'call')]['problem method']))
+        actively_coupling_call_class = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'call')]['problem class']))
+        actively_coupling_inherit_class = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'inherit')]['problem class']))
+        actively_coupling_import_class = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'import')]['problem class']))
+        actively_coupling_call_method = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'coupling') & (
+                    res['root cause'] == 'call')]['problem method']))
+        actively_cohesion_call_class = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'call')]['problem class']))
+        actively_cohesion_inherit_class = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'inherit')]['problem class']))
+        actively_cohesion_import_class = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'import')]['problem class']))
+        actively_cohesion_call_method = len(
+            set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
+                    res['root cause'] == 'call')]['problem method']))
+        count_pd = pd.DataFrame(data=[
+            [intrusive_coupling_call_class, intrusive_coupling_inherit_class, intrusive_coupling_import_class,
+             intrusive_coupling_call_method, intrusive_cohesion_call_class, intrusive_cohesion_inherit_class,
+             intrusive_cohesion_import_class, intrusive_cohesion_call_method, actively_coupling_call_class,
+             actively_coupling_inherit_class, actively_coupling_import_class, actively_coupling_call_method,
+             actively_cohesion_call_class, actively_cohesion_inherit_class, actively_cohesion_import_class,
+             actively_cohesion_call_method,
+             len(set(res[(res['class_ownership'] == 'intrusive native')]['problem class'])),
+             len(set(res[(res['class_ownership'] == 'intrusive native')]['problem method'])),
+             len(set(res[(res['class_ownership'] == 'actively native')]['problem class'])),
+             len(set(res[(res['class_ownership'] == 'actively native')]['problem method']))]],
+            columns=['#intrusive-耦合问题类(call)', '#intrusive-耦合问题类(inherit)',
+                     '#intrusive-耦合问题类(import)',
+                     '#intrusive-耦合问题方法(call)', '#intrusive-内聚问题类(call)',
+                     '#intrusive-内聚问题类(inherit)',
+                     '#intrusive-内聚问题类(import)', '#intrusive-内聚问题方法(call)',
+                     '#actively-耦合问题类(call)', '#actively-耦合问题类(inherit)', '#actively-耦合问题类(import)',
+                     '#actively-耦合问题方法(call)', '#actively-内聚问题类(call)', '#actively-内聚问题类(inherit)',
+                     '#actively-内聚问题类(import)', '#actively-内聚问题方法(call)',
+                     '#intrusive-问题类', '#intrusive-问题方法', '#actively-问题类', '#actively-问题方法'])
+    elif opt == 'sextension':
+        # 读取耦合切面数据
+        facade_data = read_file(os.path.join(path2, 'facade.json'))
+        # 自身演化以package粒度去评估
+        res = detect_common_project(diff_class_all, diff_method_all, opt, th)
+        # 将检测结果依据归属方信息进行整理
     else:
         # 一般场景下关注新版本相对于旧版本在模块质量上是否发生较大腐化
         res = detect_common_project(diff_class_all, diff_method_all, opt, th)
@@ -185,15 +214,15 @@ def detect_android_project(base_out, facade_data, diff_class, diff_method, opt, 
 
 
 def detect_common_project(diff_class_all, diff_method_all, opt, th):
-    diff_class_modify = diff_class_all
+    diff_module_modify = diff_class_all
     # 对新增或着删除的module不关注（即其中所有的类status都为add或delete）
     deleted_module = list()
     for name, group in diff_class_all.groupby('module_name'):
         if all((group['status'] == 'add') | (group['status'] == 'delete')):
             deleted_module.append(name)
-    deleted_index = diff_class_modify[diff_class_modify['module_name'].isin(deleted_module)].index
-    diff_class_modify = diff_class_modify.drop(index=deleted_index)
-    return get_common_decay_root_cause(diff_class_modify, diff_method_all, opt, th)
+    deleted_index = diff_module_modify[diff_module_modify['module_name'].isin(deleted_module)].index
+    diff_module_modify = diff_module_modify.drop(index=deleted_index)
+    return get_common_decay_root_cause(diff_module_modify, diff_method_all, opt, th)
 
 
 def get_android_decay_root_cause(ownership_pd, ownership, diff_class, base_out, diff_method, opt, th):
@@ -212,14 +241,14 @@ def get_android_decay_root_cause(ownership_pd, ownership, diff_class, base_out, 
     return res_pd
 
 
-def get_common_decay_root_cause(diff_class, diff_method, opt, th):
+def get_common_decay_root_cause(diff_module, diff_method, opt, th):
     # 对产生腐化的模块实体进行定位（根据腐化严重程度进行输出）
-    diff_class.sort_values(by="scop", inplace=True, ascending=False)
-    coupling_df = detect_coupling_problem(diff_class[diff_class['scop'] > 0], diff_method, opt, th)
+    diff_module.sort_values(by="scop", inplace=True, ascending=False)
+    coupling_df = detect_coupling_problem(diff_module[diff_module['scop'] > 0], diff_method, opt, th)
     coupling_df = coupling_df.rename(
         columns={'scop': 'module decay degree'})
-    diff_class.sort_values(by="scoh", inplace=True, ascending=True)
-    cohesion_df = detect_cohesion_problem(diff_class[diff_class['scoh'] < 0], diff_method, opt)
+    diff_module.sort_values(by="scoh", inplace=True, ascending=True)
+    cohesion_df = detect_cohesion_problem(diff_module[diff_module['scoh'] < 0], diff_method, opt)
     cohesion_df = cohesion_df.rename(
         columns={'scoh': 'module decay degree'})
     res_pd = pd.concat([coupling_df, cohesion_df], axis=0)

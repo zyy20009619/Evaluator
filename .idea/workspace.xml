@@ -2,14 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/module_measurement/com_c_metrics.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apollo-enre-out/apollo-out.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/measure_arch.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/measure_arch.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/function_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_file.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/compete_strcut_dep.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/compete_strcut_dep.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projects.txt" beforeDir="false" afterPath="$PROJECT_DIR$/projects.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,6 +82,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -100,19 +98,29 @@
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>180</line>
-          <option name="timeStamp" value="69" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>201</line>
-          <option name="timeStamp" value="73" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>42</line>
-          <option name="timeStamp" value="87" />
+          <line>12</line>
+          <option name="timeStamp" value="89" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>87</line>
+          <option name="timeStamp" value="99" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>150</line>
+          <option name="timeStamp" value="100" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>163</line>
+          <option name="timeStamp" value="101" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>174</line>
+          <option name="timeStamp" value="102" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
