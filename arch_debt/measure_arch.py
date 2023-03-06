@@ -36,11 +36,14 @@ def measure_maintenance(project_path, pf_entities, vers, detect_path):
     # issue_loc_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
     os.chdir(project_path)
     mc_list = list()
-    versions = vers.split('?')
-    for version in versions:
+    # versions = vers.split('?')
+    for version in vers:
+        version = version.replace('\n', '')
         version_mc = list()
         version_mc.append(version)
-        base_version_path = os.path.join(os.path.dirname(detect_path), 'mc/' + version)
+        base_version_path = os.path.join(os.path.join(r'D:\paper-data-and-result\results\paper-results\mv',
+                                                      os.path.basename(os.path.dirname(detect_path)) + '-enre-out'),
+                                         'mc/' + version)
         # 获取到该版本的loc和log，计算版本中每个文件的维护成本
         commit_collection_res, file_list_java, file_loc_dict = gitlog(project_path, version, base_version_path)
         # 计算所有文件的维护成本
@@ -108,8 +111,10 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
         if non_pf_entity.replace('\\', '/') in file_loc_dict:
             non_pf_entity_loc_num += int(file_loc_dict[non_pf_entity.replace('\\', '/')])
             non_pf_entities_cmt.extend(list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['cmt_id'])[0])
-            non_pf_entities_change_loc += list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['change_loc'])[0]
-            non_pf_entities_author.extend(list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['author_id'])[0])
+            non_pf_entities_change_loc += \
+                list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['change_loc'])[0]
+            non_pf_entities_author.extend(
+                list(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]['author_id'])[0])
             # non_causes_entities_issue_cmt.extend(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]]['issue_cmt_id'])
             # non_causes_entities_issue_loc += all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]]['issue_loc']
             # non_causes_entities_issue.extend(all_files_mc_pd[all_files_mc_pd['filename'] == non_pf_entity]]['issue_id'])

@@ -3,14 +3,14 @@ def com_struct_metric(current_module, module_info, struct_dep):
     iidd = dict()
     fan_in = dict()
     fan_out = dict()
-    scoh, idcc_list = _com_call_coh(module_info[current_module], struct_dep, fan_in, fan_out, iodd, iidd)
-    scop, odd, idd, edcc_list = _com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out)
+    scoh, idcc_list = com_call_coh(module_info[current_module], struct_dep, fan_in, fan_out, iodd, iidd)
+    scop, odd, idd, edcc_list = com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out)
     module_value = [float(format(scoh, '.4f')), float(format(scop, '.4f')), float(format(odd, '.4f')),
                     float(format(idd, '.4f'))]
     return module_value, idcc_list, edcc_list, fan_in, fan_out, iodd, iidd
 
 
-def _com_call_coh(classes_id, struct_dep, fan_in, fan_out, iodd, iidd):
+def com_call_coh(classes_id, struct_dep, fan_in, fan_out, iodd, iidd):
     idcc_list = dict()
     has_connections = 0
     all_connections = len(classes_id) * len(classes_id)
@@ -35,7 +35,7 @@ def _com_call_coh(classes_id, struct_dep, fan_in, fan_out, iodd, iidd):
     return scoh, idcc_list
 
 
-def _com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out):
+def com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out):
     scop = 0
     idd_list = list()
     odd_list = list()

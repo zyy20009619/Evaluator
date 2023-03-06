@@ -16,7 +16,7 @@ from util.path_operator import create_file_path
 
 # 检测安卓扩展场景和一般场景腐化问题及根因
 def detect_change(path1, path2, output, opt, th):
-    base_out = create_file_path(os.path.join(output, 'analyseResult'), '')
+    base_out = create_file_path(os.path.join(output, 'analyseResult' + str(th)), '')
     # 读取path1和path2数据
     class1_res, class2_res, method1_res, method2_res = read_csv_folder(
         os.path.join(path1, 'measure_result_class.csv'),
