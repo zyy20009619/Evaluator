@@ -122,25 +122,25 @@ def test():
     #     writer = csv.writer(file1)
     #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
     # 最优参数选择实验
-    # base_path = r'D:\paper-data-and-result\results\bishe-results\android-result'
+    base_path = r'D:\paper-data-and-result\results\bishe-results\android-result\aosp'
     for line in content:
         tmp = line.split(',')
-        # project_path = tmp[0]
-        # pro_name = tmp[0]
-        # outpath = os.path.join(base_path, pro_name)
-        ver = tmp[0]
+        project_path = tmp[0]
+        pro_name = tmp[1]
+        outpath = os.path.join(base_path, pro_name)
+        ver = tmp[2]
         vers = ver.split('?')
         # os.chdir(project_path)
         # os.system("git checkout -f " + ver)
 
-        # measure_multi_version(project_path, '', outpath, 'mv', vers[:2], 'common')
+        measure_multi_version(project_path, outpath, outpath, 'mv', vers, 'common')
         # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
         # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
         # detect_change(r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35',
         #               r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r',
         #               r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'extension', item)
         # detect_change(r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.4.0', r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.5.0', 'common', 0.6)
-        detect_change(vers[0].replace('\n', ''), vers[1].replace('\n', ''), 'extension', 0.6)
+        # detect_change(vers[0].replace('\n', ''), vers[1].replace('\n', ''), 'extension', 0.6)
         # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
         # com_mc(project_path, vers[2:], os.path.join(outpath, 'analyseResult' + str(1)))
 

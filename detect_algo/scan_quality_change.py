@@ -85,6 +85,10 @@ def detect_change(path1, path2, opt, th):
         actively_cohesion_call_method = len(
             set(res[(res['class_ownership'] == 'actively native') & (res['problem'] == 'cohesion') & (
                     res['root cause'] == 'call')]['problem method']))
+        intrusive_class = len(set(res[(res['class_ownership'] == 'intrusive native')]['problem class']))
+        intrusive_method = len(set(res[(res['class_ownership'] == 'intrusive native')]['problem method']))
+        actively_class = len(set(res[(res['class_ownership'] == 'actively native')]['problem class']))
+        actively_method = len(set(res[(res['class_ownership'] == 'actively native')]['problem method']))
         count_pd = pd.DataFrame(data=[
             [intrusive_coupling_call_class, intrusive_coupling_inherit_class, intrusive_coupling_import_class,
              intrusive_coupling_call_method, intrusive_cohesion_call_class, intrusive_cohesion_inherit_class,
@@ -92,10 +96,7 @@ def detect_change(path1, path2, opt, th):
              actively_coupling_inherit_class, actively_coupling_import_class, actively_coupling_call_method,
              actively_cohesion_call_class, actively_cohesion_inherit_class, actively_cohesion_import_class,
              actively_cohesion_call_method,
-             len(set(res[(res['class_ownership'] == 'intrusive native')]['problem class'])),
-             len(set(res[(res['class_ownership'] == 'intrusive native')]['problem method'])),
-             len(set(res[(res['class_ownership'] == 'actively native')]['problem class'])),
-             len(set(res[(res['class_ownership'] == 'actively native')]['problem method']))]],
+             intrusive_class, intrusive_method, actively_class, actively_method]],
             columns=['#intrusive-耦合问题类(call)', '#intrusive-耦合问题类(inherit)',
                      '#intrusive-耦合问题类(import)',
                      '#intrusive-耦合问题方法(call)', '#intrusive-内聚问题类(call)',
