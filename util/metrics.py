@@ -1,4 +1,4 @@
-PROJECT_METRICS = ['score', 'SMQ', 'ODD', 'IDD', 'SPREAD', 'FOUCUS', 'ICF', 'ECF', 'REI', 'CHM', 'CHD']
+PROJECT_METRICS = ['score', 'SMQ', 'ODD', 'IDD', 'SPREAD', 'FOCUS', 'ICF', 'ECF', 'REI', 'CHM', 'CHD']
 
 MODULE_METRICS = ['scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm', 'chd', 'DSM']
 

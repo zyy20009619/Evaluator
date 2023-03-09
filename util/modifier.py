@@ -14,7 +14,7 @@ const.ABSTRACT = 1024
 const.STRICTFP = 2048
 
 
-def _get_modifiers_number():
+def get_modifiers_number():
     return {'public': const.PUBLIC, 'private': const.PRIVATE, 'protected': const.PROTECTED, 'static': const.STATIC,
             'final': const.FINAL, 'synchronized': const.SYNCHRONIZED, 'volatile': const.VOLATILE,
             'transient': const.TRANSIENT, 'native': const.NATIVE, 'sealed': const.SEALED, 'abstract': const.ABSTRACT,
@@ -26,8 +26,8 @@ def get_modifiers(entity):
     if 'modifiers' in entity:
         modifier_list = entity['modifiers'].split(' ')
         for modifier in modifier_list:
-            if modifier in _get_modifiers_number():
-                c_modifiers += _get_modifiers_number()[modifier]
+            if modifier in get_modifiers_number():
+                c_modifiers += get_modifiers_number()[modifier]
     return c_modifiers
 
 

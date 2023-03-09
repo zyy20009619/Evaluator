@@ -6,11 +6,89 @@ from util.json_operator import write_result_to_json
 from util.path_operator import create_file_path
 
 
-def get_rel_info(json_dic, mapping_dic, base_out_path):
-    cells = json_dic['cells']
-    variables = json_dic['variables']
+def get_rel_info(json_dic, lang):
+    # TODO:如果后期依赖模型统一，请修改此处
+    if lang == 'c':
+        variables = json_dic[0]['variables']
+        cells = json_dic[0]['relations']
+        file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_c_rel(variables, cells)
+    else:
+        variables = json_dic['variables']
+        cells = json_dic['cells']
+        get_java_rel(variables, cells)
+    return file_contain, file_dep_matrix, struct_dep_matrix, function_dep
 
-    package_contain = dict()
+
+
+def get_three_model(first_contain, second_contain):
+    for c1 in first_contain:
+        if c1 in second_contain:
+            first_contain[c1] = second_contain[c1]
+
+
+def get_c_rel(variables, cells):
+    var_id_to_var = dict()
+    struct_contain = dict()
+    # struct->function关系构建：对所有变量进行扫描，如果变量的category是Typedef且其ParentId对应的实体category是Struct，那么认为该变量是struct下的函数
+    for var in variables:
+        var_id_to_var[var['id']] = var
+    for var in variables:
+        if 'typedefType' in var and var['typedefType'] == 'Function Pointer' and var_id_to_var[var['parentID']]['category'] == 'Struct':
+            if var['parentID'] not in struct_contain:
+                struct_contain[var['parentID']] = list()
+            struct_contain[var['parentID']].append(var['id'])
+
+    file_contain = dict()
+    # 构造依赖矩阵
+    file_dep_matrix = dict()
+    struct_dep_matrix = dict()
+    para_dep_matrix = dict()
+    use_dep_matrix = dict()
+    call_dep_matrix = dict()
+    for cell in cells:
+        # Define:用于构建file->struct
+        con_rel_info(var_id_to_var, cell, 'Define', file_contain, 'File', 'Struct')
+        con_rel_info(var_id_to_var, cell, 'Define', file_contain, 'File', 'Function')
+        # Include:用于构建file include file关系
+        con_rel_info(var_id_to_var, cell, 'Include', file_dep_matrix, 'File', 'File')
+        # Embed
+        con_rel_info(var_id_to_var, cell, 'Embed', struct_dep_matrix, 'Struct', 'Struct')
+        # Parameter
+        con_rel_info(var_id_to_var, cell, 'Parameter', para_dep_matrix, 'Function', 'Typedef')
+        # Use
+        con_rel_info(var_id_to_var, cell, 'Use', use_dep_matrix, 'Function', 'Typedef')
+        # Call
+        con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Typedef')
+        con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Function')
+    # 构建三层模型结构->第一层:module(package<java>/file<c>)+第二层:class(java)+struct(c)+第三层:method(java)+typedef(c)
+    get_three_model(file_contain, struct_contain)
+    function_dep = {'parameter': para_dep_matrix, 'use_dep_matrix': use_dep_matrix, 'call_dep_matrix': call_dep_matrix}
+    return file_contain, file_dep_matrix, struct_dep_matrix, function_dep
+
+
+def con_rel_info(variables, cell, cell_type, dep_matrix, from_type, to_type):
+    if cell['type'] == cell_type:
+        if cell['src'] in variables and cell['dest'] in variables:
+            if variables[cell['src']]['category'] == from_type and variables[cell['dest']]['category'] == to_type:
+                if cell_type == 'Define':
+                    if cell['src'] not in dep_matrix:
+                        dep_matrix[cell['src']] = list()
+                    dep_matrix[cell['src']].append(cell['dest'])
+                    return
+                add_dep_to_dict(cell['src'], cell['dest'], dep_matrix)
+                add_dep_to_dict(cell['dest'], cell['src'], dep_matrix)
+
+
+def add_dep_to_dict(src_id, dest_id, dic):
+    if src_id not in dic:
+        dic[src_id] = dict()
+    if dest_id not in dic[src_id]:
+        dic[src_id][dest_id] = 0
+    dic[src_id][dest_id] += 1
+
+
+def get_java_rel(variables, cells):
+    module_contain = dict()
     class_contain = dict()
     method_define_var = dict()
     method_use_field = dict()
@@ -49,9 +127,9 @@ def get_rel_info(json_dic, mapping_dic, base_out_path):
         # Contain
         if 'Contain' in c['values']:
             if variables[c['src']]['category'] == 'Package' and variables[c['dest']]['category'] == 'File':
-                if c['src'] not in package_contain:
-                    package_contain[c['src']] = list()
-                package_contain[c['src']].append(c['dest'])
+                if c['src'] not in module_contain:
+                    module_contain[c['src']] = list()
+                module_contain[c['src']].append(c['dest'])
                 package_name_to_id[variables[c['src']]['qualifiedName']] = c['src']
             if variables[c['src']]['category'] == 'File' and variables[c['dest']]['category'] == 'Class':
                 file_contain[c['src']] = c['dest']
@@ -84,16 +162,15 @@ def get_rel_info(json_dic, mapping_dic, base_out_path):
             override[c['src']] = c['dest']
             _add_list_value(overrided, c['dest'], c['src'])
 
-    # call -> dep
-    _convert_call_to_dep(call, method_class, dep)
-    # moduleinfo: class -> field/method
-    module_info = _get_module_info(mapping_dic, package_contain, package_name_to_id, file_contain, class_contain,
-                                   method_use_field, set_var, variables)
-    # save call/called/inherit/descendent/import_val/imported_val into a dep file
-    _save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
-                      variables, os.path.join(base_out_path, 'dep.json'))
-
-    return module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field
+    # # 将方法级依赖映射到类级别：call/use/parameter -> dep
+    # convert_call_to_dep(call, method_class, dep)
+    # # moduleinfo: class -> field/method
+    #
+    # # save call/called/inherit/descendent/import_val/imported_val into a dep file
+    # _save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
+    #                   variables, os.path.join(base_out_path, 'dep.json'))
+    #
+    # return module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field
 
 
 def _save_dep_to_json(inherit, descendent, call_id_dic, called_id_dic, import_val, imported_val,
@@ -149,7 +226,7 @@ def _add_list_value(dic, id1, id2):
     dic[id1].append(id2)
 
 
-def _convert_call_to_dep(call, method_class, dep):
+def convert_call_to_dep(call, method_class, dep):
     for src_method_id in call:
         for dest_method_id in call[src_method_id]:
             if src_method_id in method_class and dest_method_id in method_class:
@@ -160,8 +237,8 @@ def _convert_call_to_dep(call, method_class, dep):
                 dep[method_class[src_method_id]][method_class[dest_method_id]] += 1
 
 
-def _get_module_info(mapping_dic, package_contain, package_name_to_id, file_contain, class_contain, method_use_field,
-                     set_var, variables):
+def get_module_info(mapping_dic, package_contain, package_name_to_id, file_contain, class_contain, method_use_field,
+                    set_var, variables):
     module_info = dict()
     if mapping_dic:
         for module in mapping_dic:

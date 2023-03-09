@@ -116,24 +116,25 @@ def command():
 
 
 def test():
-    with open('./projects.txt', encoding='utf-8') as file:
-        content = file.readlines()
-    # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
-    #     writer = csv.writer(file1)
-    #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
-    # 最优参数选择实验
-    base_path = r'D:\paper-data-and-result\results\bishe-results\android-result\aosp'
-    for line in content:
-        tmp = line.split(',')
-        project_path = tmp[0]
-        pro_name = tmp[1]
-        outpath = os.path.join(base_path, pro_name)
-        ver = tmp[2]
-        vers = ver.split('?')
-        # os.chdir(project_path)
-        # os.system("git checkout -f " + ver)
-
-        measure_multi_version(project_path, outpath, outpath, 'mv', vers, 'common')
+    measure_package_metrics('pro', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
+    # with open('./projects.txt', encoding='utf-8') as file:
+    #     content = file.readlines()
+    # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
+    # #     writer = csv.writer(file1)
+    # #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
+    # # 最优参数选择实验
+    # base_path = r'D:\paper-data-and-result\results\bishe-results\android-result\aosp'
+    # for line in content:
+    #     tmp = line.split(',')
+    #     project_path = tmp[0]
+    #     pro_name = tmp[1]
+    #     outpath = os.path.join(base_path, pro_name)
+    #     ver = tmp[2]
+    #     vers = ver.split('?')
+    #     # os.chdir(project_path)
+    #     # os.system("git checkout -f " + ver)
+    #
+    #     measure_multi_version(project_path, outpath, outpath, 'mv', vers, 'common')
         # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
         # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
         # detect_change(r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35',
