@@ -11,19 +11,19 @@ def get_rel_info(json_dic, lang):
     if lang == 'c':
         variables = json_dic[0]['variables']
         cells = json_dic[0]['relations']
-        file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_c_rel(variables, cells)
+        var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_c_rel(variables, cells)
     else:
         variables = json_dic['variables']
         cells = json_dic['cells']
         get_java_rel(variables, cells)
-    return file_contain, file_dep_matrix, struct_dep_matrix, function_dep
-
+    return var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep
 
 
 def get_three_model(first_contain, second_contain):
     for c1 in first_contain:
-        if c1 in second_contain:
-            first_contain[c1] = second_contain[c1]
+        for c2 in first_contain[c1]:
+            if c2 in second_contain:
+                first_contain[c1][c2] = second_contain[c2]
 
 
 def get_c_rel(variables, cells):
@@ -32,11 +32,14 @@ def get_c_rel(variables, cells):
     # struct->function关系构建：对所有变量进行扫描，如果变量的category是Typedef且其ParentId对应的实体category是Struct，那么认为该变量是struct下的函数
     for var in variables:
         var_id_to_var[var['id']] = var
-    for var in variables:
-        if 'typedefType' in var and var['typedefType'] == 'Function Pointer' and var_id_to_var[var['parentID']]['category'] == 'Struct':
-            if var['parentID'] not in struct_contain:
-                struct_contain[var['parentID']] = list()
-            struct_contain[var['parentID']].append(var['id'])
+    # TODO:Funtion和Function Pointer可以对应起来之后进行该层映射
+    # for var in variables:
+    #     # if 'type' in var and var['type'] in var_id_to_var:
+    #     #     typevar = var_id_to_var[var['type']]
+    #     if 'typedefType' in var and var['typedefType'] == 'Function Pointer' and var_id_to_var[var['parentID']]['category'] == 'Struct':
+    #         if var['parentID'] not in struct_contain:
+    #             struct_contain[var['parentID']] = list()
+    #         struct_contain[var['parentID']].append(var['id'])
 
     file_contain = dict()
     # 构造依赖矩阵
@@ -55,28 +58,31 @@ def get_c_rel(variables, cells):
         con_rel_info(var_id_to_var, cell, 'Embed', struct_dep_matrix, 'Struct', 'Struct')
         # Parameter
         con_rel_info(var_id_to_var, cell, 'Parameter', para_dep_matrix, 'Function', 'Typedef')
-        # Use
-        con_rel_info(var_id_to_var, cell, 'Use', use_dep_matrix, 'Function', 'Typedef')
+        # typeUse
+        con_rel_info(var_id_to_var, cell, 'typeUse', use_dep_matrix, 'Function', 'Struct')
         # Call
-        con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Typedef')
+        # con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Typedef')
         con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Function')
-    # 构建三层模型结构->第一层:module(package<java>/file<c>)+第二层:class(java)+struct(c)+第三层:method(java)+typedef(c)
-    get_three_model(file_contain, struct_contain)
-    function_dep = {'parameter': para_dep_matrix, 'use_dep_matrix': use_dep_matrix, 'call_dep_matrix': call_dep_matrix}
-    return file_contain, file_dep_matrix, struct_dep_matrix, function_dep
+    # 构建三层模型结构->第一层:module(package<java>/file<c>)+第二层:class<java>+struct<c>+第三层:method<java>+typedef<c>
+    # get_three_model(file_contain, struct_contain)
+    function_dep = {'use_dep': use_dep_matrix, 'call_dep': call_dep_matrix, 'para_dep': para_dep_matrix}
+    return var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep
 
 
 def con_rel_info(variables, cell, cell_type, dep_matrix, from_type, to_type):
     if cell['type'] == cell_type:
         if cell['src'] in variables and cell['dest'] in variables:
+            if cell_type == 'Parameter':
+                add_dep_to_dict(cell['src'], cell['dest'], dep_matrix)
+                return
             if variables[cell['src']]['category'] == from_type and variables[cell['dest']]['category'] == to_type:
                 if cell_type == 'Define':
                     if cell['src'] not in dep_matrix:
-                        dep_matrix[cell['src']] = list()
-                    dep_matrix[cell['src']].append(cell['dest'])
+                        dep_matrix[cell['src']] = dict()
+                    dep_matrix[cell['src']][cell['dest']] = list()
                     return
                 add_dep_to_dict(cell['src'], cell['dest'], dep_matrix)
-                add_dep_to_dict(cell['dest'], cell['src'], dep_matrix)
+                # add_dep_to_dict(cell['dest'], cell['src'], dep_matrix)
 
 
 def add_dep_to_dict(src_id, dest_id, dic):

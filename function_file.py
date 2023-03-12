@@ -61,11 +61,10 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, la
     module_data = list()
     dep_dic = read_file(os.path.join(base_out_path, project_name + '-out.json'))
     if dep_dic:
-        # 获取依赖
-        file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
-        # 计算指标
-        com_metrics(ver, dict(), dict(), dict(), dict())
         # 在获取依赖时分别适配C语言和Java语言
+        var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
+        # 计算指标
+        com_metrics(ver, var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep)
         # package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
         #     dep_dic, mapping_dic, base_out_path, lang)
         # # 计算指标时应该是通用的
@@ -77,26 +76,26 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, la
         #                                                          method_use_field, 'package', module_data,
         #                                                          os.path.join(base_out_path, 'cmt.csv'))
 
-        result = list()
-        for item in module_data:
-            temp = [item[0] - item[1]]
-            temp.extend(item[2: 11: 1])
-            result.append(temp)
-        tmp_pro = np.around(np.array(result).mean(axis=0).tolist(), 4)
-        project_dic = dict()
-        tmp_pro = np.insert(tmp_pro, 0, score)
-        project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
-        project_metric['modules'] = package_dic
-        project_dic[ver] = project_metric
-
-        write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
-        write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
-                            os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
+        # result = list()
+        # for item in module_data:
+        #     temp = [item[0] - item[1]]
+        #     temp.extend(item[2: 11: 1])
+        #     result.append(temp)
+        # tmp_pro = np.around(np.array(result).mean(axis=0).tolist(), 4)
+        # project_dic = dict()
+        # tmp_pro = np.insert(tmp_pro, 0, score)
+        # project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
+        # project_metric['modules'] = package_dic
+        # project_dic[ver] = project_metric
+        #
+        # write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
+        # write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
+        #                     os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
     # else:
     #     com_metrics(dep_dic, base_out_path)
     # if not project_name == '':
     #     return tmp_pro, loc, len(module_data), c_count, m_count
-    return tmp_pro
+    # return tmp_pro
 
 
 def measure_multi_version(project_path, dep_path, output, opt, vers, obj):

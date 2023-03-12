@@ -69,111 +69,115 @@
 
 本度量工具共提供4个粒度的项目可维护性度量，每个粒度提供的指标数量统计如下：
 
-| 粒度    | 指标数量 |
-| ------- | -------- |
-| project | 11       |
-| module  | 12       |
-| class   | 42       |
-| method  | 12       |
-- ### project
+| 粒度    | Java已支持指标数量 | C已支持指标数量 |
+| ------- | ------------------ | --------------- |
+| project | 11                 | 3               |
+| module  | 12                 | 7               |
+| class   | 42                 | 9               |
+| method  | 12                 | 9               |
+**待确认问题：**
 
-| 指标                              | 来源 | 说明                                                         |
-| --------------------------------- | ---- | ------------------------------------------------------------ |
-| score                             | [1]  | 对模块级指标进行融合得到模块可维护性的综合评分               |
-| CHM                               | [2]  | 项目中所有模块在消息层内聚程度的均值。                       |
-| CHD                               | [2]  | 项目中所有模块在领域层内聚程度的均值。                       |
-| SMQ(structural modularity)        | [2]  | 结构模块化程度。SMQ 值越大,说明模块的模块化程度越高。        |
-| SPREAD                            | [3]  | 度量模块中的实体在演化过程中横切协同变化集群的个数。SPREAD越小，总体模块性越好。 |
-| FOCUS                             | [3]  | 度量模块化良好的程度。FOCUS越大，总体模块性越好。            |
-| ICF(intra co-change frequency)    | [2]  | 所有模块演化内部共变频率的平均值。ICF越高，总体模块内的实体更有可能一起演化。 |
-| ECF(external co-change frequency) | [2]  | 所有模块演化外部共变频率的平均值。ECF越低，总体跨模块边界的实体更有可能独立演化。 |
-| REI(ratio of ecf to icf)          | [2]  | 所有模块演化外部共变频率与内部共变频率的比值的平均值。REI越低，说明总体不同模块一起修改的可能性越低，各模块更有可能会独立演化、独立维护。 |
-| ODD(out-degree dependence)        | [2]  | ODD越大，总体耦合其他模块的程度越高，模块之间的动态交互度越高。 |
-| IDD(in-degree dependence)         | [2]  | IDD越大，总体被耦合的程度越高，模块间的动态交互程度越高。    |
+file在计算耦合和内聚程度时，依赖于struct之间的依赖关系，目前struct之间只存在embed关系，需将function考虑进来，但需确认：file内的实体个数认定为struct和function之和？<一等公民：变量/方法/结构体...>  两种关系
+
+- ### project 
+
+| 指标                              | Java中定义                                                   | c中定义 | c支持状态 |
+| --------------------------------- | ------------------------------------------------------------ | ------- | --------- |
+| score                             | 对模块级指标进行融合得到模块可维护性的综合评分               | -       | 待支持    |
+| CHM                               | 项目中所有模块在消息层内聚程度的均值。                       | -       | 待支持    |
+| CHD                               | 项目中所有模块在领域层内聚程度的均值。                       | -       | 待支持    |
+| SMQ(structural modularity)        | 结构模块化程度。SMQ 值越大,说明模块的模块化程度越高。        | 同java  | 已支持    |
+| SPREAD                            | 度量模块中的实体在演化过程中横切协同变化集群的个数。SPREAD越小，总体模块性越好。 | -       | 待支持    |
+| FOCUS                             | 度量模块化良好的程度。FOCUS越大，总体模块性越好。            | -       | 待支持    |
+| ICF(intra co-change frequency)    | 所有模块演化内部共变频率的平均值。ICF越高，总体模块内的实体更有可能一起演化。 | -       | 待支持    |
+| ECF(external co-change frequency) | 所有模块演化外部共变频率的平均值。ECF越低，总体跨模块边界的实体更有可能独立演化。 | -       | 待支持    |
+| REI(ratio of ecf to icf)          | 所有模块演化外部共变频率与内部共变频率的比值的平均值。REI越低，说明总体不同模块一起修改的可能性越低，各模块更有可能会独立演化、独立维护。 | -       | 待支持    |
+| ODD(out-degree dependence)        | ODD越大，总体耦合其他模块的程度越高，模块之间的动态交互度越高。 | 同java  | 已支持    |
+| IDD(in-degree dependence)         | IDD越大，总体被耦合的程度越高，模块间的动态交互程度越高。    | 同java  | 已支持    |
 
 - ### module --file
 
-| 指标   | 来源 | 说明                                                         | C                     |
-| ------ | ---- | ------------------------------------------------------------ | --------------------- |
-| scoh   | [2]  | scoh越大，模块内的结构内聚程度越大。                         |                       |
-| scop   | [2]  | scop越大，模块间的结构耦合程度越大。                         |                       |
-| odd    | [2]  | odd越大，该模块耦合其他模块的程度越高，模块之间的动态交互度越高。 |                       |
-| idd    | [2]  | idd越大，该模块被耦合的程度越高，模块间的动态交互程度越高。  |                       |
-| spread | [3]  | 度量模块中的实体在演化过程中接触的共变集群个数。spread越小，模块性越好。 | -                     |
-| focus  | [3]  | 度量模块中的实体在演化过程中专注自身演进的程度。focus越大，模块性越好。 | -                     |
-| icf    | [2]  | icf越高，模块内的实体更有可能一起演化。                      | -                     |
-| ecf    | [2]  | ecf越低，跨模块边界的实体更有可能独立演化。                  | -                     |
-| rei    | [2]  | rei越低，说明不同模块一起修改的可能性越低，模块更有可能会独立演化、独立维护。 | -                     |
-| DSM    | [4]  | DSM越大，模块越复杂，与外部耦合的                            | 统计struct            |
-| chm    | [2]  | chm越大，模块在消息层内聚程度越高。                          |                       |
-| chd    | [2]  | chd越大，模块在领域层内聚程度越高。                          |                       |
-| NOI    | ours | file导入依赖的个数                                           | include(针对所有文件) |
-| NOID   | ours | file被导入依赖的个数                                         |                       |
+| 指标   | java中定义                                                   | c中定义                                         | c支持状态 |
+| ------ | ------------------------------------------------------------ | ----------------------------------------------- | --------- |
+| scoh   | scoh越大，模块内的结构内聚程度越大。                         | 同java(目前仅考虑struct之间的embed依赖，需扩展) | 已支持    |
+| scop   | scop越大，模块间的结构耦合程度越大。                         | 同java(目前仅考虑struct之间的embed依赖，需扩展) | 已支持    |
+| odd    | odd越大，该模块耦合其他模块的程度越高，模块之间的动态交互度越高。 | 同java(目前仅考虑struct之间的embed依赖，需扩展) | 已支持    |
+| idd    | idd越大，该模块被耦合的程度越高，模块间的动态交互程度越高。  | 同java(目前仅考虑struct之间的embed依赖，需扩展) | 已支持    |
+| spread | 度量模块中的实体在演化过程中接触的共变集群个数。spread越小，模块性越好。 | -                                               | 待支持    |
+| focus  | 度量模块中的实体在演化过程中专注自身演进的程度。focus越大，模块性越好。 | -                                               | 待支持    |
+| icf    | icf越高，模块内的实体更有可能一起演化。                      | -                                               | 待支持    |
+| ecf    | ecf越低，跨模块边界的实体更有可能独立演化。                  | -                                               | 待支持    |
+| rei    | rei越低，说明不同模块一起修改的可能性越低，模块更有可能会独立演化、独立维护。 | -                                               | 未支持    |
+| DSM    | DSM越大，模块越复杂，与外部耦合的                            | 同java(文件内struct个数)                        | 已支持    |
+| chm    | chm越大，模块在消息层内聚程度越高。                          | -                                               | 待支持    |
+| chd    | chd越大，模块在领域层内聚程度越高。                          | -                                               | 待支持    |
+| NOI    | -                                                            | file导入依赖的个数                              | 已支持    |
+| NOID   | -                                                            | file被导入依赖的个数                            | 已支持    |
 
 - ### class --struct
 
-| 指标                   | 来源 | 说明                                        | C                                                            |
-| ---------------------- | ---- | ------------------------------------------- | ------------------------------------------------------------ |
-| CIS                    | [4]  | 类中公共接口数                              | visibility                                                   |
-| NOM                    | [4]  | 类中方法总数                                | 统计下function pointer数量                                   |
-| NOP                    | [4]  | 多态方法数量                                | 无                                                           |
-| NAC                    | [4]  | 类继承树深度                                | 扫描struct中所有var，根据parent和type是否为struct确定继承关系 |
-| NDC                    | [4]  | 派生类个数                                  |                                                              |
-|                        |      |                                             |                                                              |
-|                        |      |                                             |                                                              |
-| CTM                    | [5]  | 调用方法个数(除自身类中方法)                | 无                                                           |
-| IDCC                   | [4]  | 模块内耦合类数量                            |                                                              |
-| IODD                   | ours | 模块内耦合其他类的数量                      |                                                              |
-| IIDD                   | ours | 模块内被其他类耦合的数量                    |                                                              |
-| EDCC                   | [4]  | 模块外耦合类数量                            |                                                              |
-| c_FAN_IN               | [5]  | 类扇入                                      |                                                              |
-| c_FAN_OUT              | [5]  | 类扇出                                      |                                                              |
-| CBC                    | [5]  | 类依赖的数量(包含被依赖)                    | 继承/方法之间的关系  ()                                      |
-| c_chm                  | [2]  | 类在消息层的功能内聚度                      | function                                                     |
-| c_chd                  | [2]  | 类在领域层的功能内聚度                      |                                                              |
-| c_variablesQty         | [5]  | 类中变量数量                                |                                                              |
-| privateMethodsQty      | [5]  | 私有方法数量                                |                                                              |
-| protectedMethodsQty    | [5]  | 保护方法数量                                |                                                              |
-| staticMethodsQty       | [5]  | 静态方法数量                                | storage_class里面                                            |
-| defaultMethodsQty      | [5]  | 缺省方法数量                                | 无                                                           |
-| abstractMethodsQty     | [5]  | 抽象方法数量                                | 无                                                           |
-| finalMethodsQty        | [5]  | final方法数量                               | 无                                                           |
-| synchronizedMethodsQty | [5]  | synchronized方法数量                        | 无                                                           |
-| publicFieldsQty        | [5]  | 公有字段数量                                |                                                              |
-| privateFieldsQty       | [5]  | 私有字段数量                                |                                                              |
-| protectedFieldsQty     | [5]  | 保护字段数量                                |                                                              |
-| staticFieldsQty        | [5]  | 静态字段数量                                | storage_class里面                                            |
-| defaultFieldsQty       | [5]  | 缺省字段数量                                | 无                                                           |
-| finalFieldsQty         | [5]  | final字段数量                               | 无                                                           |
-| synchronizedFieldsQty  | [5]  | synchronized字段数量                        | 无                                                           |
-| RFC                    | [5]  | 类的响应数量(本地方法数量+调用外部方法数量) |                                                              |
-| NOF                    | [5]  | 字段数量                                    | 紫凡确认一下                                                 |
-| NOVM                   | [5]  | 可见方法数量                                |                                                              |
-| NOSI                   | [5]  | 静态方法调用数量                            |                                                              |
-| TCC                    | [5]  | 紧类内聚(仅考虑可见方法的直接调用)          |                                                              |
-| LCC                    | [5]  | 松类内聚(考虑可见方法的直接调用和间接调用)  |                                                              |
-| LCOM                   | [5]  | 方法内聚性缺失                              |                                                              |
-| LOCM*                  | [5]  | 方法内聚性缺失(标准化结果)                  |                                                              |
-| WMC                    | [5]  | 类方法复杂度之和                            |                                                              |
-| c_modifiers            | [5]  | 类中修饰符                                  |                                                              |
+| 指标                   | java中定义                                  | c中定义                       | c支持状态 |
+| ---------------------- | ------------------------------------------- | ----------------------------- | --------- |
+| CIS                    | 类中公共接口数                              | -(visibility）                | 待支持    |
+| NOM                    | 类中方法总数                                | -(统计下function pointer数量) | 待支持    |
+| NOP                    | 多态方法数量                                | -                             | 不支持    |
+| NAC                    | 类继承树深度                                | 同java                        | 已支持    |
+| NDC                    | 派生类个数                                  | 同java                        | 已支持    |
+| NOI                    | 导入数量                                    | -                             | 不支持    |
+| NOID                   | 被导入数量                                  | -                             | 不支持    |
+| CTM                    | 调用方法个数(除自身类中方法)                | -                             | 待支持    |
+| IDCC                   | 模块内耦合类数量                            | 同java                        | 已支持    |
+| IODD                   | 模块内耦合其他类的数量                      | 同java                        | 已支持    |
+| IIDD                   | 模块内被其他类耦合的数量                    | 同java                        | 已支持    |
+| EDCC                   | 模块外耦合类数量                            | 同java                        | 已支持    |
+| c_FAN_IN               | 类扇入                                      | 同java                        | 已支持    |
+| c_FAN_OUT              | 类扇出                                      | 同java                        | 已支持    |
+| CBC                    | 类依赖的数量(包含被依赖)                    | 同java(struct之间的embed关系) | 已支持    |
+| c_chm                  | 类在消息层的功能内聚度                      | -                             | 待支持    |
+| c_chd                  | 类在领域层的功能内聚度                      | -                             | 待支持    |
+| c_variablesQty         | 类中变量数量                                | -                             | 待支持    |
+| privateMethodsQty      | 私有方法数量                                | -                             | 待支持    |
+| protectedMethodsQty    | 保护方法数量                                | -                             | 待支持    |
+| staticMethodsQty       | 静态方法数量                                | -(storage_class)              | 待支持    |
+| defaultMethodsQty      | 缺省方法数量                                | -                             | 不支持    |
+| abstractMethodsQty     | 抽象方法数量                                | -                             | 不支持    |
+| finalMethodsQty        | final方法数量                               | -                             | 不支持    |
+| synchronizedMethodsQty | synchronized方法数量                        | -                             | 不支持    |
+| publicFieldsQty        | 公有字段数量                                | -                             | 待支持    |
+| privateFieldsQty       | 私有字段数量                                | -                             | 待支持    |
+| protectedFieldsQty     | 保护字段数量                                | -                             | 待支持    |
+| staticFieldsQty        | 静态字段数量                                | -(storage_class)              | 待支持    |
+| defaultFieldsQty       | 缺省字段数量                                | -                             | 不支持    |
+| finalFieldsQty         | final字段数量                               | -                             | 不支持    |
+| synchronizedFieldsQty  | synchronized字段数量                        | -                             | 不支持    |
+| RFC                    | 类的响应数量(本地方法数量+调用外部方法数量) | -                             | 待支持    |
+| NOF                    | 字段数量                                    | -                             | 待支持    |
+| NOVM                   | 可见方法数量                                | -                             | 待支持    |
+| NOSI                   | 静态方法调用数量                            | -                             | 待支持    |
+| TCC                    | 紧类内聚(仅考虑可见方法的直接调用)          | -                             | 待支持    |
+| LCC                    | 松类内聚(考虑可见方法的直接调用和间接调用)  | -                             | 待支持    |
+| LCOM                   | 方法内聚性缺失                              | -                             | 待支持    |
+| LOCM*                  | 方法内聚性缺失(标准化结果)                  | -                             | 待支持    |
+| WMC                    | 类方法复杂度之和                            | -                             | 待支持    |
+| c_modifiers            | 类中修饰符                                  | -                             | 待支持    |
 
 - ### method  --function
 
-| 指标                           | 来源 | 说明                             | C                                                            |
-| ------------------------------ | ---- | -------------------------------- | ------------------------------------------------------------ |
-| startLine                      | ours | 方法开始位置                     |                                                              |
-| CBM                            | [5]  | 方法依赖的数量(call/override)    | relation-parameter:<br />①parameter->type(function pointer)<br />②parameter->type(typedef)->typedef(function pointer)<br />use:同parameter<br />call:正常relation<br />var->function(parent) and var->struct(type) |
-| m_FAN_IN                       | [5]  | 方法扇入                         |                                                              |
-| m_FAN_OUT                      | [5]  | 方法扇出                         |                                                              |
-| IDMC                           | [4]  | 模块内(所有file)耦合方法的数量   | 每个.h和.c                                                   |
-| EDMC                           | [4]  | 模块外耦合方法的数量             |                                                              |
-| methodsInvokedQty              | [5]  | 调用方法的数量                   |                                                              |
-| methodsInvokedLocalQty         | [5]  | 调用本地方法(当前文件)的数量     |                                                              |
-| methodsInvokedIndirectLocalQty | [5]  | 间接调用本地方法(当前文件)的数量 |                                                              |
-| m_variablesQty                 | [5]  | 方法中变量数量                   |                                                              |
-| parametersQty                  | [5]  | 方法参数数量                     |                                                              |
-| m_modifier                     | [5]  | 方法修饰符                       | 字段名：visibility(public/private/protected)                 |
-| storage_class                  |      | 方法存储区                       | 字段名：storage_class(extern/auto/const...)                  |
+| 指标                           | java中定义                       | c中定义                                                      | c支持状态 |
+| ------------------------------ | -------------------------------- | ------------------------------------------------------------ | --------- |
+| startLine                      | 方法开始位置                     | 同java                                                       | 已支持    |
+| CBM                            | 方法依赖的数量(call/override)    | <br />目前仅考虑了call<应将call关系映射到file层级，这样typeuse也将被考虑进来><br />relation-parameter:<br />①parameter->type(function pointer)<br />②parameter->type(typedef)->typedef(function pointer)<br />br />call:正常relation<br />var->function(parent) and var->struct(type) | 部分支持  |
+| m_FAN_IN                       | 方法扇入                         | 同java(被耦合数量)  --struct/function<br />映射规则和指标本身含义不可杂糅 | 已支持    |
+| m_FAN_OUT                      | 方法扇出                         | 同java(耦合数量)                                             | 已支持    |
+| IDMC                           | 模块内(所有file)耦合方法的数量   | 同java(耦合的方法数量)                                       | 已支持    |
+| EDMC                           | 模块外耦合方法的数量             | 同java(耦合的方法数量)                                       | 已支持    |
+| methodsInvokedQty              | 调用方法的数量                   | 同java                                                       | 已支持    |
+| methodsInvokedLocalQty         | 调用本地方法(当前文件)的数量     | 同java                                                       | 已支持    |
+| methodsInvokedIndirectLocalQty | 间接调用本地方法(当前文件)的数量 | -                                                            | 待支持    |
+| m_variablesQty                 | 方法中变量数量                   | -                                                            | 待支持    |
+| parametersQty                  | 方法参数数量                     | 同java                                                       | 已支持    |
+| m_modifier                     | 方法修饰符                       | -(visibility(public/private/protected))                      | 待支持    |
+| storage_class                  | 方法存储区                       | -(storage_class(extern/auto/const...))                       | 待支持    |
 
 ## 输出结果说明
 
