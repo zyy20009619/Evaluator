@@ -2,16 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Evaluator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Evaluator.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c-README.md" beforeDir="false" afterPath="$PROJECT_DIR$/c-README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/function_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/com_metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/com_metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/project.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/project.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/rel_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/rel_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
