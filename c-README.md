@@ -74,8 +74,8 @@
 | project | 11                 | 3               |
 | module  | 12                 | 7               |
 | class   | 42                 | 9               |
-| method  | 12                 | 9               |
-**待确认问题：**
+| method  | 12               | 11              |
+|**待确认问题：**|||
 
 file在计算耦合和内聚程度时，依赖于struct之间的依赖关系，目前struct之间只存在embed关系，需将function考虑进来，但需确认：file内的实体个数认定为struct和function之和？<一等公民：变量/方法/结构体...>  两种关系
 
@@ -166,15 +166,15 @@ file在计算耦合和内聚程度时，依赖于struct之间的依赖关系，�
 | 指标                           | java中定义                       | c中定义                                                      | c支持状态 |
 | ------------------------------ | -------------------------------- | ------------------------------------------------------------ | --------- |
 | startLine                      | 方法开始位置                     | 同java                                                       | 已支持    |
-| CBM                            | 方法依赖的数量(call/override)    | <br />目前仅考虑了call<应将call关系映射到file层级，这样typeuse也将被考虑进来><br />relation-parameter:<br />①parameter->type(function pointer)<br />②parameter->type(typedef)->typedef(function pointer)<br />br />call:正常relation<br />var->function(parent) and var->struct(type) | 部分支持  |
-| m_FAN_IN                       | 方法扇入                         | 同java(被耦合数量)  --struct/function<br />映射规则和指标本身含义不可杂糅 | 已支持    |
-| m_FAN_OUT                      | 方法扇出                         | 同java(耦合数量)                                             | 已支持    |
+| CBM                            | 方法依赖的数量                   | ①**relation-typeuse**:<br />function->struct<br />②**relation-call**:<br />function->function<br />③relation-parameter:<br />a)parameter->type(function pointer)<br />b)parameter->type(typedef)->typedef(function pointer)<br />④relation-use:<br />var->function(parent) | 部分支持  |
+| m_FAN_IN                       | 方法扇入                         | 同java(被耦合数量) --call                                    | 已支持    |
+| m_FAN_OUT                      | 方法扇出                         | 同java(耦合数量)--typeuse和call                              | 已支持    |
 | IDMC                           | 模块内(所有file)耦合方法的数量   | 同java(耦合的方法数量)                                       | 已支持    |
 | EDMC                           | 模块外耦合方法的数量             | 同java(耦合的方法数量)                                       | 已支持    |
 | methodsInvokedQty              | 调用方法的数量                   | 同java                                                       | 已支持    |
 | methodsInvokedLocalQty         | 调用本地方法(当前文件)的数量     | 同java                                                       | 已支持    |
-| methodsInvokedIndirectLocalQty | 间接调用本地方法(当前文件)的数量 | -                                                            | 待支持    |
-| m_variablesQty                 | 方法中变量数量                   | -                                                            | 待支持    |
+| methodsInvokedIndirectLocalQty | 间接调用本地方法(当前文件)的数量 | 同java                                                       | 已支持    |
+| m_variablesQty                 | 方法中变量数量                   | 同java                                                       | 已支持    |
 | parametersQty                  | 方法参数数量                     | 同java                                                       | 已支持    |
 | m_modifier                     | 方法修饰符                       | -(visibility(public/private/protected))                      | 待支持    |
 | storage_class                  | 方法存储区                       | -(storage_class(extern/auto/const...))                       | 待支持    |

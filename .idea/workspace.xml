@@ -2,8 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/c-README.md" beforeDir="false" afterPath="$PROJECT_DIR$/c-README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module_measurement/project.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/project.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output2.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/rel_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/rel_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +52,7 @@
       <recent name="C:\Users\20465\Desktop\codes\Evaluator" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.measure">
     <configuration name="measure" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Evaluator" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -67,9 +74,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Evaluator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="D:\python3\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.measure" />
+        <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
   </component>
@@ -120,21 +149,6 @@
           <option name="timeStamp" value="99" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>150</line>
-          <option name="timeStamp" value="100" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>163</line>
-          <option name="timeStamp" value="101" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>174</line>
-          <option name="timeStamp" value="102" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/function_file.py</url>
           <line>113</line>
           <option name="timeStamp" value="103" />
@@ -143,6 +157,21 @@
           <url>file://$PROJECT_DIR$/util/rel_data.py</url>
           <line>147</line>
           <option name="timeStamp" value="123" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
+          <line>212</line>
+          <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/util/rel_data.py</url>
+          <line>67</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test.py</url>
+          <line>30</line>
+          <option name="timeStamp" value="136" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

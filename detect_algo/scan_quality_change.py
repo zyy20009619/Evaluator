@@ -204,13 +204,14 @@ def detect_android_project(base_out, facade_data, diff_class, diff_method, opt, 
     # 获取到intrusive native和actively native类实体的质量diff并对腐化实体进行根因定位
     intrusive_res_pd = get_android_decay_root_cause(entity_pd, 'intrusive native', diff_class, base_out,
                                                     diff_method, opt, th)
-    actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', diff_class, base_out, diff_method, opt,
-                                                   th)
-    actively_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', diff_class, base_out, diff_method, opt,
-                                                   th)
-    actively_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', diff_class, base_out, diff_method, opt,
-                                                   th)
-    res_pd = pd.concat([intrusive_res_pd, actively_res_pd], axis=0)
+    # actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', diff_class, base_out, diff_method, opt,
+    #                                                th)
+    # extensive_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', diff_class, base_out, diff_method, opt,
+    #                                                th)
+    # obsoletely_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', diff_class, base_out, diff_method, opt,
+    #                                                th)
+    # res_pd = pd.concat([intrusive_res_pd, actively_res_pd, extensive_res_pd, obsoletely_res_pd], axis=0)
+    res_pd = pd.concat([intrusive_res_pd], axis=0)
     res_pd = res_pd.rename(
         columns={'CBC': 'class decay degree', 'CBM': 'method decay degree', 'ownership': 'method_ownership',
                  'class_name': 'problem class', 'method_name': 'problem method'})

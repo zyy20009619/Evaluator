@@ -116,7 +116,7 @@ def command():
 
 
 def test():
-    # measure_package_metrics('pro', r'F:\test', r'F:\test', 'main', dict(), 'c')
+    measure_package_metrics('pro', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
     # with open('./projects.txt', encoding='utf-8') as file:
     #     content = file.readlines()
     # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
@@ -137,8 +137,8 @@ def test():
     #     measure_multi_version(project_path, outpath, outpath, 'mv', vers, 'common')
         # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
         # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
-        detect_change(r'D:\paper-data-and-result\results\bishe-results\android-result\lineage\lineage-16.0\ad31dbbdcd76091d7d2d1fc6c863ee17c3bfe87d',
-                      r'D:\paper-data-and-result\results\bishe-results\android-result\lineage\lineage-16.0', 'extension', 0.6)
+        # detect_change(r'D:\paper-data-and-result\results\bishe-results\android-result\lineage\lineage-18.1\49d8b986dddd441df741698541788c5f3a9c465f',
+        #               r'D:\paper-data-and-result\results\bishe-results\android-result\lineage\lineage-18.1', 'extension', 0.6)
         # detect_change(r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.4.0', r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.5.0', 'common', 0.6)
         # detect_change(vers[0].replace('\n', ''), vers[1].replace('\n', ''), 'extension', 0.6)
         # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')

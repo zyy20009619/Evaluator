@@ -13,15 +13,14 @@ class Method:
         self.__dep = dep_info
         self.__cur_children_info = cur_children_info
         self.startLine = 0
-        self.CBM = 0  # （暂未计算typeuse）
-        # Function之间的关系映射到Struct
-        self.m_FAN_IN = 0  # 被调用方法数
-        self.m_FAN_OUT = 0  # 调用方法数
+        self.CBM = 0
+        self.m_FAN_IN = 0  # 被调用方法数(call)
+        self.m_FAN_OUT = 0  # 调用方法数(call+typeuse)
         self.IDMC = 0  # 调用file内方法数量以及被本file内方法调用的数量
         self.EDMC = 0  # 调用file外方法数量以及被file外方法调用的数量
         self.methodsInvokedQty = 0  # 方法调用的所有方法数
         self.methodsInvokedLocalQty = 0  # 方法调用本file内的方法数
-        self.methodsInvokedIndirectLocalQty = 0  # 暂无
+        self.methodsInvokedIndirectLocalQty = 0  # 间接调用本地方法的数量
         self.m_variablesQty = 0  # 暂无
         self.parametersQty = 0
         self.m_modifier = 0  # 数据里暂无
@@ -40,12 +39,33 @@ class Method:
 
     def __set_local_qty(self):
         if self.__method in self.__dep['call_dep']:
-            for call in self.__dep['call_dep'][self.__method]:
-                if call in self.__cur_children_info:
-                    # self.IDMC += 1
+            method_invocations_indirect_local = list()
+            for called_id in self.__dep['call_dep'][self.__method]:
+                if called_id in self.__cur_children_info:
                     self.methodsInvokedLocalQty += 1
-                # else:
-                #     self.EDMC += 1
+                    # 处理间接调用本地方法的结果
+                    method_invocations_indirect_local.extend(self.__get_called_values(self.__invocation(called_id, dict(), self.__dep['call_dep'], self.__cur_children_info).values()))
+            self.methodsInvokedIndirectLocalQty = len(set(method_invocations_indirect_local))
+
+    def __invocation(self, method_id, explored, invoke_methods, local_contain):
+        if method_id not in invoke_methods:
+            return explored
+
+        next_invocations = list()
+        for called_id in invoke_methods[method_id]:
+            if called_id not in explored and method_id != called_id and called_id in local_contain:
+                next_invocations.append(called_id)
+        if len(next_invocations) > 0:
+            explored[method_id] = next_invocations
+            for next_invocation in next_invocations:
+                self.__invocation(next_invocation, explored, invoke_methods, local_contain)
+        return explored
+
+    def __get_called_values(self, arrays):
+        res = list()
+        for item1 in arrays:
+            res.extend(item1)
+        return res
 
     def __com_rel(self):
         self.m_FAN_OUT = self.methodsInvokedQty
@@ -59,9 +79,14 @@ class Method:
                         self.IDMC += 1
                     else:
                         self.EDMC += 1
-
-        # for use in self.__dep['use_dep']:
-        #     pass
+        # IDMC和EDMC也需考虑typeuse
+        if self.__method in self.__dep['typeuse_dep']:
+            self.m_FAN_OUT += len(self.__dep['typeuse_dep'][self.__method])
+            for struct_id in self.__dep['typeuse_dep'][self.__method]:
+                if struct_id in self.__cur_children_info:
+                    self.IDMC += 1
+                else:
+                    self.EDMC += 1
 
 
 class Class:

@@ -46,7 +46,7 @@ def get_c_rel(variables, cells):
     file_dep_matrix = dict()
     struct_dep_matrix = dict()
     para_dep_matrix = dict()
-    use_dep_matrix = dict()
+    typeuse_dep_matrix = dict()
     call_dep_matrix = dict()
     for cell in cells:
         # Define:用于构建file->struct
@@ -59,13 +59,13 @@ def get_c_rel(variables, cells):
         # Parameter
         con_rel_info(var_id_to_var, cell, 'Parameter', para_dep_matrix, 'Function', 'Typedef')
         # typeUse
-        con_rel_info(var_id_to_var, cell, 'typeUse', use_dep_matrix, 'Function', 'Struct')
+        con_rel_info(var_id_to_var, cell, 'typeUse', typeuse_dep_matrix, 'Function', 'Struct')
         # Call
         # con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Typedef')
         con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Function')
     # 构建三层模型结构->第一层:module(package<java>/file<c>)+第二层:class<java>+struct<c>+第三层:method<java>+typedef<c>
     # get_three_model(file_contain, struct_contain)
-    function_dep = {'use_dep': use_dep_matrix, 'call_dep': call_dep_matrix, 'para_dep': para_dep_matrix}
+    function_dep = {'typeuse_dep': typeuse_dep_matrix, 'call_dep': call_dep_matrix, 'para_dep': para_dep_matrix}
     return var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep
 
 
