@@ -33,7 +33,6 @@ def detect_change(path1, path2, opt, th):
     if opt == 'extension':
         # 读取耦合切面数据
         facade_data = read_file(os.path.join(path2, 'facade.json'))
-        # 分场景扫描：原生自身演化场景和原生相对于伴生演化场景
         # 安卓场景下关注伴生相对于原生进行修改的类实体是否引起较大的腐化
         res = detect_android_project(base_out, facade_data, diff_class_inner, diff_method_all, opt, th)
         # 统计检测结果数据
@@ -206,6 +205,10 @@ def detect_android_project(base_out, facade_data, diff_class, diff_method, opt, 
     intrusive_res_pd = get_android_decay_root_cause(entity_pd, 'intrusive native', diff_class, base_out,
                                                     diff_method, opt, th)
     actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', diff_class, base_out, diff_method, opt,
+                                                   th)
+    actively_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', diff_class, base_out, diff_method, opt,
+                                                   th)
+    actively_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', diff_class, base_out, diff_method, opt,
                                                    th)
     res_pd = pd.concat([intrusive_res_pd, actively_res_pd], axis=0)
     res_pd = res_pd.rename(
