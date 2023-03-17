@@ -4,6 +4,9 @@ import numpy as np
 import csv
 from util.metrics import *
 from operator import itemgetter
+from score_compete.index_measure import get_score
+from module_measurement.moduarity.sf_measure import get_spread_and_focus
+from module_measurement.evolution.com_icf_ecf import get_icf_ecf_rei
 
 
 class Method:
@@ -35,6 +38,10 @@ class Method:
             'call_dep'] else 0
         self.__set_local_qty()
         self.__com_rel()
+        current_children_info = self.__cur_children_info
+        current_method_id = self.__method
+        self.m_variablesQty = len(self.__cur_children_info[self.__method]) if isinstance(
+            current_children_info[current_method_id], dict) else 0
         self.CBM = self.m_FAN_IN + self.m_FAN_OUT
 
     def __set_local_qty(self):
@@ -44,7 +51,9 @@ class Method:
                 if called_id in self.__cur_children_info:
                     self.methodsInvokedLocalQty += 1
                     # 处理间接调用本地方法的结果
-                    method_invocations_indirect_local.extend(self.__get_called_values(self.__invocation(called_id, dict(), self.__dep['call_dep'], self.__cur_children_info).values()))
+                    method_invocations_indirect_local.extend(self.__get_called_values(
+                        self.__invocation(called_id, dict(), self.__dep['call_dep'],
+                                          self.__cur_children_info).values()))
             self.methodsInvokedIndirectLocalQty = len(set(method_invocations_indirect_local))
 
     def __invocation(self, method_id, explored, invoke_methods, local_contain):
@@ -162,13 +171,18 @@ class Class:
         self.CBC = self.c_FAN_IN + self.c_FAN_OUT
         self.NAC = self.c_FAN_OUT
         self.NDC = self.c_FAN_IN
+        current_children_info = self.__cur_children_info
+        current_class_id = self.__class_id
+        self.NOM = len(self.__cur_children_info[self.__class_id]) if isinstance(
+            current_children_info[current_class_id], list) else 0
+        self.WMC = self.NOM
 
 
 class Module:
-    def __init__(self, cur_module, vars_info, all_contain, class_contain, dep_info):
+    def __init__(self, cur_module, vars_info, all_contain, dep_info):
         self.__cur_module = cur_module
-        self.__class_contain = class_contain
-        self.__children = all_contain
+        self.__all_contain = all_contain
+        self.__children = all_contain[cur_module]
         self.__vars_info = vars_info
         self.__dep = dep_info
         self.scoh = 0
@@ -191,8 +205,8 @@ class Module:
 
     def __set_children(self):
         for cld in self.__children:
+            self.DSM += 1
             if self.__vars_info[cld]['category'] == 'Struct':
-                self.DSM += 1
                 self.struct[self.__vars_info[cld]['qualifiedName']] = Class(cld, self.__vars_info, self.__children,
                                                                             self.__dep['class'])
             if self.__vars_info[cld]['category'] == 'Function':
@@ -205,30 +219,53 @@ class Module:
         self.__set_NOID()
         self.__set_rel()
 
+    #     self.__set_cmt()
+    #
+    # def __set_cmt(self):
+    #     # measure history dep
+    #     focus_dic, spread_dic, module_classes, commit = get_spread_and_focus(cmt_path, package_info, variables)
+    #     icf_dic, ecf_dic, rei_dic = get_icf_ecf_rei(module_classes, commit)
+
     def __set_NOID(self):
         for mod1 in self.__dep['module']:
             if self.__cur_module in self.__dep['module'][mod1]:
                 self.NOID += 1
 
     def __set_rel(self):
-        self.__com_call_coh(self.struct.keys(), self.__dep['class'])
-        self.com_call_coup(self.__cur_module, self.__class_contain, self.__dep['class'])
+        # 本file内所有一等公民(struct/function...)都要考虑
+        self.__com_call_coh(self.__children, self.__dep, self.__vars_info)
+        self.__com_call_coup(self.__cur_module, self.__all_contain, self.__dep, self.__vars_info)
 
-    def __com_call_coh(self, classes_id, struct_dep):
+    def __com_call_coh(self, children_id, dep_info, vars_info):
+        struct_dep = dep_info['class']
+        function_dep = dep_info['method']
+        function_typeuse_dep = function_dep['typeuse_dep']
+        function_call_dep = function_dep['call_dep']
         has_connections = 0
-        all_connections = len(classes_id) * len(classes_id)
+        all_connections = len(children_id) * len(children_id)
         if all_connections == 0:
             return
-        for id1 in classes_id:
-            for id2 in classes_id:
+        for id1 in children_id:
+            for id2 in children_id:
                 if id1 != id2:
-                    if id1 in struct_dep and id2 in struct_dep[id1] and struct_dep[id1][id2] != 0:
-                        has_connections += 1
+                    if vars_info[id1]['category'] == 'Struct':
+                        if id1 in struct_dep and id2 in struct_dep[id1] and struct_dep[id1][id2] != 0:
+                            has_connections += 1
+                    if vars_info[id1]['category'] == 'Function':
+                        if (id1 in function_typeuse_dep and id2 in function_typeuse_dep[id1] and
+                            function_typeuse_dep[id1][id2]) != 0 or (
+                                id1 in function_call_dep and id2 in function_call_dep[id1] and
+                                function_call_dep[id1][id2]) != 0:
+                            has_connections += 1
         self.scoh = has_connections / all_connections
 
-    def com_call_coup(self, current_module, module_info, struct_dep):
+    def __com_call_coup(self, current_module, module_info, dep_info, vars_info):
         if current_module not in module_info:
             return
+        struct_dep = dep_info['class']
+        function_dep = dep_info['method']
+        function_typeuse_dep = function_dep['typeuse_dep']
+        function_call_dep = function_dep['call_dep']
         scop = 0
         idd_list = list()
         odd_list = list()
@@ -241,12 +278,26 @@ class Module:
                     current_class_odd = 0
                     current_class_idd = 0
                     for id2 in module_info[module]:
-                        if id1 in struct_dep and id2 in struct_dep[id1] and struct_dep[id1][id2] != 0:
-                            current_class_odd += 1
-                            has_connections += 1
-                        elif id2 in struct_dep and id1 in struct_dep[id2] and struct_dep[id2][id1] != 0:
-                            current_class_idd += 1
-                            has_connections += 1
+                        if vars_info[id1]['category'] == 'Struct':
+                            if id1 in struct_dep and id2 in struct_dep[id1] and struct_dep[id1][id2] != 0:
+                                current_class_odd += 1
+                                has_connections += 1
+                            elif id2 in struct_dep and id1 in struct_dep[id2] and struct_dep[id2][id1] != 0:
+                                current_class_idd += 1
+                                has_connections += 1
+                        if vars_info[id1]['category'] == 'Function':
+                            if (id1 in function_typeuse_dep and id2 in function_typeuse_dep[id1] and
+                                function_typeuse_dep[id1][id2]) != 0 or (
+                                    id1 in function_call_dep and id2 in function_call_dep[id1] and
+                                    function_call_dep[id1][id2]) != 0:
+                                current_class_odd += 1
+                                has_connections += 1
+                            elif (id2 in function_typeuse_dep and id1 in function_typeuse_dep[id2] and
+                                  function_typeuse_dep[id2][id1]) != 0 or (
+                                    id2 in function_call_dep and id1 in function_call_dep[id2] and
+                                    function_call_dep[id2][id1]) != 0:
+                                current_class_idd += 1
+                                has_connections += 1
                     current_module_odd += current_class_odd
                     current_module_idd += current_class_idd
                 if current_module_odd != 0:
@@ -257,7 +308,7 @@ class Module:
                     idd_list.append(1)
                 else:
                     idd_list.append(0)
-
+                # 此处考虑在计算依赖时，应该是有向图，所以*2
                 scop += has_connections / (2 * len(module_info[current_module]) * len(module_info[module]))
         self.scop = scop
         self.odd = sum(odd_list) / (len(module_info) - 1)
@@ -265,8 +316,9 @@ class Module:
 
 
 class Project:
-    def __init__(self, var_id_to_var, pro_info):
+    def __init__(self, var_id_to_var, pro_info, out_path):
         self.version = pro_info['version']
+        self.__out_path = out_path
         self.__vars_info = var_id_to_var
         self.__contain = pro_info['contain']
         self.__dep = pro_info['dep']
@@ -284,30 +336,31 @@ class Project:
         self.CHD = 0
         self.module = dict()
         self.__set_module()
-        self.__set_others()
+        # self.__set_others()
         # __set_score(self.)
         self.__to_csv()
 
     def __set_module(self):
-        tmp_class_contain = dict()
+        # tmp_class_contain = dict()
+        # for mod in self.__contain:
+        #     for child in self.__contain[mod]:
+        #         if self.__vars_info[child]['category'] == 'Struct':
+        #             if mod not in tmp_class_contain:
+        #                 tmp_class_contain[mod] = list()
+        #             tmp_class_contain[mod].append(child)
         for mod in self.__contain:
-            for child in self.__contain[mod]:
-                if self.__vars_info[child]['category'] == 'Struct':
-                    if mod not in tmp_class_contain:
-                        tmp_class_contain[mod] = list()
-                    tmp_class_contain[mod].append(child)
-        for mod in self.__contain:
-            self.module[self.__vars_info[mod]['qualifiedName']] = Module(mod, self.__vars_info, self.__contain[mod],
-                                                                         tmp_class_contain, self.__dep)
+            self.module[self.__vars_info[mod]['qualifiedName']] = Module(mod, self.__vars_info, self.__contain,
+                                                                         self.__dep)
 
-    def __set_others(self):
-        pass
+    # def __set_others(self):
+    #     self.__set_cmt()
 
     def __to_csv(self):
         # 获取所有可能的列名
         fieldnames1 = list()
         # for row1 in self:
         # fieldnames1.update('version')
+        fieldnames1.append('score')
         fieldnames1.extend(PROJECT_METRICS)
         fieldnames1.append('module')
         fieldnames1.extend(MODULE_METRICS)
@@ -328,7 +381,11 @@ class Project:
             temp.extend(item[2: 11: 1])
             result.append(temp)
         project_metrics = np.around(np.array(result).mean(axis=0).tolist(), 4)
-
+        [normalized_result, score_result] = get_score(tmp_metrics,
+                                                      [[0.08], [0.08], [0.07], [0.07], [0.07], [0.07], [0.07], [0.07],
+                                                       [0.07], [0.07], [0.07], [0.07], [0.07], [0.07]],
+                                                      MODULE_METRICS)
+        project_metrics = np.insert(project_metrics, 0, np.mean(score_result))
         # 将数据写入CSV文件
         with open('output1.csv', 'w', newline='') as csvfile:
             writer1 = csv.writer(csvfile, delimiter=",")
@@ -364,3 +421,9 @@ class Project:
         for o in dir(obj):
             attrs[o] = getattr(obj, o)
         return attrs
+    #
+    # def __set_cmt(self):
+    #     cmt_path = os.path.join(self.__out_path, 'cmt.csv')
+    #     # measure history dep
+    #     focus_dic, spread_dic, module_classes, commit = get_spread_and_focus(cmt_path, self.__contain, self.__vars_info)
+    #     icf_dic, ecf_dic, rei_dic = get_icf_ecf_rei(module_classes, commit)

@@ -116,7 +116,8 @@ def command():
 
 
 def test():
-    measure_package_metrics('pro', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
+    measure_multi_version(pro, dep, output, 'mv', ver, obj)
+    measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
     # with open('./projects.txt', encoding='utf-8') as file:
     #     content = file.readlines()
     # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:

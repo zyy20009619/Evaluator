@@ -27,7 +27,7 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
 def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, lang):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
-    if lang != 'c' and ver != '':
+    if ver != '':
         os.chdir(project_path)
         os.system("git checkout -f " + ver)
         os.system(GIT_COMMAND)
@@ -57,14 +57,13 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, la
         os.system(execute)
         if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
             shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
-    project_name = ''
     module_data = list()
     dep_dic = read_file(os.path.join(base_out_path, project_name + '-out.json'))
     if dep_dic:
         # 在获取依赖时分别适配C语言和Java语言
         var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
         # 计算指标
-        com_metrics(ver, var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep)
+        com_metrics(ver, var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep, base_out_path)
         # package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
         #     dep_dic, mapping_dic, base_out_path, lang)
         # # 计算指标时应该是通用的
@@ -98,7 +97,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, la
     # return tmp_pro
 
 
-def measure_multi_version(project_path, dep_path, output, opt, vers, obj):
+def measure_multi_version(project_path, dep_path, output, opt, vers, obj, lang):
     project_list = list()
     project_path_list = project_path.split('?')
     dep_path_list = dep_path.split('?')
@@ -110,7 +109,7 @@ def measure_multi_version(project_path, dep_path, output, opt, vers, obj):
             pro_path = project_path[index]
             dep_path = dep_path[index]
         mapping_dic = dict()
-        tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, 'java')
+        measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, lang)
         project_list.append(tmp_pro)
         index += 1
 

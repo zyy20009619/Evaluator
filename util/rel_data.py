@@ -33,15 +33,16 @@ def get_c_rel(variables, cells):
     for var in variables:
         var_id_to_var[var['id']] = var
     # TODO:Funtion和Function Pointer可以对应起来之后进行该层映射
-    # for var in variables:
-    #     # if 'type' in var and var['type'] in var_id_to_var:
-    #     #     typevar = var_id_to_var[var['type']]
-    #     if 'typedefType' in var and var['typedefType'] == 'Function Pointer' and var_id_to_var[var['parentID']]['category'] == 'Struct':
-    #         if var['parentID'] not in struct_contain:
-    #             struct_contain[var['parentID']] = list()
-    #         struct_contain[var['parentID']].append(var['id'])
+    for var in var_id_to_var:
+        # if 'type' in var and var['type'] in var_id_to_var:
+        #     typevar = var_id_to_var[var['type']]
+        if 'typedefType' in var_id_to_var[var] and var_id_to_var[var]['typedefType'] == 'Function Pointer' and var_id_to_var[var_id_to_var[var]['parentID']]['category'] == 'Struct':
+            if var_id_to_var[var]['parentID'] not in struct_contain:
+                struct_contain[var_id_to_var[var]['parentID']] = list()
+            struct_contain[var_id_to_var[var]['parentID']].append(var)
 
     file_contain = dict()
+    function_contain = dict()
     # 构造依赖矩阵
     file_dep_matrix = dict()
     struct_dep_matrix = dict()
@@ -49,9 +50,11 @@ def get_c_rel(variables, cells):
     typeuse_dep_matrix = dict()
     call_dep_matrix = dict()
     for cell in cells:
-        # Define:用于构建file->struct
+        # Define:用于构建file->struct/function + function->variable
         con_rel_info(var_id_to_var, cell, 'Define', file_contain, 'File', 'Struct')
         con_rel_info(var_id_to_var, cell, 'Define', file_contain, 'File', 'Function')
+        con_rel_info(var_id_to_var, cell, 'Define', function_contain, 'Struct', 'Variable')
+        con_rel_info(var_id_to_var, cell, 'Define', function_contain, 'Function', 'Variable')
         # Include:用于构建file include file关系
         con_rel_info(var_id_to_var, cell, 'Include', file_dep_matrix, 'File', 'File')
         # Embed
@@ -63,11 +66,19 @@ def get_c_rel(variables, cells):
         # Call
         # con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Typedef')
         con_rel_info(var_id_to_var, cell, 'Call', call_dep_matrix, 'Function', 'Function')
-    # 构建三层模型结构->第一层:module(package<java>/file<c>)+第二层:class<java>+struct<c>+第三层:method<java>+typedef<c>
-    # get_three_model(file_contain, struct_contain)
+    # 构造file->Struct/Function->Variable
+    con_contain_info(file_contain, struct_contain, function_contain)
     function_dep = {'typeuse_dep': typeuse_dep_matrix, 'call_dep': call_dep_matrix, 'para_dep': para_dep_matrix}
     return var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep
 
+
+def con_contain_info(file_contain, struct_contain, function_contain):
+    for file in file_contain:
+        for child_id in file_contain[file]:
+            if child_id in function_contain:
+                file_contain[file][child_id] = function_contain[child_id]
+            if child_id in struct_contain:
+                file_contain[file][child_id] = struct_contain[child_id]
 
 def con_rel_info(variables, cell, cell_type, dep_matrix, from_type, to_type):
     if cell['type'] == cell_type:

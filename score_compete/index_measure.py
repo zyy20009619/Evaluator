@@ -7,7 +7,7 @@ import numpy as np
 def get_score(index_matrix, weight, type_names):
     # max_feature：越大越好；min_feature:越小越好
     max_feature = {'chm', 'chd', 'icf', 'scoh', 'ccoh', 'focus'}
-    min_feature = {'ifn', 'rei', 'idd', 'odd', 'ecf', 'scop', 'ccop', 'DSM', 'spread'}
+    min_feature = {'ifn', 'rei', 'idd', 'odd', 'ecf', 'scop', 'ccop', 'DSM', 'spread', 'NOI', 'NOID'}
     normalized_result = [['' for col in range(len(type_names))] for row in range(len(index_matrix))]
 
     # axis为0时求每列最值，为1时求每行最值
