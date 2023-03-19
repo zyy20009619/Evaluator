@@ -3,12 +3,13 @@ import os
 import shutil
 import csv
 import subprocess
-# import pandas as pd
+import pandas as pd
 from function_file import measure_package_metrics, compare_diff
 from detect_algo.detect_root_cause import analyse_data
 from arch_debt.measure_arch import com_mc
 from util.metrics import PROJECT_METRICS
-
+from util.csv_operator import read_csv_to_pd
+from arch_debt.measure_arch import com_mc
 
 def get_tag(content):
     with open('./tag.csv', 'w', encoding='UTF8', newline='') as f:

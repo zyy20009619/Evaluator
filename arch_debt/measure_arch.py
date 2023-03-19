@@ -5,17 +5,66 @@ import pandas as pd
 from arch_debt.maintenance_cost_measurement.changeproness import *
 from arch_debt.maintenance_cost_measurement.gitlogprocessor import *
 from util.csv_operator import write_to_csv, read_csv, read_csv_to_pd
+from util.path_operator import create_dir_path
 
 
-def com_mc(project_path, vers, detect_path):
+def com_mc(project_path, vers, detect_path, pro_name, method):
     # causes_entities = read_csv(cause_path, 'causes_entities.csv')
-    detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
-    measure_maintenance(project_path,
-                        list(set(detection_res[detection_res['class status'] != 'delete']['problem class'])), vers,
-                        detect_path)
+    if method == 'ours':
+        detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
+        measure_maintenance(project_path,
+                            list(set(detection_res[detection_res['class status'] != 'delete']['problem class'])), vers,
+                            detect_path, pro_name)
+    elif method == 'dv8':
+        extract_dv8_pf_files(project_path, vers, pro_name, method)
 
 
-def measure_maintenance(project_path, pf_entities, vers, detect_path):
+def extract_dv8_pf_files(project_path, vers, pro_name, method):
+    compare_base_path = r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8'
+    file_path = compare_base_path + '/' + pro_name + '/dv8-analysis-result/file-measure-report.csv'
+    dv8_pd = read_csv_to_pd(file_path)
+    pf_pd = dv8_pd[
+        ['FileName', 'numCrossing', 'numModularityViolation', 'numPackageCycle', 'numUnhealthyInheritance',
+         'numUnstableInterface', 'numClique']]
+    # pf_pd.replace('/', '\\', inplace=True)
+    crossing_files = pf_pd[pf_pd['numCrossing'] != 0]['FileName']
+    modularity_violation_files = pf_pd[pf_pd['numModularityViolation'] != 0]['FileName']
+    package_cycle_files = pf_pd[pf_pd['numPackageCycle'] != 0]['FileName']
+    unhealthy_inheritance_files = pf_pd[pf_pd['numUnhealthyInheritance'] != 0]['FileName']
+    unstable_interface_files = pf_pd[pf_pd['numUnstableInterface'] != 0]['FileName']
+    clique_files = pf_pd[pf_pd['numClique'] != 0]['FileName']
+
+    all_pf_files = pd.concat(
+        [crossing_files, modularity_violation_files, package_cycle_files, unhealthy_inheritance_files,
+         unstable_interface_files, clique_files], axis=0).reset_index(drop=True)
+
+    # 计算维护成本
+    measure_maintenance(project_path, crossing_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\crossing')), pro_name, method)
+    measure_maintenance(project_path, modularity_violation_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\cmodularity_violation')), pro_name, method)
+    measure_maintenance(project_path, package_cycle_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\package_cycle')), pro_name, method)
+    measure_maintenance(project_path, unhealthy_inheritance_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\\unhealthy_inheritance')), pro_name, method)
+    measure_maintenance(project_path, unstable_interface_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\\unstable_interface')), pro_name, method)
+    measure_maintenance(project_path, clique_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\clique')), pro_name, method)
+    measure_maintenance(project_path, all_pf_files, vers,
+                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                                     pro_name + '\\all_pf')), pro_name, method)
+
+
+def measure_maintenance(project_path, pf_entities, vers, output_path, pro_name, method):
+    if pf_entities.empty:
+        return
     # causes_cmt_mc_list = list()
     # causes_author_mc_list = list()
     # causes_issue_mc_list = list()
@@ -36,13 +85,13 @@ def measure_maintenance(project_path, pf_entities, vers, detect_path):
     # issue_loc_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
     os.chdir(project_path)
     mc_list = list()
-    # versions = vers.split('?')
-    for version in vers:
+    versions = vers.split('?')
+    for version in versions:
         version = version.replace('\n', '')
         version_mc = list()
         version_mc.append(version)
         base_version_path = os.path.join(os.path.join(r'D:\paper-data-and-result\results\paper-results\mv',
-                                                      os.path.basename(os.path.dirname(detect_path)) + '-enre-out'),
+                                                      pro_name + '-enre-out'),
                                          'mc/' + version)
         # 获取到该版本的loc和log，计算版本中每个文件的维护成本
         commit_collection_res, file_list_java, file_loc_dict = gitlog(project_path, version, base_version_path)
@@ -50,13 +99,13 @@ def measure_maintenance(project_path, pf_entities, vers, detect_path):
         all_files_mc_pd = changeProness(file_list_java, commit_collection_res,
                                         create_file_path(base_version_path, 'file mc.csv'))
         # 计算问题实体和非问题实体的维护成本
-        com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc)
+        com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc, method)
         mc_list.append(version_mc)
     res_pf = pd.DataFrame(data=mc_list, columns=['version', '#commit-mc(A)', '#commit-mc(B)', '#commit-average(P)',
                                                  '#changeLoc-mc(A)', '#changeLoc-mc(B)', '#changeLoc-average(P)',
                                                  '#author-mc(A)', '#author-mc(B)', '#author-average(P)'])
     res_pf['projectname'] = os.path.basename(project_path)
-    res_pf.to_csv(os.path.join(detect_path, "mc result.csv"), index=False, sep=',')
+    res_pf.to_csv(os.path.join(output_path, "mc result.csv"), index=False, sep=',')
     # write_to_csv(cmt_list, out_path + '/mc/causes_cmt.csv')
     # write_to_csv(change_loc_list, out_path + '/mc/causes_change_loc.csv')
     # write_to_csv(author_list, out_path + '/mc/causes_author.csv')
@@ -67,14 +116,14 @@ def measure_maintenance(project_path, pf_entities, vers, detect_path):
     # write_to_csv(issue_loc_list, out_path + '/mc/causes_issue_loc.csv')
 
 
-def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
+def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc, method):
     # causes_mc_result = list()
     # causes_mc_result.append(['cause', '#author', '#cmt', '#changeloc', '#issue', '#issue-cmt', 'issueLoc'])
     # test_entities = list()
     # TODO：本步骤可在一开始评估时，多加入一列File Path，此处即无需转换
     # TODO:此处先使用之前的代码逻辑计算维护成本，实验全部做完之后再优化代码
     # 求问题实体维护成本
-    pf_entities = _format_file_path(all_files_mc_pd['filename'], pf_entities)
+    pf_entities = _format_file_path(all_files_mc_pd['filename'], pf_entities, method)
     pf_entities_cmt = list()
     pf_entities_change_loc = 0
     pf_entities_author = list()
@@ -199,11 +248,11 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
     # return causes_mc_result
 
 
-def _format_file_path(filenames, pf_entities):
+def _format_file_path(filenames, pf_entities, method):
     result = dict()
     for pf_entity in pf_entities:
         for file in filenames:
-            if pf_entity.replace('.', '\\') in file:
+            if (method == 'ours' and pf_entity.replace('.', '\\') in file) or (method == 'dv8' and pf_entity.replace('/', '\\') in file):
                 result[file] = pf_entity
                 break
     return result

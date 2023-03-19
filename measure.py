@@ -123,7 +123,8 @@ def test():
         pro_path = tmp[0]
         pro_name = tmp[1]
         ver = tmp[2]
-        measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
+        com_mc(pro_path, ver, '', pro_name, 'dv8')
+        # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
     # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
     # #     writer = csv.writer(file1)
     # #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])
