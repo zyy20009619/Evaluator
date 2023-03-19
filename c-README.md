@@ -88,11 +88,11 @@ file在计算耦合和内聚程度时，依赖于struct之间的依赖关系，�
 | IDD(in-degree dependence)         | IDD越大，总体被耦合的程度越高，模块间的动态交互程度越高。    | 同java  | 已支持    |
 | CHM                               | 项目中所有模块在消息层内聚程度的均值。                       | 同java  | 待支持    |
 | CHD                               | 项目中所有模块在领域层内聚程度的均值。                       | 同java  | 待支持    |
-| SPREAD                            | 度量模块中的实体在演化过程中横切协同变化集群的个数。SPREAD越小，总体模块性越好。（粒度太细，目前历史提取无法做到此粒度） | -       | 不支持    |
-| FOCUS                             | 度量模块化良好的程度。FOCUS越大，总体模块性越好。            | -       | 不支持    |
-| ICF(intra co-change frequency)    | 所有模块演化内部共变频率的平均值。ICF越高，总体模块内的实体更有可能一起演化。 | -       | 不支持    |
-| ECF(external co-change frequency) | 所有模块演化外部共变频率的平均值。ECF越低，总体跨模块边界的实体更有可能独立演化。 | -       | 不支持    |
-| REI(ratio of ecf to icf)          | 所有模块演化外部共变频率与内部共变频率的比值的平均值。REI越低，说明总体不同模块一起修改的可能性越低，各模块更有可能会独立演化、独立维护。 | -       | 不支持    |
+| SPREAD                            | 度量模块中的实体在演化过程中横切协同变化集群的个数。SPREAD越小，总体模块性越好。（粒度太细，目前历史提取无法做到此粒度） | -       | 待支持    |
+| FOCUS                             | 度量模块化良好的程度。FOCUS越大，总体模块性越好。            | -       | 待支持    |
+| ICF(intra co-change frequency)    | 所有模块演化内部共变频率的平均值。ICF越高，总体模块内的实体更有可能一起演化。 | -       | 待支持    |
+| ECF(external co-change frequency) | 所有模块演化外部共变频率的平均值。ECF越低，总体跨模块边界的实体更有可能独立演化。 | -       | 待支持    |
+| REI(ratio of ecf to icf)          | 所有模块演化外部共变频率与内部共变频率的比值的平均值。REI越低，说明总体不同模块一起修改的可能性越低，各模块更有可能会独立演化、独立维护。 | -       | 待支持    |
 
 - ### module --**file**
 
@@ -107,58 +107,58 @@ file在计算耦合和内聚程度时，依赖于struct之间的依赖关系，�
 | NOID   | -                                                            | file被导入依赖的个数    | 已支持    |
 | chm    | chm越大，模块在消息层内聚程度越高。                          | -                       | 待支持    |
 | chd    | chd越大，模块在领域层内聚程度越高。                          | -                       | 待支持    |
-| spread | 度量模块中的实体在演化过程中接触的共变集群个数。spread越小，模块性越好。 | -                       | 不支持    |
-| focus  | 度量模块中的实体在演化过程中专注自身演进的程度。focus越大，模块性越好。 | -                       | 不支持    |
-| icf    | icf越高，模块内的实体更有可能一起演化。                      | -                       | 不支持    |
-| ecf    | ecf越低，跨模块边界的实体更有可能独立演化。                  | -                       | 不支持    |
-| rei    | rei越低，说明不同模块一起修改的可能性越低，模块更有可能会独立演化、独立维护。 | -                       | 不支持    |
+| spread | 度量模块中的实体在演化过程中接触的共变集群个数。spread越小，模块性越好。 | -                       | 待支持    |
+| focus  | 度量模块中的实体在演化过程中专注自身演进的程度。focus越大，模块性越好。 | -                       | 待支持    |
+| icf    | icf越高，模块内的实体更有可能一起演化。                      | -                       | 待支持    |
+| ecf    | ecf越低，跨模块边界的实体更有可能独立演化。                  | -                       | 待支持    |
+| rei    | rei越低，说明不同模块一起修改的可能性越低，模块更有可能会独立演化、独立维护。 | -                       | 待支持    |
 
 - ### class --struct
 
-| 指标                   | java中定义                                  | c中定义                       | c支持状态 |
-| ---------------------- | ------------------------------------------- | ----------------------------- | --------- |
-| CBC                    | 类依赖的数量(包含被依赖)                    | 同java(struct之间的embed关系) | 已支持    |
-| c_FAN_IN               | 类扇入                                      | 同java                        | 已支持    |
-| c_FAN_OUT              | 类扇出                                      | 同java                        | 已支持    |
-| IDCC                   | 模块内耦合类数量                            | 同java                        | 已支持    |
-| IODD                   | 模块内耦合其他类的数量                      | 同java                        | 已支持    |
-| IIDD                   | 模块内被其他类耦合的数量                    | 同java                        | 已支持    |
-| EDCC                   | 模块外耦合类数量                            | 同java                        | 已支持    |
-| NAC                    | 类继承树深度                                | 同java                        | 已支持    |
-| NDC                    | 派生类个数                                  | 同java                        | 已支持    |
-| NOM                    | 类中方法总数                                | -(统计下function pointer数量) | 已支持    |
-| WMC                    | 类方法复杂度之和                            | -                             | 已支持    |
-| c_chm                  | 类在消息层的功能内聚度                      | -                             | 待支持    |
-| c_chd                  | 类在领域层的功能内聚度                      | -                             | 待支持    |
-| NOVM                   | 可见方法数量                                | -                             | 待支持    |
-| CTM                    | 调用方法个数(除自身类中方法)                | -                             | 待支持    |
-| RFC                    | 类的响应数量(本地方法数量+调用外部方法数量) | -                             | 待支持    |
-| NOSI                   | 静态方法调用数量                            | -                             | 待支持    |
-| TCC                    | 紧类内聚(仅考虑可见方法的直接调用)          | -                             | 待支持    |
-| LCC                    | 松类内聚(考虑可见方法的直接调用和间接调用)  | -                             | 待支持    |
-| LCOM                   | 方法内聚性缺失                              | -                             | 待支持    |
-| LOCM*                  | 方法内聚性缺失(归一化结果)                  | -                             | 待支持    |
-| c_modifiers            | 类中修饰符                                  | -                             | 待支持    |
-| CIS                    | 类中公共接口数                              | -(visibility）                | 待支持    |
-| privateMethodsQty      | 私有方法数量                                | -                             | 待支持    |
-| protectedMethodsQty    | 保护方法数量                                | -                             | 待支持    |
-| staticMethodsQty       | 静态方法数量                                | -(storage_class)              | 待支持    |
-| c_variablesQty         | 类中变量数量                                | -                             | 待支持    |
-| NOF                    | 字段数量                                    | -                             | 待支持    |
-| staticFieldsQty        | 静态字段数量                                | -(storage_class)              | 待支持    |
-| protectedFieldsQty     | 保护字段数量                                | -                             | 待支持    |
-| privateFieldsQty       | 私有字段数量                                | -                             | 待支持    |
-| publicFieldsQty        | 公有字段数量                                | -                             | 待支持    |
-| defaultMethodsQty      | 缺省方法数量                                | -                             | 不支持    |
-| abstractMethodsQty     | 抽象方法数量                                | -                             | 不支持    |
-| finalMethodsQty        | final方法数量                               | -                             | 不支持    |
-| synchronizedMethodsQty | synchronized方法数量                        | -                             | 不支持    |
-| defaultFieldsQty       | 缺省字段数量                                | -                             | 不支持    |
-| finalFieldsQty         | final字段数量                               | -                             | 不支持    |
-| synchronizedFieldsQty  | synchronized字段数量                        | -                             | 不支持    |
-| NOP                    | 多态方法数量                                | -                             | 不支持    |
-| NOI                    | 导入数量                                    | -                             | 不支持    |
-| NOID                   | 被导入数量                                  | -                             | 不支持    |
+| 指标                   | java中定义                                  | c中定义                                     | c支持状态 |
+| ---------------------- | ------------------------------------------- | ------------------------------------------- | --------- |
+| CBC                    | 类依赖的数量(包含被依赖)                    | 同java(struct之间的embed关系)               | 已支持    |
+| c_FAN_IN               | 类扇入                                      | 同java                                      | 已支持    |
+| c_FAN_OUT              | 类扇出                                      | 同java                                      | 已支持    |
+| IDCC                   | 模块内耦合类数量                            | 同java                                      | 已支持    |
+| IODD                   | 模块内耦合其他类的数量                      | 同java                                      | 已支持    |
+| IIDD                   | 模块内被其他类耦合的数量                    | 同java                                      | 已支持    |
+| EDCC                   | 模块外耦合类数量                            | 同java                                      | 已支持    |
+| NAC                    | 类继承树深度                                | 同java                                      | 已支持    |
+| NDC                    | 派生类个数                                  | 同java                                      | 已支持    |
+| NOM                    | 类中方法总数                                | -(统计下function pointer数量)               | 已支持    |
+| WMC                    | 类方法复杂度之和                            | -                                           | 已支持    |
+| c_chm                  | 类在消息层的功能内聚度                      | -(考虑要把function的参数都抽出来之后再进行) | 待支持    |
+| c_chd                  | 类在领域层的功能内聚度                      | -                                           | 待支持    |
+| NOVM                   | 可见方法数量                                | -                                           | 待支持    |
+| CTM                    | 调用方法个数(除自身类中方法)                | -                                           | 待支持    |
+| RFC                    | 类的响应数量(本地方法数量+调用外部方法数量) | -                                           | 待支持    |
+| NOSI                   | 静态方法调用数量                            | -                                           | 待支持    |
+| TCC                    | 紧类内聚(仅考虑可见方法的直接调用)          | -                                           | 待支持    |
+| LCC                    | 松类内聚(考虑可见方法的直接调用和间接调用)  | -                                           | 待支持    |
+| LCOM                   | 方法内聚性缺失                              | -                                           | 待支持    |
+| LOCM*                  | 方法内聚性缺失(归一化结果)                  | -                                           | 待支持    |
+| c_modifiers            | 类中修饰符                                  | -                                           | 待支持    |
+| CIS                    | 类中公共接口数                              | -(visibility）                              | 待支持    |
+| privateMethodsQty      | 私有方法数量                                | -                                           | 待支持    |
+| protectedMethodsQty    | 保护方法数量                                | -                                           | 待支持    |
+| staticMethodsQty       | 静态方法数量                                | -(storage_class)                            | 待支持    |
+| c_variablesQty         | 类中变量数量                                | -                                           | 待支持    |
+| NOF                    | 字段数量                                    | -                                           | 待支持    |
+| staticFieldsQty        | 静态字段数量                                | -(storage_class)                            | 待支持    |
+| protectedFieldsQty     | 保护字段数量                                | -                                           | 待支持    |
+| privateFieldsQty       | 私有字段数量                                | -                                           | 待支持    |
+| publicFieldsQty        | 公有字段数量                                | -                                           | 待支持    |
+| defaultMethodsQty      | 缺省方法数量                                | -                                           | 不支持    |
+| abstractMethodsQty     | 抽象方法数量                                | -                                           | 不支持    |
+| finalMethodsQty        | final方法数量                               | -                                           | 不支持    |
+| synchronizedMethodsQty | synchronized方法数量                        | -                                           | 不支持    |
+| defaultFieldsQty       | 缺省字段数量                                | -                                           | 不支持    |
+| finalFieldsQty         | final字段数量                               | -                                           | 不支持    |
+| synchronizedFieldsQty  | synchronized字段数量                        | -                                           | 不支持    |
+| NOP                    | 多态方法数量                                | -                                           | 不支持    |
+| NOI                    | 导入数量                                    | -                                           | 不支持    |
+| NOID                   | 被导入数量                                  | -                                           | 不支持    |
 
 - ### method  --function
 

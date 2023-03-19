@@ -25,7 +25,7 @@ def detect_change(path1, path2, opt, th):
         os.path.join(path2, 'measure_result_method.csv'))
     diff_class_inner, diff_class_left, diff_class_right, diff_class_all = com_diff(class1_res, class2_res, base_out,
                                                                                    'module_name', 'class_name', 'class',
-                                                                                   65)
+                                                                                   60)
     diff_method_inner, diff_method_left, diff_method_right, diff_method_all = com_diff(method1_res, method2_res,
                                                                                        base_out, 'class_name',
                                                                                        'method_name', 'method', 11)
@@ -161,15 +161,16 @@ def com_diff(res1, res2, base_out, focus_name1, focus_name2, grau, metric_num):
     diff_left = pd.merge(res1, res2, how='left', left_on=[focus_name2], right_on=[focus_name2],
                          suffixes=['', '1'])
     # 如果包含非数字列，加入.select_dtypes(include=[np.number])
-    diff_left = diff_left[diff_left.isna().any(axis=1)].dropna(axis=1, how='any')
-    diff_left_name = diff_left[[focus_name1, focus_name2]]
+    diff_left = diff_left[diff_left.isna().any(axis=1)].dropna(axis=1, how='all')
+    diff_left_name = diff_left if diff_left.empty else diff_left[[focus_name1, focus_name2]]
+    # diff_left_name = diff_left[[focus_name1, focus_name2]]
     diff_left = -diff_left.select_dtypes(include=[np.number])
     diff_left = pd.concat([diff_left_name, diff_left], axis=1)
     diff_left['status'] = 'delete'
 
     diff_right = pd.merge(res1, res2, how='right', left_on=[focus_name2], right_on=[focus_name2],
                           suffixes=['1', ''])
-    diff_right = diff_right[diff_right.isna().any(axis=1)].dropna(axis=1, how='any')
+    diff_right = diff_right[diff_right.isna().any(axis=1)].dropna(axis=1, how='all')
     diff_right['status'] = 'add'
 
     diff_all = pd.concat([diff_inner, diff_left, diff_right], axis=0).reset_index(drop=True)

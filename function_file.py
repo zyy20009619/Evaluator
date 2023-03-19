@@ -27,94 +27,92 @@ def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
 def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, lang):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
+    project_name = os.path.basename(project_path)
     if ver != '':
-        os.chdir(project_path)
-        os.system("git checkout -f " + ver)
-        os.system(GIT_COMMAND)
-
         # loc_count = os.popen('cloc .').read()
         # tmp_loc = loc_count.split('\n')
         # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
         # loc = tmp_loc1[len(tmp_loc1) - 1]
 
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
         # print(sys.path[0])
         # print(sys.argv[0])
         # print(os.path.realpath(sys.executable))
         # print(os.path.dirname(os.path.realpath(sys.argv[0])))
         # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
-        project_name = os.path.basename(project_path)
-        if dep_path == '':
-            os.system('java -Xmx20G -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + project_name)
-            if not os.path.exists(os.path.join(base_out_path, project_name + '-out.json')):
-                shutil.move(project_name + '-enre-out/' + project_name + '-out.json', base_out_path)
-                shutil.rmtree(project_name + '-enre-out')
-        else:
-            if not os.path.exists(os.path.join(dep_path, ver)):
-                shutil.move(os.rename(os.listdir(os.path.join(dep_path, ver))[0], project_name + '-out.json'),
-                            base_out_path)
-        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
-        os.system(execute)
-        if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
-            shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
+        if lang == 'java':
+            os.chdir(project_path)
+            os.system("git checkout -f " + ver)
+            os.system(GIT_COMMAND)
+            os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+            if dep_path == '':
+                os.system('java -Xmx20G -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + project_name)
+                if not os.path.exists(os.path.join(base_out_path, project_name + '-out.json')):
+                    shutil.move(project_name + '-enre-out/' + project_name + '-out.json', base_out_path)
+                    shutil.rmtree(project_name + '-enre-out')
+            else:
+                if not os.path.exists(os.path.join(dep_path, ver)):
+                    shutil.move(os.rename(os.listdir(os.path.join(dep_path, ver))[0], project_name + '-out.json'),
+                                base_out_path)
+            execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+            os.system(execute)
+            if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
+                shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
     module_data = list()
     dep_dic = read_file(os.path.join(base_out_path, project_name + '-out.json'))
     if dep_dic:
-        # 在获取依赖时分别适配C语言和Java语言
-        var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
-        # 计算指标
-        com_metrics(ver, var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep, base_out_path)
-        # package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-        #     dep_dic, mapping_dic, base_out_path, lang)
-        # # 计算指标时应该是通用的
-        # package_dic, score, c_count, m_count = get_module_metric(dep_dic['variables'], package_info, inherit,
-        #                                                          descendent, method_class, dep,
-        #                                                          call, called, override, overrided, import_val,
-        #                                                          imported_val, parameter,
-        #                                                          method_define_var,
-        #                                                          method_use_field, 'package', module_data,
-        #                                                          os.path.join(base_out_path, 'cmt.csv'))
+        if lang == 'java':
+            package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
+                dep_dic, lang)
+            package_dic, score, c_count, m_count = get_module_metric(dep_dic['variables'], package_info, inherit,
+                                                                     descendent, method_class, dep,
+                                                                     call, called, override, overrided, import_val,
+                                                                     imported_val, parameter,
+                                                                     method_define_var,
+                                                                     method_use_field, 'package', module_data,
+                                                                     os.path.join(base_out_path, 'cmt.csv'))
+            result = list()
+            for item in module_data:
+                temp = [item[0] - item[1]]
+                temp.extend(item[2: 11: 1])
+                result.append(temp)
+            tmp_pro = np.around(np.array(result).mean(axis=0).tolist(), 4)
+            project_dic = dict()
+            tmp_pro = np.insert(tmp_pro, 0, score)
+            project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
+            project_metric['modules'] = package_dic
+            project_dic[ver] = project_metric
 
-        # result = list()
-        # for item in module_data:
-        #     temp = [item[0] - item[1]]
-        #     temp.extend(item[2: 11: 1])
-        #     result.append(temp)
-        # tmp_pro = np.around(np.array(result).mean(axis=0).tolist(), 4)
-        # project_dic = dict()
-        # tmp_pro = np.insert(tmp_pro, 0, score)
-        # project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
-        # project_metric['modules'] = package_dic
-        # project_dic[ver] = project_metric
-        #
-        # write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
-        # write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
-        #                     os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
-    # else:
-    #     com_metrics(dep_dic, base_out_path)
-    # if not project_name == '':
-    #     return tmp_pro, loc, len(module_data), c_count, m_count
-    # return tmp_pro
+            write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
+            write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
+                                os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
+            return tmp_pro
+        else:
+            # 在获取依赖时分别适配C语言和Java语言
+            var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
+            # 计算指标
+            com_metrics(ver, var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep, base_out_path)
 
 
 def measure_multi_version(project_path, dep_path, output, opt, vers, obj, lang):
     project_list = list()
     project_path_list = project_path.split('?')
     dep_path_list = dep_path.split('?')
+    version_list = vers.split('?')
     index = 0
-    for ver in vers:
+    for ver in version_list:
         pro_path = project_path_list[0]
         dep_path = dep_path_list[0]
         if obj == 'extension':
             pro_path = project_path[index]
             dep_path = dep_path[index]
         mapping_dic = dict()
-        measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, lang)
+        tmp_pro = measure_package_metrics(pro_path, dep_path, output, ver, mapping_dic, lang)
         project_list.append(tmp_pro)
         index += 1
 
     project_list = np.around(project_list, 4)
-    draw_line_chart(vers, project_list, output)
+    draw_line_chart(version_list, project_list, output)
 
 
 def draw_line_chart(version_list, project_list, output):

@@ -1,3 +1,4 @@
+import os
 import csv
 import pandas as pd
 import numpy as np
@@ -361,9 +362,9 @@ class Project:
         # for row1 in self:
         # fieldnames1.update('version')
         fieldnames1.append('score')
-        fieldnames1.extend(PROJECT_METRICS)
+        fieldnames1.extend(C_PROJECT_METRICS)
         fieldnames1.append('module')
-        fieldnames1.extend(MODULE_METRICS)
+        fieldnames1.extend(C_MODULE_METRICS)
         fieldnames1.append('class')
         fieldnames1.extend(CLASS_METRICS)
         fieldnames2 = list()
@@ -373,21 +374,23 @@ class Project:
 
         # 计算project指标
         tmp_metrics = list()
+        infusion_metrics = list()
         for row1 in self.module:
-            tmp_metrics.append(list(itemgetter(*MODULE_METRICS)(self.__get__all_attrs(self.module[row1]))))
+            tmp_metrics.append(list(itemgetter(*C_MODULE_METRICS)(self.__get__all_attrs(self.module[row1]))))
+            infusion_metrics.append(list(itemgetter(*['scoh', 'scop', 'odd', 'idd', 'DSM', 'NOI', 'NOID'])(self.__get__all_attrs(self.module[row1]))))
         result = list()
         for item in tmp_metrics:
             temp = [item[0] - item[1]]
             temp.extend(item[2: 11: 1])
             result.append(temp)
         project_metrics = np.around(np.array(result).mean(axis=0).tolist(), 4)
-        [normalized_result, score_result] = get_score(tmp_metrics,
-                                                      [[0.08], [0.08], [0.07], [0.07], [0.07], [0.07], [0.07], [0.07],
-                                                       [0.07], [0.07], [0.07], [0.07], [0.07], [0.07]],
-                                                      MODULE_METRICS)
+        [normalized_result, score_result] = get_score(infusion_metrics,
+                                                      [[0.15], [0.15], [0.14], [0.14], [0.14], [0.14], [0.14]],
+                                                      ['scoh', 'scop', 'odd', 'idd', 'DSM', 'NOI', 'NOID'])
         project_metrics = np.insert(project_metrics, 0, np.mean(score_result))
+        print(project_metrics)
         # 将数据写入CSV文件
-        with open('output1.csv', 'w', newline='') as csvfile:
+        with open(os.path.join(self.__out_path, 'measure_file_and_struct.csv'), 'w', newline='') as csvfile:
             writer1 = csv.writer(csvfile, delimiter=",")
             row_data = list()
             row_data.append(fieldnames1)
@@ -395,13 +398,13 @@ class Project:
                 for row2 in self.module[row1].struct:
                     tmp = list(project_metrics)
                     tmp.append(row1)
-                    tmp.extend(list(itemgetter(*MODULE_METRICS)(self.__get__all_attrs(self.module[row1]))))
+                    tmp.extend(list(itemgetter(*C_MODULE_METRICS)(self.__get__all_attrs(self.module[row1]))))
                     tmp.append(row2)
                     tmp.extend(list(itemgetter(*CLASS_METRICS)(self.__get__all_attrs(self.module[row1].struct[row2]))))
                     row_data.append(tmp)
             writer1.writerows(row_data)
 
-        with open('output2.csv', 'w', newline='') as csvfile:
+        with open(os.path.join(self.__out_path, 'measure_function.csv'), 'w', newline='') as csvfile:
             writer2 = csv.writer(csvfile, delimiter=",")
             row_data = list()
             row_data.append(fieldnames2)
@@ -409,7 +412,7 @@ class Project:
                 for row2 in self.module[row1].function:
                     tmp = list()
                     tmp.append(row1)
-                    # tmp.extend(list(itemgetter(*MODULE_METRICS)(self.__get__all_attrs(self.module[row1]))))
+                    # tmp.extend(list(itemgetter(*C_MODULE_METRICS)(self.__get__all_attrs(self.module[row1]))))
                     tmp.append(row2)
                     tmp.extend(
                         list(itemgetter(*METHOD_METRICS)(self.__get__all_attrs(self.module[row1].function[row2]))))

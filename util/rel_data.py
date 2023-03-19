@@ -11,12 +11,10 @@ def get_rel_info(json_dic, lang):
     if lang == 'c':
         variables = json_dic[0]['variables']
         cells = json_dic[0]['relations']
-        var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_c_rel(variables, cells)
-    else:
-        variables = json_dic['variables']
-        cells = json_dic['cells']
-        get_java_rel(variables, cells)
-    return var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep
+        return get_c_rel(variables, cells)
+    variables = json_dic['variables']
+    cells = json_dic['cells']
+    return get_java_rel(variables, cells)
 
 
 def get_three_model(first_contain, second_contain):
@@ -180,17 +178,18 @@ def get_java_rel(variables, cells):
             _add_list_value(overrided, c['dest'], c['src'])
 
     # # 将方法级依赖映射到类级别：call/use/parameter -> dep
-    # convert_call_to_dep(call, method_class, dep)
+    convert_call_to_dep(call, method_class, dep)
     # # moduleinfo: class -> field/method
-    #
-    # # save call/called/inherit/descendent/import_val/imported_val into a dep file
-    # _save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
+    module_info = get_module_info(module_contain, package_name_to_id, file_contain, class_contain,
+                                   method_use_field, set_var, variables)
+    # save call/called/inherit/descendent/import_val/imported_val into a dep file
+    # save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
     #                   variables, os.path.join(base_out_path, 'dep.json'))
-    #
-    # return module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field
+
+    return module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field
 
 
-def _save_dep_to_json(inherit, descendent, call_id_dic, called_id_dic, import_val, imported_val,
+def save_dep_to_json(inherit, descendent, call_id_dic, called_id_dic, import_val, imported_val,
                       parameter, variables, dep_path):
     result = dict()
     result['inherit'] = _convert_dep_name_dic(inherit, variables)
@@ -254,33 +253,33 @@ def convert_call_to_dep(call, method_class, dep):
                 dep[method_class[src_method_id]][method_class[dest_method_id]] += 1
 
 
-def get_module_info(mapping_dic, package_contain, package_name_to_id, file_contain, class_contain, method_use_field,
+def get_module_info(package_contain, package_name_to_id, file_contain, class_contain, method_use_field,
                     set_var, variables):
     module_info = dict()
-    if mapping_dic:
-        for module in mapping_dic:
-            packages = mapping_dic[module]
-            module_info[module] = dict()
-            for package in packages:
-                for file in package_contain[package_name_to_id[package]]:
-                    if file in file_contain and file_contain[file] in class_contain:
-                        module_info[module][file_contain[file]] = class_contain[file_contain[file]]
-                if len(module_info[module]) == 0:
-                    del module_info[module]
-    else:
-        for package in package_contain:
-            module_info[package] = dict()
-            for file in package_contain[package]:
-                if file in file_contain and file_contain[file] in class_contain:
-                    contain_list = list()
-                    for method_or_field_id in class_contain[file_contain[file]]:
-                        contain_list.append(method_or_field_id)
-                        if variables[method_or_field_id][
-                            'category'] == 'Method' and method_or_field_id in method_use_field:
-                            contain_list.extend(method_use_field[method_or_field_id])
-                    if file_contain[file] in set_var:
-                        contain_list.extend(set_var[file_contain[file]])
-                    module_info[package][file_contain[file]] = list(set(contain_list))
-            if len(module_info[package]) == 0:
-                del module_info[package]
+    # if mapping_dic:
+    #     for module in mapping_dic:
+    #         packages = mapping_dic[module]
+    #         module_info[module] = dict()
+    #         for package in packages:
+    #             for file in package_contain[package_name_to_id[package]]:
+    #                 if file in file_contain and file_contain[file] in class_contain:
+    #                     module_info[module][file_contain[file]] = class_contain[file_contain[file]]
+    #             if len(module_info[module]) == 0:
+    #                 del module_info[module]
+    # else:
+    for package in package_contain:
+        module_info[package] = dict()
+        for file in package_contain[package]:
+            if file in file_contain and file_contain[file] in class_contain:
+                contain_list = list()
+                for method_or_field_id in class_contain[file_contain[file]]:
+                    contain_list.append(method_or_field_id)
+                    if variables[method_or_field_id][
+                        'category'] == 'Method' and method_or_field_id in method_use_field:
+                        contain_list.extend(method_use_field[method_or_field_id])
+                if file_contain[file] in set_var:
+                    contain_list.extend(set_var[file_contain[file]])
+                module_info[package][file_contain[file]] = list(set(contain_list))
+        if len(module_info[package]) == 0:
+            del module_info[package]
     return module_info
