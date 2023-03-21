@@ -116,14 +116,14 @@ def command():
 
 def test():
     # measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
-    with open('./projects.txt', encoding='utf-8') as file:
-        content = file.readlines()
-    for line in content:
-        tmp = line.split(',')
-        pro_path = tmp[0]
-        pro_name = tmp[1]
-        ver = tmp[2]
-        com_mc(pro_path, ver, '', pro_name, 'dv8')
+    # with open('./projects.txt', encoding='utf-8') as file:
+    #     content = file.readlines()
+    # for line in content:
+    #     tmp = line.split(',')
+    #     pro_path = tmp[0]
+    #     pro_name = tmp[1]
+    #     ver = tmp[2]
+    #     com_mc(pro_path, ver, '', pro_name, 'tc')
         # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
     # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
     # #     writer = csv.writer(file1)
@@ -149,8 +149,8 @@ def test():
     #     measure_multi_version(project_path, outpath, outpath, 'mv', vers, 'common')
     # compare_diff(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\r', r'D:\paper-data-and-result\results\android-results\实验结果\aosp-out\base\android-11.0.0_r35', '', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out')
     # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
-    # detect_change(r'D:\paper-data-and-result\results\bishe-results\android-result\CalyxOS\android11\49d8b986dddd441df741698541788c5f3a9c465f',
-    #               r'D:\paper-data-and-result\results\bishe-results\android-result\CalyxOS\android11', 'extension', 0.6)
+    detect_change(r'D:\paper-data-and-result\results\bishe-results\android-result\honor\s\android-12.0.0_r2',
+                  r'D:\paper-data-and-result\results\bishe-results\android-result\honor\s', 'extension', 0.6)
     # detect_change(r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.4.0', r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.5.0', 'common', 0.6)
     # detect_change(vers[0].replace('\n', ''), vers[1].replace('\n', ''), 'extension', 0.6)
     # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')

@@ -18,7 +18,34 @@ def com_mc(project_path, vers, detect_path, pro_name, method):
                             detect_path, pro_name)
     elif method == 'dv8':
         extract_dv8_pf_files(project_path, vers, pro_name)
+    elif method == 'tc':
+        extract_tc_pf_files(project_path, vers, pro_name)
 
+# 这条路走不通
+def extract_tc_pf_files(project_path, vers, pro_name):
+    versions = vers.split('?')
+    # 将dv8识别的文件名结果转化为qualifiedName
+    base_out_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
+                    versions[0]
+    dep_dic = read_file(os.path.join(base_out_path, pro_name + '-out.json'))
+    variables = dep_dic['variables']
+    path_to_qualifiedName = list()
+    for var in variables:
+        if var['category'] == 'File':
+            path_to_qualifiedName.append([var['File'], var['qualifiedName'][:-5]])
+    file_pd = pd.DataFrame(data=path_to_qualifiedName, columns=['class_path', 'qualifiedName'])
+
+    compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\TDClassifier-results'
+    file_path = compare_base_path + '/' + pro_name + '/results.csv'
+    tc_pd = read_csv_to_pd(file_path)
+    pf_pd = tc_pd[['class_path', 'high_td']]
+    pf_pd = pd.merge(pf_pd, file_pd, how='inner', on=['class_path'])
+    del pf_pd['class_path']
+    high_td_files = pf_pd[pf_pd['high_td'] == 1]['qualifiedName']
+
+    # 计算维护成本
+    measure_maintenance(project_path, high_td_files, versions[1:],
+                        create_dir_path(os.path.join(compare_base_path, pro_name)), pro_name)
 
 def extract_dv8_pf_files(project_path, vers, pro_name):
     versions = vers.split('?')
@@ -57,25 +84,25 @@ def extract_dv8_pf_files(project_path, vers, pro_name):
 
     # 计算维护成本
     measure_maintenance(project_path, crossing_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\crossing')), pro_name)
     measure_maintenance(project_path, modularity_violation_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\cmodularity_violation')), pro_name)
     measure_maintenance(project_path, package_cycle_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\package_cycle')), pro_name)
     measure_maintenance(project_path, unhealthy_inheritance_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\\unhealthy_inheritance')), pro_name)
     measure_maintenance(project_path, unstable_interface_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\\unstable_interface')), pro_name)
     measure_maintenance(project_path, clique_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\clique')), pro_name)
     measure_maintenance(project_path, all_pf_files, versions[1:],
-                        create_dir_path(os.path.join(r'D:\paper-data-and-result\results\bishe-results\compare-result\dv8',
+                        create_dir_path(os.path.join(compare_base_path,
                                      pro_name + '\\all_pf')), pro_name)
 
 

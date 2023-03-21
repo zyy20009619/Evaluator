@@ -25,7 +25,7 @@ def detect_change(path1, path2, opt, th):
         os.path.join(path2, 'measure_result_method.csv'))
     diff_class_inner, diff_class_left, diff_class_right, diff_class_all = com_diff(class1_res, class2_res, base_out,
                                                                                    'module_name', 'class_name', 'class',
-                                                                                   60)
+                                                                                   65)
     diff_method_inner, diff_method_left, diff_method_right, diff_method_all = com_diff(method1_res, method2_res,
                                                                                        base_out, 'class_name',
                                                                                        'method_name', 'method', 11)
@@ -34,7 +34,7 @@ def detect_change(path1, path2, opt, th):
         # 读取耦合切面数据
         facade_data = read_file(os.path.join(path2, 'facade.json'))
         # 安卓场景下关注伴生相对于原生进行修改的类实体是否引起较大的腐化
-        res = detect_android_project(base_out, facade_data, diff_class_inner, diff_method_all, opt, th)
+        res = detect_android_project(base_out, facade_data, class2_res, diff_class_inner, diff_method_all, opt, th)
         # 统计检测结果数据
         intrusive_coupling_call_class = len(
             set(res[(res['class_ownership'] == 'intrusive native') & (res['problem'] == 'coupling') & (
@@ -181,7 +181,7 @@ def com_diff(res1, res2, base_out, focus_name1, focus_name2, grau, metric_num):
     return diff_inner, diff_left, diff_right, diff_all
 
 
-def detect_android_project(base_out, facade_data, diff_class, diff_method, opt, th):
+def detect_android_project(base_out, facade_data, class2_res, diff_class, diff_method, opt, th):
     # 从耦合切面数据中抽取伴生项目中所有类/方法实体的实体归属方
     ownership_res = list()
     for facade in facade_data['res']:
@@ -203,16 +203,16 @@ def detect_android_project(base_out, facade_data, diff_class, diff_method, opt, 
     diff_method.to_csv(os.path.join(base_out, "diff ownership method.csv"), index=False, sep=',')
 
     # 获取到intrusive native和actively native类实体的质量diff并对腐化实体进行根因定位
-    intrusive_res_pd = get_android_decay_root_cause(entity_pd, 'intrusive native', diff_class, base_out,
+    intrusive_res_pd = get_android_decay_root_cause(entity_pd, 'intrusive native', class2_res, diff_class, base_out,
                                                     diff_method, opt, th)
-    # actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', diff_class, base_out, diff_method, opt,
-    #                                                th)
-    # extensive_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', diff_class, base_out, diff_method, opt,
-    #                                                th)
-    # obsoletely_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', diff_class, base_out, diff_method, opt,
-    #                                                th)
-    # res_pd = pd.concat([intrusive_res_pd, actively_res_pd, extensive_res_pd, obsoletely_res_pd], axis=0)
-    res_pd = pd.concat([intrusive_res_pd], axis=0)
+    actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', class2_res, diff_class, base_out, diff_method, opt,
+                                                   th)
+    extensive_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', class2_res, diff_class, base_out, diff_method, opt,
+                                                   th)
+    obsoletely_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', class2_res, diff_class, base_out, diff_method, opt,
+                                                   th)
+    res_pd = pd.concat([intrusive_res_pd, actively_res_pd, extensive_res_pd, obsoletely_res_pd], axis=0)
+    # res_pd = pd.concat([intrusive_res_pd], axis=0)
     res_pd = res_pd.rename(
         columns={'CBC': 'class decay degree', 'CBM': 'method decay degree', 'ownership': 'method_ownership',
                  'class_name': 'problem class', 'method_name': 'problem method'})
@@ -231,18 +231,26 @@ def detect_common_project(diff_class_all, diff_method_all, opt, th):
     return get_common_decay_root_cause(diff_module_modify, diff_method_all, opt, th)
 
 
-def get_android_decay_root_cause(ownership_pd, ownership, diff_class, base_out, diff_method, opt, th):
+def get_android_decay_root_cause(ownership_pd, ownership, class2_res, diff_class, base_out, diff_method, opt, th):
     ownership_class = ownership_pd[(ownership_pd['category'] == 'Class') & (ownership_pd['ownership'] == ownership)][
         'qualifiedName']
-    ownership_diff_class_measure = diff_class.loc[diff_class['class_name'].isin(ownership_class)]
-    ownership_diff_class_measure.sort_values(by="CBC", inplace=True, ascending=False)
-    ownership_diff_class_measure.to_csv(os.path.join(base_out, 'diff ' + ownership + '.csv'), index=False, sep=',')
-    # 对产生腐化的类实体进行定位（根据腐化严重程度进行输出）
-    coupling_df = detect_coupling_problem(ownership_diff_class_measure, diff_method, opt, th)
-    del coupling_df['scop']
-    cohesion_df = detect_cohesion_problem(ownership_diff_class_measure, diff_method, opt)
-    del cohesion_df['scoh']
-    res_pd = pd.concat([coupling_df, cohesion_df], axis=0).reset_index(drop=True)
+    if ownership != 'extensive':
+        ownership_diff_class_measure = diff_class.loc[diff_class['class_name'].isin(ownership_class)]
+        ownership_diff_class_measure.sort_values(by="CBC", inplace=True, ascending=False)
+        # ownership_diff_class_measure.to_csv(os.path.join(base_out, 'diff ' + ownership + '.csv'), index=False, sep=',')
+        # 对产生腐化的类实体进行定位（根据腐化严重程度进行输出）
+        coupling_df = detect_coupling_problem(ownership_diff_class_measure, diff_method, opt, th)
+        del coupling_df['scop']
+        cohesion_df = detect_cohesion_problem(ownership_diff_class_measure, diff_method, opt)
+        del cohesion_df['scoh']
+        res_pd = pd.concat([coupling_df, cohesion_df], axis=0).reset_index(drop=True)
+    else:
+        class2_res.sort_values(by="CBC", inplace=True, ascending=False)
+        class2_res = class2_res[class2_res['CBC'] > 0]
+        res_pd = class2_res.loc[class2_res['class_name'].isin(ownership_class)][['module_name', 'class_name', 'CBC']]
+        # res_pd = res_pd.rename(
+        #     columns={'CBC': 'class decay degree','class_name': 'problem class', 'module_name': 'problem module'})
+
     res_pd.insert(0, 'class_ownership', ownership)
     return res_pd
 
