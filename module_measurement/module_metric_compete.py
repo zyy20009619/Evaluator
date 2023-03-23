@@ -8,18 +8,18 @@ from score_compete.index_measure import get_score
 
 
 def get_module_metric(variables, package_info, inherit, descendent, method_class, struct_dep, call, called, override,
-                      overrided, import_val, imported_val, parameter, method_define_var, method_use_field, type,
-                      module_data, cmt_path):
+                      overrided, import_val, imported_val, parameter, method_define_var, method_use_field,
+                      module_data, cmt_path, grau):
     package_dic = dict()
     # measure history dep
-    focus_dic, spread_dic, module_classes, commit = get_spread_and_focus(cmt_path, package_info, variables)
+    focus_dic, spread_dic, module_classes, commit = get_spread_and_focus(cmt_path, package_info, variables, grau)
     icf_dic, ecf_dic, rei_dic = get_icf_ecf_rei(module_classes, commit)
     # measure structure dep
     module_list = list()
     c_count = 0
     m_num = 0
     for package in package_info:
-        if type == 'module':
+        if grau == 'component':
             package_name = package
         else:
             package_name = variables[package]['qualifiedName']

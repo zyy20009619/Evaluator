@@ -5,9 +5,9 @@ import csv
 from module_measurement.moduarity.chameleon import getCoChangeCluster
 
 
-def get_spread_and_focus(cmt_path, module_info, variables):
+def get_spread_and_focus(cmt_path, module_info, variables, grau):
     # create coChangeGraph
-    commit, module_classes = read_commit(cmt_path, module_info, variables)
+    commit, module_classes = read_commit(cmt_path, module_info, variables, grau)
     co_change_graph, vertexes = _get_co_change_graph(commit)
     # get coChangeCluster
     co_change_cluster = getCoChangeCluster(co_change_graph)
@@ -21,13 +21,19 @@ def get_spread_and_focus(cmt_path, module_info, variables):
     # return dict(), dict(), module_classes, commit
 
 
-def get_module_classes(module_info, variables, all_classes):
+def get_module_classes(module_info, variables, all_classes, grau):
     result = dict()
     for module_id in module_info:
-        result[variables[module_id]['qualifiedName']] = list()
+        if grau == 'component':
+            result[module_id] = list()
+        else:
+            result[variables[module_id]['qualifiedName']] = list()
         for class_id in module_info[module_id]:
             # if variables[class_id]['File'] in all_classes:
-            result[variables[module_id]['qualifiedName']].append(variables[class_id]['File'])
+            if grau == 'component':
+                result[module_id].append(variables[class_id]['File'])
+            else:
+                result[variables[module_id]['qualifiedName']].append(variables[class_id]['File'])
     return result
 
 
@@ -113,7 +119,7 @@ def spreadNormalized(tempSpread):
     return temp
 
 
-def read_commit(file_name, module_info, variables):
+def read_commit(file_name, module_info, variables, grau):
     all_classes = list()
     commit_dic = dict()
     with open(file_name, 'r', newline="") as fp:
@@ -128,7 +134,7 @@ def read_commit(file_name, module_info, variables):
             commit_dic[class1][class2] = int(commit)
 
     # module contains classes
-    module_classes = get_module_classes(module_info, variables, all_classes)
+    module_classes = get_module_classes(module_info, variables, all_classes, grau)
 
     return commit_dic, module_classes
 

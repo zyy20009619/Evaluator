@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-
+from xml.dom.minidom import parse
 from arch_debt.maintenance_cost_measurement.changeproness import *
 from arch_debt.maintenance_cost_measurement.gitlogprocessor import *
 from util.csv_operator import write_to_csv, read_csv, read_csv_to_pd
@@ -20,6 +20,51 @@ def com_mc(project_path, vers, detect_path, pro_name, method):
         extract_dv8_pf_files(project_path, vers, pro_name)
     elif method == 'tc':
         extract_tc_pf_files(project_path, vers, pro_name)
+    elif method == 'arcade':
+        extract_arcade_pf_files(project_path, vers, pro_name)
+    elif method == 'designite':
+        extract_designite_pf_files(project_path, vers, pro_name)
+#
+# def save_pf_files(pf_entities, var_to_path):
+#
+
+
+def extract_designite_pf_files(project_path, vers, pro_name):
+    versions = vers.split('?')
+    compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\Designite-results'
+    design_file_path = compare_base_path + '/' + pro_name + '/designCodeSmells.csv'
+    implementation_file_path = compare_base_path + '/' + pro_name + '/implementationCodeSmells.csv'
+
+    design_pd = read_csv_to_pd(design_file_path)
+    design_pd = design_pd[['Package Name', 'Type Name']]
+    design_pd['Type Name']=design_pd.apply(lambda x:x['Package Name']+"."+x['Type Name'],axis=1)
+
+    implementation_pd = read_csv_to_pd(implementation_file_path)
+    implementation_pd = design_pd[['Package Name', 'Type Name']]
+    implementation_pd['Type Name'] = implementation_pd.apply(lambda x: x['Package Name'] + "." + x['Type Name'], axis=1)
+
+    pf_pd = pd.concat([design_pd, implementation_pd], axis=0).reset_index(drop=True)
+    # 计算维护成本
+    measure_maintenance(project_path, pf_pd['Type Name'], versions[1:],
+                        create_dir_path(os.path.join(compare_base_path, pro_name)), pro_name)
+
+def extract_arcade_pf_files(project_path, vers, pro_name):
+    versions = vers.split('?')
+    compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\\ARCADE-results'
+    file_path = compare_base_path + '/' + pro_name + '/smells.xml'
+    dom = parse(file_path)
+    # 获取文件元素对象
+    document = dom.documentElement
+    # 读取配置文件中ipinfo数据
+    entities = document.getElementsByTagName("string")
+    pf_entities = list()
+    for entity in entities:
+        pf_entities.append(entity.childNodes[0].data)
+    # print(set(pf_entities))
+    pf_files = pd.DataFrame(data=pf_entities, columns=['class'])
+    # 计算维护成本
+    measure_maintenance(project_path, pf_files['class'], versions[1:],
+                        create_dir_path(os.path.join(compare_base_path, pro_name)), pro_name)
 
 # 这条路走不通
 def extract_tc_pf_files(project_path, vers, pro_name):
@@ -297,4 +342,5 @@ def _format_file_path(filenames, pf_entities):
             if pf_entity.replace('.', '\\') in file:
                 result[file] = pf_entity
                 break
+    print(len(result))
     return result

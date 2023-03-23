@@ -6,7 +6,7 @@ from util.json_operator import write_result_to_json
 from util.path_operator import create_file_path
 
 
-def get_rel_info(json_dic, lang):
+def get_rel_info(json_dic, lang, grau):
     # TODO:如果后期依赖模型统一，请修改此处
     if lang == 'c':
         variables = json_dic[0]['variables']
@@ -14,7 +14,7 @@ def get_rel_info(json_dic, lang):
         return get_c_rel(variables, cells)
     variables = json_dic['variables']
     cells = json_dic['cells']
-    return get_java_rel(variables, cells)
+    return get_java_rel(variables, cells, grau)
 
 
 def get_three_model(first_contain, second_contain):
@@ -102,7 +102,7 @@ def add_dep_to_dict(src_id, dest_id, dic):
     dic[src_id][dest_id] += 1
 
 
-def get_java_rel(variables, cells):
+def get_java_rel(variables, cells, grau):
     module_contain = dict()
     class_contain = dict()
     method_define_var = dict()
@@ -181,7 +181,7 @@ def get_java_rel(variables, cells):
     convert_call_to_dep(call, method_class, dep)
     # # moduleinfo: class -> field/method
     module_info = get_module_info(module_contain, package_name_to_id, file_contain, class_contain,
-                                   method_use_field, set_var, variables)
+                                   method_use_field, set_var, variables, grau)
     # save call/called/inherit/descendent/import_val/imported_val into a dep file
     # save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
     #                   variables, os.path.join(base_out_path, 'dep.json'))
@@ -254,32 +254,39 @@ def convert_call_to_dep(call, method_class, dep):
 
 
 def get_module_info(package_contain, package_name_to_id, file_contain, class_contain, method_use_field,
-                    set_var, variables):
+                    set_var, variables, grau):
     module_info = dict()
-    # if mapping_dic:
-    #     for module in mapping_dic:
-    #         packages = mapping_dic[module]
-    #         module_info[module] = dict()
-    #         for package in packages:
-    #             for file in package_contain[package_name_to_id[package]]:
-    #                 if file in file_contain and file_contain[file] in class_contain:
-    #                     module_info[module][file_contain[file]] = class_contain[file_contain[file]]
-    #             if len(module_info[module]) == 0:
-    #                 del module_info[module]
-    # else:
     for package in package_contain:
-        module_info[package] = dict()
-        for file in package_contain[package]:
-            if file in file_contain and file_contain[file] in class_contain:
-                contain_list = list()
-                for method_or_field_id in class_contain[file_contain[file]]:
-                    contain_list.append(method_or_field_id)
-                    if variables[method_or_field_id][
-                        'category'] == 'Method' and method_or_field_id in method_use_field:
-                        contain_list.extend(method_use_field[method_or_field_id])
-                if file_contain[file] in set_var:
-                    contain_list.extend(set_var[file_contain[file]])
-                module_info[package][file_contain[file]] = list(set(contain_list))
-        if len(module_info[package]) == 0:
-            del module_info[package]
+        if grau == 'component':
+            component_name = package
+            for file in package_contain[package]:
+                component_name = variables[file]['File'].split('/')[0]
+                if component_name not in module_info:
+                    module_info[component_name] = dict()
+                if file in file_contain and file_contain[file] in class_contain:
+                    contain_list = list()
+                    for method_or_field_id in class_contain[file_contain[file]]:
+                        contain_list.append(method_or_field_id)
+                        if variables[method_or_field_id]['category'] == 'Method' and method_or_field_id in method_use_field:
+                            contain_list.extend(method_use_field[method_or_field_id])
+                    if file_contain[file] in set_var:
+                        contain_list.extend(set_var[file_contain[file]])
+                    module_info[component_name][file_contain[file]] = list(set(contain_list))
+            if len(module_info[component_name]) == 0:
+                del module_info[component_name]
+        else:
+            module_info[package] = dict()
+            for file in package_contain[package]:
+                if file in file_contain and file_contain[file] in class_contain:
+                    contain_list = list()
+                    for method_or_field_id in class_contain[file_contain[file]]:
+                        contain_list.append(method_or_field_id)
+                        if variables[method_or_field_id][
+                            'category'] == 'Method' and method_or_field_id in method_use_field:
+                            contain_list.extend(method_use_field[method_or_field_id])
+                    if file_contain[file] in set_var:
+                        contain_list.extend(set_var[file_contain[file]])
+                    module_info[package][file_contain[file]] = list(set(contain_list))
+            if len(module_info[package]) == 0:
+                del module_info[package]
     return module_info

@@ -4,12 +4,79 @@ import shutil
 import csv
 import subprocess
 import pandas as pd
+import numpy as np
 from function_file import measure_package_metrics, compare_diff
 from detect_algo.detect_root_cause import analyse_data
 from arch_debt.measure_arch import com_mc
+from arch_debt.compute_bench_mc_metric import com_gt
 from util.metrics import PROJECT_METRICS
 from util.csv_operator import read_csv_to_pd
 from arch_debt.measure_arch import com_mc
+from util.json_operator import read_file
+from util.path_operator import create_dir_path
+from score_compete.index_measure import get_score
+
+
+# 克隆代码并且计算每个项目的SCORE
+def clone_code():
+    base_path = r'D:\paper-data-and-result\results\bishe-results\subjects.csv'
+    pro_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\projects'
+    SCORE_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\SCORE\component\all'
+    measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\component'
+    gt_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\gt'
+    subjects_pd = read_csv_to_pd(base_path)
+    subjects_pd = subjects_pd[['project name ', 'url']]
+
+    # os.chdir(pro_out_path)
+    score = list()
+    gt_list = list()
+    for index, row in subjects_pd.iterrows():
+        print(row[0])
+        # os.system('git clone ' + row[1])
+        # 调用指标计算方法计算指标结果(粒度：package/component)
+        # measure_package_metrics(os.path.join(pro_out_path, row[0]), '', os.path.join(measure_out_path, row[0]), '',
+        #                         'java', 'package')
+        # 根据需求计算SCORE值
+        # metrics = ['module_name','scoh', 'scop', 'odd', 'idd']
+        # weight = [[0.25], [0.25], [0.25], [0.25]]
+        # metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm', 'chd', 'DSM']
+        # weight = [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08]]
+        metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei']
+        weight = [[0.1], [0.1], [0.1], [0.1], [0.12], [0.12], [0.12], [0.12], [0.12]]
+        measure_path = os.path.join(measure_out_path, row[0])
+        if os.path.exists(measure_path):
+            measure_pd = read_csv_to_pd(measure_path + '\\measure_result_class.csv')
+            module_list = measure_pd[metrics]
+            module_list.drop_duplicates(subset=['module_name'],keep='first',inplace=True)
+            del module_list['module_name']
+            [normalized_result, score_result] = get_score(module_list.values, weight, metrics[1:])
+        score.append([row[0], np.mean(score_result)])
+        # 计算groundtruth指标
+        # com_gt(os.path.join(pro_out_path, row[0]), os.path.join(gt_out_path, row[0]), row[0], gt_list)
+    # gt_pd = pd.DataFrame(data=gt_list, columns=['project', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
+    # gt_pd.to_csv(os.path.join(gt_out_path, "gt.csv"), index=False, sep=',')
+    score_pd = pd.DataFrame(data=score, columns=['project', 'score'])
+    score_pd.to_csv(os.path.join(SCORE_out_path, "score.csv"), index=False, sep=',')
+
+
+# 编译java文件
+def out_file_list(pro_name, pro_path, version):
+    base_out_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
+                    version[0]
+    arcade_out_path = create_dir_path(
+        r'D:\paper-data-and-result\results\bishe-results\mc-result\ARCADE-results' + '\\' + pro_name + '\\' + 'classfiles')
+
+    dep_dic = read_file(os.path.join(base_out_path, pro_name + '-out.json'))
+    variables = dep_dic['variables']
+    # path_to_qualifiedName = list()
+    os.chdir(pro_path)
+    os.system("git checkout -f " + version[0])
+    for var in variables:
+        if var['category'] == 'File':
+            # path_to_qualifiedName.append(var['File'])
+            os.system('javac ' + var['File'] + ' -d ' + arcade_out_path + ' -encoding utf-8')
+    # file_pd = pd.DataFrame(data=path_to_qualifiedName)
+
 
 def get_tag(content):
     with open('./tag.csv', 'w', encoding='UTF8', newline='') as f:
@@ -37,11 +104,11 @@ def evaluate(content, writer):
         base_path = './data/' + pro_name + '-enre-out'
         os.makedirs(base_path, exist_ok=True)
         for index in range(0, len(vers)):
-        # for index in range(0, 2):
+            # for index in range(0, 2):
             # 可维护性评估
             tmp_pro, loc, m_num, c_num, me_num = measure_package_metrics(pro_name, pro_path, '',
-                                                                       base_path, vers[index],
-                                                                       dict(), 'sv')
+                                                                         base_path, vers[index],
+                                                                         dict(), 'sv')
             res = [pro_name, vers[index], loc, m_num, c_num, me_num]
             res.extend(tmp_pro)
             writer.writerow(res)
@@ -101,6 +168,7 @@ def com_count(count_list, causes_to_entities):
     #                    functionality_class_count, complexity_module_count, evolution_module_count, all_module_count,
     #                    all_class_count, all_method_count])
 
+
 def count_file_loc_commit():
     with open('./projects.txt', encoding='utf-8') as file:
         content = file.readlines()
@@ -132,7 +200,6 @@ def count_file_loc_commit():
 
             os.chdir(os.path.dirname(os.path.abspath(__file__)))
             writer.writerow([pro_name, ver, 'loc', 'file', commit_num])
-
 
 # if __name__ == '__main__':
 #     # count_file_loc_commit()

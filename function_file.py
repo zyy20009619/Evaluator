@@ -16,61 +16,53 @@ from module_measurement.com_metrics import com_metrics
 GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
 
-def measure_module_metrics(project_path, dep_path, output, mapping_path, opt):
-    mapping_dic = read_file(mapping_path)
-    if mapping_dic:
-        measure_package_metrics(project_path, dep_path, output, '', mapping_dic, opt)
-        return True
-    return False
-
-
-def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, lang):
+def measure_package_metrics(project_path, dep_path, output, ver, lang, grau):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
     project_name = os.path.basename(project_path)
-    if ver != '':
-        # loc_count = os.popen('cloc .').read()
-        # tmp_loc = loc_count.split('\n')
-        # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
-        # loc = tmp_loc1[len(tmp_loc1) - 1]
+    # if ver != '':
+    # loc_count = os.popen('cloc .').read()
+    # tmp_loc = loc_count.split('\n')
+    # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+    # loc = tmp_loc1[len(tmp_loc1) - 1]
 
-        # print(sys.path[0])
-        # print(sys.argv[0])
-        # print(os.path.realpath(sys.executable))
-        # print(os.path.dirname(os.path.realpath(sys.argv[0])))
-        # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
-        if lang == 'java':
-            os.chdir(project_path)
-            os.system("git checkout -f " + ver)
-            os.system(GIT_COMMAND)
-            os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # print(sys.path[0])
+    # print(sys.argv[0])
+    # print(os.path.realpath(sys.executable))
+    # print(os.path.dirname(os.path.realpath(sys.argv[0])))
+    # execute = "java -jar {} {}".format(os.path.dirname(os.path.realpath(sys.executable)) + '/commit.jar', project_path)
+    if lang == 'java':
+        os.chdir(project_path)
+        os.system("git checkout -f " + ver)
+        os.system(GIT_COMMAND)
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-            if dep_path == '':
-                os.system('java -Xmx20G -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + project_name)
-                if not os.path.exists(os.path.join(base_out_path, project_name + '-out.json')):
-                    shutil.move(project_name + '-enre-out/' + project_name + '-out.json', base_out_path)
-                    shutil.rmtree(project_name + '-enre-out')
-            else:
-                if not os.path.exists(os.path.join(dep_path, ver)):
-                    shutil.move(os.rename(os.listdir(os.path.join(dep_path, ver))[0], project_name + '-out.json'),
-                                base_out_path)
-            execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
-            os.system(execute)
-            if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
-                shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
+        if dep_path == '':
+            os.system('java -Xmx20G -jar ./util/tools/enre_java.jar java ' + project_path + ' ' + project_name)
+            if not os.path.exists(os.path.join(base_out_path, project_name + '-out.json')):
+                shutil.move(project_name + '-enre-out/' + project_name + '-out.json', base_out_path)
+                shutil.rmtree(project_name + '-enre-out')
+        else:
+            if not os.path.exists(os.path.join(dep_path, ver)):
+                shutil.move(os.rename(os.listdir(os.path.join(dep_path, ver))[0], project_name + '-out.json'),
+                            base_out_path)
+        execute = "java -jar {} {}".format('./util/tools/commit.jar', project_path)
+        os.system(execute)
+        if not os.path.exists(os.path.join(base_out_path, 'cmt.csv')):
+            shutil.move(os.path.join(project_path, 'cmt.csv'), base_out_path)
     module_data = list()
     dep_dic = read_file(os.path.join(base_out_path, project_name + '-out.json'))
     if dep_dic:
         if lang == 'java':
             package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-                dep_dic, lang)
+                dep_dic, lang, grau)
             package_dic, score, c_count, m_count = get_module_metric(dep_dic['variables'], package_info, inherit,
                                                                      descendent, method_class, dep,
                                                                      call, called, override, overrided, import_val,
                                                                      imported_val, parameter,
                                                                      method_define_var,
-                                                                     method_use_field, 'package', module_data,
-                                                                     os.path.join(base_out_path, 'cmt.csv'))
+                                                                     method_use_field, module_data,
+                                                                     os.path.join(base_out_path, 'cmt.csv'), grau)
             result = list()
             for item in module_data:
                 temp = [item[0] - item[1]]
@@ -86,7 +78,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, mapping_dic, la
             write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
             write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
                                 os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)
-            return tmp_pro
+            return score
         else:
             # 在获取依赖时分别适配C语言和Java语言
             var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
