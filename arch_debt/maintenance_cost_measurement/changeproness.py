@@ -170,16 +170,28 @@ def change_bug_proness_compute(file_list_java, mc_author_dict, mc_commit_times_d
 
 
 def changeProness(file_list_java, commit_collection_res, outfile):
-    [mc_author_dict, mc_commit_times_dict, mc_change_loc_dict, mc_issue_count_dict, mc_issue_loc_dict] = read_commit_info(
+    [mc_author_dict, mc_commit_times_dict, mc_change_loc_dict, mc_issue_count_dict,
+     mc_issue_loc_dict] = read_commit_info(
         commit_collection_res)
     all_files_mc_list, all_files_mc_pd = change_bug_proness_compute(file_list_java, mc_author_dict,
-                                                                     mc_commit_times_dict,
-                                                                     mc_change_loc_dict, mc_issue_count_dict,
-                                                                     mc_issue_loc_dict)
+                                                                    mc_commit_times_dict,
+                                                                    mc_change_loc_dict, mc_issue_count_dict,
+                                                                    mc_issue_loc_dict)
     title = ['id', 'filename', '#author', '#cmt', '#changeloc', '#issue', '#issue-cmt', 'issueLoc']
     final = list()
     final.append(title)
     final.extend(all_files_mc_list)
     write_to_csv(final, outfile)
+    all_cmt = list()
+    for cmt in mc_commit_times_dict:
+        all_cmt.extend(mc_commit_times_dict[cmt])
 
-    return all_files_mc_pd
+    all_loc = 0
+    for loc in mc_change_loc_dict:
+        all_loc += mc_change_loc_dict[cmt]
+
+    all_auth = list()
+    for auth in mc_author_dict:
+        all_auth.extend(list(mc_author_dict[auth].keys()))
+
+    return all_files_mc_pd, len(list(set(all_cmt))), all_loc, len(list(set(all_auth)))

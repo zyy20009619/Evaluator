@@ -7,7 +7,7 @@ from util.path_operator import create_file_path
 
 def generateLog(project_path, out_path):
     # os.system('git checkout -f ' + version)
-    os.chdir(project_path)
+    # os.chdir(project_path)
 
     git_log_file = create_file_path(out_path, 'gitlog')
     git_loc_file = create_file_path(out_path, 'gitloc')
@@ -16,7 +16,7 @@ def generateLog(project_path, out_path):
     # 获取git loc文件
     # os.system('git ls-files | xargs wc -l > ' + git_loc_file)
 
-    return git_log_file
+    return git_log_file, git_loc_file
 
 
 def processGitLog(file_name, file_list_java):

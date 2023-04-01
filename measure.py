@@ -116,18 +116,21 @@ def command():
 
 
 def test():
-    clone_code()
+    # clone_code()
     # measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
-    # with open('./projects.txt', encoding='utf-8') as file:
-    #     content = file.readlines()
-    # for line in content:
-    #     tmp = line.split(',')
-    #     pro_path = tmp[0]
-    #     pro_name = tmp[1]
-    #     print(pro_name)
-    #     ver = tmp[2]
-    #     # out_file_list(pro_name, pro_path, ver.split('?'))
-    #     com_mc(pro_path, ver, '', pro_name, 'designite')
+    with open('./projects.txt', encoding='utf-8') as file:
+        content = file.readlines()
+    for line in content:
+        tmp = line.split(',')
+        pro_path = tmp[0]
+        pro_name = tmp[1]
+        print(pro_name)
+        ver = tmp[2]
+        # out_file_list(pro_name, pro_path, ver.split('?'))
+        files = com_mc(pro_path, ver, pro_name, 'ours', list(), set())
+        com_mc(pro_path, ver, pro_name, 'designite', files, set())
+        com_mc(pro_path, ver, pro_name, 'arcade', files, set())
+        com_mc(pro_path, ver, pro_name, 'dv8', files, set())
         # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
     # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
     # #     writer = csv.writer(file1)

@@ -9,27 +9,53 @@ from util.path_operator import create_dir_path
 from util.json_operator import read_file
 
 
-def com_mc(project_path, vers, detect_path, pro_name, method):
+def com_mc(project_path, vers, pro_name, method, files, our_pf_files):
+    print(method)
     # causes_entities = read_csv(cause_path, 'causes_entities.csv')
     if method == 'ours':
+        versions = vers.split('?')
+        os.chdir(project_path)
+        os.system('git checkout -f ' + versions[0])
+        files = get_all_files_by_filter(project_path)
+        print('file_number:', len(files))
+        detect_path = 'D:\\paper-data-and-result\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
         detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
+        # pf_entities = _format_file_path(files, list(
+        #     set(detection_res[detection_res['class status'] != 'delete']['problem class'])))
+        # print('ours:', len(pf_entities))
+        # print('ours(总比率):', len(pf_entities) / len(files))
+        # pd_df = pd.DataFrame(data=pf_entities, columns=['class'])
         measure_maintenance(project_path,
-                            list(set(detection_res[detection_res['class status'] != 'delete']['problem class'])), vers,
+                            detection_res[detection_res['class status'] != 'delete']['problem class'], versions[1:],
                             detect_path, pro_name)
+        return files
     elif method == 'dv8':
-        extract_dv8_pf_files(project_path, vers, pro_name)
+        extract_dv8_pf_files(project_path, vers, pro_name, files, our_pf_files)
     elif method == 'tc':
         extract_tc_pf_files(project_path, vers, pro_name)
     elif method == 'arcade':
-        extract_arcade_pf_files(project_path, vers, pro_name)
+        extract_arcade_pf_files(project_path, vers, pro_name, files, our_pf_files)
     elif method == 'designite':
-        extract_designite_pf_files(project_path, vers, pro_name)
-#
-# def save_pf_files(pf_entities, var_to_path):
-#
+        extract_designite_pf_files(project_path, vers, pro_name, files, our_pf_files)
 
 
-def extract_designite_pf_files(project_path, vers, pro_name):
+def get_all_files_by_filter(project_path):
+    file_list_java = list()
+    for filename, dirs, files in os.walk(project_path, topdown=True):
+        filename = filename.split(project_path)[1]
+        filename = filename.replace("\\", "/")
+        if filename.startswith(".git") or filename.startswith(".github"):
+            continue
+        for file in files:
+            file_temp = filename + "\\" + file
+            file_temp = file_temp[1:]
+            file_temp = file_temp.replace("\\", "/")
+            if file.endswith(".java"):
+                file_list_java.append(file_temp)
+    return file_list_java
+
+
+def extract_designite_pf_files(project_path, vers, pro_name, files, our_pf_files):
     versions = vers.split('?')
     compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\Designite-results'
     design_file_path = compare_base_path + '/' + pro_name + '/designCodeSmells.csv'
@@ -37,21 +63,29 @@ def extract_designite_pf_files(project_path, vers, pro_name):
 
     design_pd = read_csv_to_pd(design_file_path)
     design_pd = design_pd[['Package Name', 'Type Name']]
-    design_pd['Type Name']=design_pd.apply(lambda x:x['Package Name']+"."+x['Type Name'],axis=1)
+    design_pd['Type Name'] = design_pd.apply(lambda x: x['Package Name'] + "." + x['Type Name'], axis=1)
 
     implementation_pd = read_csv_to_pd(implementation_file_path)
     implementation_pd = design_pd[['Package Name', 'Type Name']]
     implementation_pd['Type Name'] = implementation_pd.apply(lambda x: x['Package Name'] + "." + x['Type Name'], axis=1)
 
     pf_pd = pd.concat([design_pd, implementation_pd], axis=0).reset_index(drop=True)
+    # pf_entities = _format_file_path(files, list(set(pf_pd['Type Name'])))
+    # print('Designite:', len(pf_entities))
+    # print('Designite(总比率):', len(pf_entities) / len(files))
+    # print('Designite:', len(set(pf_entities) & our_pf_files))
+    # print('Designite(交集比率):', (len(set(pf_entities) & our_pf_files)) / len(our_pf_files))
     # 计算维护成本
     measure_maintenance(project_path, pf_pd['Type Name'], versions[1:],
                         create_dir_path(os.path.join(compare_base_path, pro_name)), pro_name)
 
-def extract_arcade_pf_files(project_path, vers, pro_name):
+
+def extract_arcade_pf_files(project_path, vers, pro_name, files, our_pf_files):
     versions = vers.split('?')
     compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\\ARCADE-results'
     file_path = compare_base_path + '/' + pro_name + '/smells.xml'
+    if not os.path.exists(file_path):
+        return
     dom = parse(file_path)
     # 获取文件元素对象
     document = dom.documentElement
@@ -62,9 +96,15 @@ def extract_arcade_pf_files(project_path, vers, pro_name):
         pf_entities.append(entity.childNodes[0].data)
     # print(set(pf_entities))
     pf_files = pd.DataFrame(data=pf_entities, columns=['class'])
+    # pf_entities = _format_file_path(files, list(set(pf_files['class'])))
+    # print('ARCADE:', len(pf_entities))
+    # print('ARCADE(总比率):', len(pf_entities) / len(files))
+    # print('ARCADE:', len(set(pf_entities) & our_pf_files))
+    # print('ARCADE(交集比率):', (len(set(pf_entities) & our_pf_files)) / len(our_pf_files))
     # 计算维护成本
     measure_maintenance(project_path, pf_files['class'], versions[1:],
                         create_dir_path(os.path.join(compare_base_path, pro_name)), pro_name)
+
 
 # 这条路走不通
 def extract_tc_pf_files(project_path, vers, pro_name):
@@ -92,7 +132,8 @@ def extract_tc_pf_files(project_path, vers, pro_name):
     measure_maintenance(project_path, high_td_files, versions[1:],
                         create_dir_path(os.path.join(compare_base_path, pro_name)), pro_name)
 
-def extract_dv8_pf_files(project_path, vers, pro_name):
+
+def extract_dv8_pf_files(project_path, vers, pro_name, files, our_pf_files):
     versions = vers.split('?')
     # 将dv8识别的文件名结果转化为qualifiedName
     base_out_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
@@ -104,7 +145,6 @@ def extract_dv8_pf_files(project_path, vers, pro_name):
         if var['category'] == 'File':
             path_to_qualifiedName.append([var['File'], var['qualifiedName'][:-5]])
     file_pd = pd.DataFrame(data=path_to_qualifiedName, columns=['FileName', 'qualifiedName'])
-
 
     compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\dv8-results'
     file_path = compare_base_path + '/' + pro_name + '/dv8-analysis-result/file-measure-report.csv'
@@ -125,30 +165,33 @@ def extract_dv8_pf_files(project_path, vers, pro_name):
     all_pf_files = pd.concat(
         [crossing_files, modularity_violation_files, package_cycle_files, unhealthy_inheritance_files,
          unstable_interface_files, clique_files], axis=0).reset_index(drop=True)
-
-
+    # pf_entities = _format_file_path(files, list(set(all_pf_files)))
+    # print('DV8:', len(pf_entities))
+    # print('DV8(总比率):', len(pf_entities) / len(files))
+    # print('DV8:', len(set(pf_entities) & our_pf_files))
+    # print('DV8(交集比率):', (len(set(pf_entities) & our_pf_files)) / len(our_pf_files))
     # 计算维护成本
-    measure_maintenance(project_path, crossing_files, versions[1:],
-                        create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\crossing')), pro_name)
-    measure_maintenance(project_path, modularity_violation_files, versions[1:],
-                        create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\cmodularity_violation')), pro_name)
-    measure_maintenance(project_path, package_cycle_files, versions[1:],
-                        create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\package_cycle')), pro_name)
-    measure_maintenance(project_path, unhealthy_inheritance_files, versions[1:],
-                        create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\\unhealthy_inheritance')), pro_name)
-    measure_maintenance(project_path, unstable_interface_files, versions[1:],
-                        create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\\unstable_interface')), pro_name)
-    measure_maintenance(project_path, clique_files, versions[1:],
-                        create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\clique')), pro_name)
+    # measure_maintenance(project_path, crossing_files, versions[1:],
+    #                     create_dir_path(os.path.join(compare_base_path,
+    #                                  pro_name + '\crossing')), pro_name)
+    # measure_maintenance(project_path, modularity_violation_files, versions[1:],
+    #                     create_dir_path(os.path.join(compare_base_path,
+    #                                  pro_name + '\cmodularity_violation')), pro_name)
+    # measure_maintenance(project_path, package_cycle_files, versions[1:],
+    #                     create_dir_path(os.path.join(compare_base_path,
+    #                                  pro_name + '\package_cycle')), pro_name)
+    # measure_maintenance(project_path, unhealthy_inheritance_files, versions[1:],
+    #                     create_dir_path(os.path.join(compare_base_path,
+    #                                  pro_name + '\\unhealthy_inheritance')), pro_name)
+    # measure_maintenance(project_path, unstable_interface_files, versions[1:],
+    #                     create_dir_path(os.path.join(compare_base_path,
+    #                                  pro_name + '\\unstable_interface')), pro_name)
+    # measure_maintenance(project_path, clique_files, versions[1:],
+    #                     create_dir_path(os.path.join(compare_base_path,
+    #                                  pro_name + '\clique')), pro_name)
     measure_maintenance(project_path, all_pf_files, versions[1:],
                         create_dir_path(os.path.join(compare_base_path,
-                                     pro_name + '\\all_pf')), pro_name)
+                                                     pro_name + '\\all_pf')), pro_name)
 
 
 def measure_maintenance(project_path, pf_entities, versions, output_path, pro_name):
@@ -174,27 +217,45 @@ def measure_maintenance(project_path, pf_entities, versions, output_path, pro_na
     # issue_loc_list.append(['avg_pf_mc', 'avg_non_pf_mc'])
     os.chdir(project_path)
     mc_list = list()
+    gt_mc_list = list()
     # versions = vers.split('?')
     for version in versions:
         version = version.replace('\n', '')
         version_mc = list()
+        gt_version_mc = list()
         version_mc.append(version)
+        gt_version_mc.append(version)
         base_version_path = os.path.join(os.path.join(r'D:\paper-data-and-result\results\paper-results\mv',
                                                       pro_name + '-enre-out'),
                                          'mc/' + version)
         # 获取到该版本的loc和log，计算版本中每个文件的维护成本
         commit_collection_res, file_list_java, file_loc_dict = gitlog(project_path, version, base_version_path)
         # 计算所有文件的维护成本
-        all_files_mc_pd = changeProness(file_list_java, commit_collection_res,
-                                        create_file_path(base_version_path, 'file mc.csv'))
+        all_files_mc_pd, all_cmt, all_loc, all_auth = changeProness(file_list_java, commit_collection_res,
+                                                                    create_file_path(base_version_path, 'file mc.csv'))
         # 计算问题实体和非问题实体的维护成本
-        com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc)
+        pf_cmt, pf_loc, pf_auth = com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc, gt_version_mc)
         mc_list.append(version_mc)
+        gt_version_mc.append(pf_cmt)
+        gt_version_mc.append(all_cmt)
+        gt_version_mc.append(pf_cmt / all_cmt)
+        gt_version_mc.append(pf_loc)
+        gt_version_mc.append(all_loc)
+        gt_version_mc.append(pf_loc / all_loc)
+        gt_version_mc.append(pf_auth)
+        gt_version_mc.append(all_auth)
+        gt_version_mc.append(pf_auth / all_auth)
+        gt_mc_list.append(gt_version_mc)
     res_pf = pd.DataFrame(data=mc_list, columns=['version', '#commit-mc(A)', '#commit-mc(B)', '#commit-average(P)',
                                                  '#changeLoc-mc(A)', '#changeLoc-mc(B)', '#changeLoc-average(P)',
                                                  '#author-mc(A)', '#author-mc(B)', '#author-average(P)'])
+    pf_res_pf = pd.DataFrame(data=gt_mc_list, columns=['version', '#pf_cmt', '#all_cmt', '#R_cmt',
+                                                       '#pf_loc', '#all_loc', '#R_loc',
+                                                       '#pf_author', '#all_author', '#R_author', ])
     res_pf['projectname'] = os.path.basename(project_path)
+    pf_res_pf['projectname'] = os.path.basename(project_path)
     res_pf.to_csv(os.path.join(output_path, "mc result.csv"), index=False, sep=',')
+    pf_res_pf.to_csv(os.path.join(output_path, "pf mc result.csv"), index=False, sep=',')
     # write_to_csv(cmt_list, out_path + '/mc/causes_cmt.csv')
     # write_to_csv(change_loc_list, out_path + '/mc/causes_change_loc.csv')
     # write_to_csv(author_list, out_path + '/mc/causes_author.csv')
@@ -205,7 +266,7 @@ def measure_maintenance(project_path, pf_entities, versions, output_path, pro_na
     # write_to_csv(issue_loc_list, out_path + '/mc/causes_issue_loc.csv')
 
 
-def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
+def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc, gt_version_mc):
     # causes_mc_result = list()
     # causes_mc_result.append(['cause', '#author', '#cmt', '#changeloc', '#issue', '#issue-cmt', 'issueLoc'])
     # test_entities = list()
@@ -228,7 +289,6 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
             #     all_files_mc_pd[all_files_mc_pd['filename'] == cause_entity]['issue_cmt_id'])
             # causes_entities_issue_loc += all_files_mc_pd[all_files_mc_pd['filename'] == cause_entity]['issue_loc']
             # causes_entities_issue.extend(all_files_mc_pd[all_files_mc_pd['filename'] == cause_entity]['issue_id'])
-
     # pf_entities_mc = all_files_mc_pd.loc[all_files_mc_pd['filename'].isin(pf_entities)]
     # pf_entities_sum_commit = pf_entities_mc['change_loc'].sum()
     # pf_entities_sum_loc = pf_entities_mc['change_loc'].sum()
@@ -260,6 +320,10 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
     # non_pf_entities_sum_loc = non_pf_entities_mc['change_loc'].sum()
     # non_pf_entities_sum_author = non_pf_entities_mc['change_loc'].sum()
     # 将问题实体和非问题实体的结果写入结果数组
+    print('pf_entities_change_loc:', pf_entities_change_loc)
+    print('pf_entity_loc_num:', pf_entity_loc_num)
+    print('non_pf_entities_change_loc:', non_pf_entities_change_loc)
+    print('non_pf_entity_loc_num:', non_pf_entity_loc_num)
     version_mc.extend(
         [len(set(pf_entities_cmt)) / pf_entity_loc_num, len(set(non_pf_entities_cmt)) / non_pf_entity_loc_num,
          (len(set(pf_entities_cmt)) / pf_entity_loc_num) / (len(set(non_pf_entities_cmt)) / non_pf_entity_loc_num),
@@ -268,6 +332,7 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc):
          len(set(pf_entities_author)) / pf_entity_loc_num, len(set(non_pf_entities_author)) / non_pf_entity_loc_num,
          (len(set(pf_entities_author)) / pf_entity_loc_num) / (
                  len(set(non_pf_entities_author)) / non_pf_entity_loc_num)])
+    return len(set(pf_entities_cmt)), pf_entities_change_loc, len(set(pf_entities_author))
 
     #
     # for cause in causes_to_entities:
@@ -342,5 +407,5 @@ def _format_file_path(filenames, pf_entities):
             if pf_entity.replace('.', '\\') in file:
                 result[file] = pf_entity
                 break
-    print(len(result))
+    # print(len(result))
     return result
