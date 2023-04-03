@@ -280,7 +280,6 @@ def detect_coupling_problem(diff_class_measure, diff_method_measure, opt, th):
     diff_coupling_inherit_decay_class = diff_coupling_decay_class[
         (diff_coupling_decay_class['c_FAN_OUT'] > 0) & (diff_coupling_decay_class['NAC'] > 0) |
         (diff_coupling_decay_class['c_FAN_IN'] > 0) & (diff_coupling_decay_class['NDC'] > 0)]
-
     diff_coupling_import_decay_class = diff_coupling_decay_class[
         (diff_coupling_decay_class['c_FAN_OUT'] > 0) & (diff_coupling_decay_class['NOI'] > 0) |
         (diff_coupling_decay_class['c_FAN_IN'] > 0) & (diff_coupling_decay_class['NOID'] > 0)]

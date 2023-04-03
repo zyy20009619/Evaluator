@@ -85,7 +85,10 @@ def get_dv8(pro_name, files, method):
 
 
 def get_metrics(label):
-    # 第一个参数为真实值，第二个参数为预测值
+    TP = len(label[(label['label_pre'] == 1) & (label['label'] == 1)])
+    FP = len(label[(label['label_pre'] == 1) & (label['label'] == 0)])
+    FN = len(label[(label['label_pre'] == 0) & (label['label'] == 1)])
+    TN = len(label[(label['label_pre'] == 0) & (label['label'] == 0)])
     # 计算Precision
     print('Precision:', precision_score(label['label'], label['label_pre']))
     # 计算Recall
@@ -103,11 +106,13 @@ def get_gt(pro_name, versions):
     # 读gt，整理所有文件，满足阈值条件的标记为1，不满足阈值条件的标记为0
     base_version_path = os.path.join(os.path.join(r'E:\results\paper-results\mv',
                                                   pro_name + '-enre-out'),
-                                     'mc/' + versions[1].replace('\n', ''))
+                                     'mc/' + versions[3].replace('\n', ''))
     gt_path = read_csv_to_pd(os.path.join(base_version_path, 'file mc.csv'))
     # 取前5%为高维护成本文件
+    gt_file_number = 10
     # gt_file_number = len(detection_res)
-    gt_file_number = int(len(gt_path) * 0.03)
+    # gt_file_number = int(len(gt_path) * 0.03)
+    # gt_file_number = int(len(gt_path) * 0.1)
     # gt_file_number = int(len(gt_path) * 0.05)
     print('file number:', len(gt_path))
     print('gt file number:', gt_file_number)

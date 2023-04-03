@@ -40,6 +40,10 @@ def com_call_coup(current_module, module_info, struct_dep, fan_in, fan_out):
     idd_list = list()
     odd_list = list()
     edcc_list = dict()
+    if len(module_info) == 1:
+        for id in module_info[current_module]:
+            edcc_list[id] = 0
+        return scop, 0, 0, edcc_list
     for module in module_info:
         if module != current_module:
             has_connections = 0

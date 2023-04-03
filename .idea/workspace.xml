@@ -6,8 +6,11 @@
       <change beforePath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arch_debt/measure_arch.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/measure_arch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module_measurement/compete_strcut_dep.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/compete_strcut_dep.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module_measurement/evolution/com_icf_ecf.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/evolution/com_icf_ecf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projects.txt" beforeDir="false" afterPath="$PROJECT_DIR$/projects.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -167,7 +170,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>212</line>
+          <line>211</line>
           <option name="timeStamp" value="125" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -177,7 +180,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/detect_algo/scan_quality_change.py</url>
-          <line>246</line>
+          <line>253</line>
           <option name="timeStamp" value="213" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -187,38 +190,43 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>694</line>
+          <line>699</line>
           <option name="timeStamp" value="266" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py</url>
-          <line>184</line>
+          <line>193</line>
           <option name="timeStamp" value="268" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>277</line>
-          <option name="timeStamp" value="277" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>27</line>
+          <line>504</line>
           <option name="timeStamp" value="278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>162</line>
+          <line>665</line>
           <option name="timeStamp" value="280" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/experiment.py</url>
-          <line>67</line>
+          <line>79</line>
           <option name="timeStamp" value="281" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/experiment.py</url>
-          <line>61</line>
+          <line>65</line>
           <option name="timeStamp" value="288" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/module_measurement/compete_strcut_dep.py</url>
+          <line>50</line>
+          <option name="timeStamp" value="291" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
+          <line>92</line>
+          <option name="timeStamp" value="293" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
