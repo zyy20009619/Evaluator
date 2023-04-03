@@ -3,10 +3,11 @@ import os
 import csv
 import argparse
 import datetime
+import pandas as pd
 from function_file import measure_package_metrics, compare_diff, measure_multi_version
 from detect_algo.detect_root_cause import analyse_data
 from detect_algo.scan_quality_change import detect_change
-from arch_debt.measure_arch import com_mc
+from arch_debt.measure_arch import com_mc, com_inter, com_aarf
 from experiment import out_file_list, clone_code
 
 
@@ -120,18 +121,36 @@ def test():
     # measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
     with open('./projects.txt', encoding='utf-8') as file:
         content = file.readlines()
+    top_ver = list()
+    gt = list()
     for line in content:
+        tmp_gt = list()
         tmp = line.split(',')
         pro_path = tmp[0]
         pro_name = tmp[1]
         print(pro_name)
-        ver = tmp[2]
+        # th = tmp[2]
+        vers = tmp[2]
+        com_aarf(vers, pro_name)
+        # com_inter(pro_path, ver, pro_name, 'ours', top_ver)
+        # top_ver = pd.DataFrame(data=top_ver)
+        # top_ver = pd.DataFrame(data=top_ver,
+        #                        columns=['project', 'version', 'ours-#author(top10)', 'ours-#author(top50)',
+        #                                 'ours-#cmt(top10)', 'ours-#cmt(top50)', 'ours-changeloc(top10)',
+        #                                 'ours-changeloc(top50)', 'dv8-#author(top10)', 'dv8-#author(top50)',
+        #                                 'dv8-#cmt(top10)', 'dv8-#cmt(top50)', 'dv8-changeloc(top10)',
+        #                                 'dv8-changeloc(top50)'])
+        # top_ver.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "top.csv"), index=False, sep=',')
         # out_file_list(pro_name, pro_path, ver.split('?'))
-        files = com_mc(pro_path, ver, pro_name, 'ours', list(), set())
-        com_mc(pro_path, ver, pro_name, 'designite', files, set())
-        com_mc(pro_path, ver, pro_name, 'arcade', files, set())
-        com_mc(pro_path, ver, pro_name, 'dv8', files, set())
+        # files = com_mc(pro_path, ver, pro_name, 'ours', list(), set(), tmp_gt)
+        # gt.append(tmp_gt)
+        # com_mc(pro_path, ver, pro_name, 'designite', files, set())
+        # com_mc(pro_path, ver, pro_name, 'arcade', files, set())
+        # com_mc(pro_path, ver, pro_name, 'dv8', files, set())
         # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
+    # gt = pd.DataFrame(data=gt, columns=['project', '#author', '#cmt', 'changeloc'])
+    # gt.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "gt.csv"), index=False,
+    #           sep=',')
     # # with open('./count.csv.', 'w', encoding='UTF8', newline='') as file1:
     # #     writer = csv.writer(file1)
     # #     writer.writerow(['project name', 'version', 'loc', '#files', '#commits'])

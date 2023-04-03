@@ -169,7 +169,7 @@ def change_bug_proness_compute(file_list_java, mc_author_dict, mc_commit_times_d
     return all_files_mc_list, all_files_mc_pd
 
 
-def changeProness(file_list_java, commit_collection_res, outfile):
+def changeProness(file_list_java, commit_collection_res, outfile, tmp_gt):
     [mc_author_dict, mc_commit_times_dict, mc_change_loc_dict, mc_issue_count_dict,
      mc_issue_loc_dict] = read_commit_info(
         commit_collection_res)
@@ -181,6 +181,7 @@ def changeProness(file_list_java, commit_collection_res, outfile):
     final = list()
     final.append(title)
     final.extend(all_files_mc_list)
+    tmp_gt.extend(all_files_mc_list[2:5])
     write_to_csv(final, outfile)
     all_cmt = list()
     for cmt in mc_commit_times_dict:
