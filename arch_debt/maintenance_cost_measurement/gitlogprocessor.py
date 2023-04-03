@@ -7,7 +7,7 @@ from util.path_operator import create_file_path
 
 def generateLog(project_path, out_path):
     # os.system('git checkout -f ' + version)
-    # os.chdir(project_path)
+    os.chdir(project_path)
 
     git_log_file = create_file_path(out_path, 'gitlog')
     git_loc_file = create_file_path(out_path, 'gitloc')
@@ -166,7 +166,7 @@ def get_all_files_by_filter(project_path):
 
 
 def get_file_mc(project_path, out_path, project_name):
-    gitlogFile = generateLog(project_path, out_path)
+    gitlogFile, git_loc_file = generateLog(project_path, out_path)
     [fileList_all, fileList_java, fileList_notest] = getAllFilesByFilter(project_path)
 
     commitCollection_java = processGitLog(gitlogFile, fileList_java)

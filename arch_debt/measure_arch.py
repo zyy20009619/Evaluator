@@ -35,7 +35,7 @@ def com_aarf(vers, pro_name):
 
 
 def get_designite(pro_name, files, method):
-    compare_base_path = r'G:\results\bishe-results\mc-result\Designite-results'
+    compare_base_path = r'E:\results\bishe-results\mc-result\Designite-results'
     design_file_path = compare_base_path + '/' + pro_name + '/designCodeSmells.csv'
     implementation_file_path = compare_base_path + '/' + pro_name + '/implementationCodeSmells.csv'
 
@@ -65,7 +65,7 @@ def get_metric(auth, cmt, cChurn, sample):
 
 
 def get_dv8(pro_name, files, method):
-    dv8_base_path = r'G:\results\bishe-results\mc-result\dv8-results'
+    dv8_base_path = r'E:\results\bishe-results\mc-result\dv8-results'
     file_path = dv8_base_path + '/' + pro_name + '/dv8-analysis-result/file-measure-report.csv'
     dv8_pd = read_csv_to_pd(file_path)
     pf_pd = dv8_pd[
@@ -97,18 +97,18 @@ def get_metrics(label):
 
 
 def get_gt(pro_name, versions):
-    detect_path = 'G:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+    detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
     detection_res = set(detection_res['problem class'])
     # 读gt，整理所有文件，满足阈值条件的标记为1，不满足阈值条件的标记为0
-    base_version_path = os.path.join(os.path.join(r'G:\results\paper-results\mv',
+    base_version_path = os.path.join(os.path.join(r'E:\results\paper-results\mv',
                                                   pro_name + '-enre-out'),
                                      'mc/' + versions[1].replace('\n', ''))
     gt_path = read_csv_to_pd(os.path.join(base_version_path, 'file mc.csv'))
     # 取前5%为高维护成本文件
     # gt_file_number = len(detection_res)
-    # gt_file_number = int(len(gt_path) * 0.03)
-    gt_file_number = int(len(gt_path) * 0.05)
+    gt_file_number = int(len(gt_path) * 0.03)
+    # gt_file_number = int(len(gt_path) * 0.05)
     print('file number:', len(gt_path))
     print('gt file number:', gt_file_number)
     # 分别读#author、#cmt、#changeloc，划分真正正例和负例
@@ -143,7 +143,7 @@ def get_gt(pro_name, versions):
 
 
 def get_ours(pro_name, files, method):
-    detect_path = 'G:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+    detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
     detection_res = set(detection_res['problem class'])
     return get_sample_dis(files, detection_res, method)
@@ -173,12 +173,12 @@ def get_sample_dis(files, pf_entities, method):
 def com_inter(project_path, vers, pro_name, method, top_ver):
     versions = vers.split('?')
     # ours
-    detect_path = 'G:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+    detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
     detection_res.sort_values(by="class decay degree", inplace=True, ascending=False)
     detection_res.drop_duplicates(subset=['problem class'], keep='first', inplace=True)
     # dv8
-    base_out_path = r'G:\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
+    base_out_path = r'E:\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
                     versions[0]
     dep_dic = read_file(os.path.join(base_out_path, pro_name + '-out.json'))
     variables = dep_dic['variables']
@@ -187,7 +187,7 @@ def com_inter(project_path, vers, pro_name, method, top_ver):
         if var['category'] == 'File':
             path_to_qualifiedName.append([var['File'], var['qualifiedName'][:-5]])
     file_pd = pd.DataFrame(data=path_to_qualifiedName, columns=['FileName', 'problem class'])
-    compare_base_path = r'G:\results\bishe-results\mc-result\dv8-results'
+    compare_base_path = r'E:\results\bishe-results\mc-result\dv8-results'
     file_path = compare_base_path + '/' + pro_name + '/dv8-analysis-result/file-measure-report.csv'
     dv8_pd = read_csv_to_pd(file_path)
     pf_pd = dv8_pd[
@@ -202,7 +202,7 @@ def com_inter(project_path, vers, pro_name, method, top_ver):
         axis=1)
     pf_pd.sort_values(by="count", inplace=True, ascending=False)
     # designite
-    compare_base_path = r'G:\results\bishe-results\mc-result\Designite-results'
+    compare_base_path = r'E:\results\bishe-results\mc-result\Designite-results'
     design_file_path = compare_base_path + '/' + pro_name + '/designCodeSmells.csv'
     implementation_file_path = compare_base_path + '/' + pro_name + '/implementationCodeSmells.csv'
 
@@ -226,7 +226,7 @@ def com_inter(project_path, vers, pro_name, method, top_ver):
         tmp_top_ver.append(pro_name)
         tmp_top_ver.append(version)
         # 读gt
-        base_version_path = os.path.join(os.path.join(r'G:\results\paper-results\mv',
+        base_version_path = os.path.join(os.path.join(r'E:\results\paper-results\mv',
                                                       pro_name + '-enre-out'),
                                          'mc/' + version)
         gt_path = read_csv_to_pd(os.path.join(base_version_path, 'file mc.csv'))
@@ -308,7 +308,7 @@ def com_mc(project_path, vers, pro_name, method, files, our_pf_files, tmp_gt):
         os.system('git checkout -f ' + versions[0])
         files = get_all_files_by_filter(project_path)
         print('file_number:', len(files))
-        detect_path = 'G:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+        detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
         detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
         # pf_entities = _format_file_path(files, list(
         #     set(detection_res[detection_res['class status'] != 'delete']['problem class'])))
@@ -347,7 +347,7 @@ def get_all_files_by_filter(project_path):
 
 def extract_designite_pf_files(project_path, vers, pro_name, files, our_pf_files):
     versions = vers.split('?')
-    compare_base_path = r'G:\results\bishe-results\mc-result\Designite-results'
+    compare_base_path = r'E:\results\bishe-results\mc-result\Designite-results'
     design_file_path = compare_base_path + '/' + pro_name + '/designCodeSmells.csv'
     implementation_file_path = compare_base_path + '/' + pro_name + '/implementationCodeSmells.csv'
 
@@ -373,7 +373,7 @@ def extract_designite_pf_files(project_path, vers, pro_name, files, our_pf_files
 
 def extract_arcade_pf_files(project_path, vers, pro_name, files, our_pf_files):
     versions = vers.split('?')
-    compare_base_path = r'G:\results\bishe-results\mc-result\\ARCADE-results'
+    compare_base_path = r'E:\results\bishe-results\mc-result\\ARCADE-results'
     file_path = compare_base_path + '/' + pro_name + '/smells.xml'
     if not os.path.exists(file_path):
         return
@@ -401,7 +401,7 @@ def extract_arcade_pf_files(project_path, vers, pro_name, files, our_pf_files):
 def extract_tc_pf_files(project_path, vers, pro_name):
     versions = vers.split('?')
     # 将dv8识别的文件名结果转化为qualifiedName
-    base_out_path = r'G:\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
+    base_out_path = r'E:\results\bishe-results\mc-result\dbMIT-results' + '\\' + pro_name + '\\' + \
                     versions[0]
     dep_dic = read_file(os.path.join(base_out_path, pro_name + '-out.json'))
     variables = dep_dic['variables']
@@ -411,7 +411,7 @@ def extract_tc_pf_files(project_path, vers, pro_name):
             path_to_qualifiedName.append([var['File'], var['qualifiedName'][:-5]])
     file_pd = pd.DataFrame(data=path_to_qualifiedName, columns=['class_path', 'qualifiedName'])
 
-    compare_base_path = r'G:\results\bishe-results\mc-result\TDClassifier-results'
+    compare_base_path = r'E:\results\bishe-results\mc-result\TDClassifier-results'
     file_path = compare_base_path + '/' + pro_name + '/results.csv'
     tc_pd = read_csv_to_pd(file_path)
     pf_pd = tc_pd[['class_path', 'high_td']]

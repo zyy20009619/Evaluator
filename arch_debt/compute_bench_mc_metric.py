@@ -181,6 +181,9 @@ def readHistory(historyFile):
 
 
 def computeEntry(historyFile, project_name):
+    CCOR_list = list()
+    CCFOR_list = list()
+    CPCO_list = list()
     [commitCollection, commitLen, bugCommitLen]  = readHistory(historyFile)
 
     #printAll(commitCollection)

@@ -15,6 +15,7 @@ from arch_debt.measure_arch import com_mc
 from util.json_operator import read_file
 from util.path_operator import create_dir_path
 from score_compete.index_measure import get_score
+from scipy.stats import pearsonr
 
 
 # 克隆代码并且计算每个项目的SCORE
@@ -22,7 +23,7 @@ def clone_code():
     base_path = r'D:\paper-data-and-result\results\bishe-results\subjects.csv'
     pro_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\projects'
     SCORE_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\SCORE\component\all'
-    measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\component'
+    measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\package'
     gt_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\gt'
     subjects_pd = read_csv_to_pd(base_path)
     subjects_pd = subjects_pd[['project name ', 'url']]
@@ -39,23 +40,39 @@ def clone_code():
         # 根据需求计算SCORE值
         # metrics = ['module_name','scoh', 'scop', 'odd', 'idd']
         # weight = [[0.25], [0.25], [0.25], [0.25]]
-        # metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm', 'chd', 'DSM']
-        # weight = [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08]]
-        metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei']
-        weight = [[0.1], [0.1], [0.1], [0.1], [0.12], [0.12], [0.12], [0.12], [0.12]]
+        metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm', 'chd',
+                   'DSM']
+        weight = [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08]]
+        # metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei']
+        # weight = [[0.1], [0.1], [0.1], [0.1], [0.12], [0.12], [0.12], [0.12], [0.12]]
         measure_path = os.path.join(measure_out_path, row[0])
         if os.path.exists(measure_path):
             measure_pd = read_csv_to_pd(measure_path + '\\measure_result_class.csv')
             module_list = measure_pd[metrics]
-            module_list.drop_duplicates(subset=['module_name'],keep='first',inplace=True)
+            module_list.drop_duplicates(subset=['module_name'], keep='first', inplace=True)
             del module_list['module_name']
             [normalized_result, score_result] = get_score(module_list.values, weight, metrics[1:])
         score.append([row[0], np.mean(score_result)])
         # 计算groundtruth指标
-        # com_gt(os.path.join(pro_out_path, row[0]), os.path.join(gt_out_path, row[0]), row[0], gt_list)
+        com_gt(os.path.join(pro_out_path, row[0]), os.path.join(gt_out_path, row[0]), row[0], gt_list)
     # gt_pd = pd.DataFrame(data=gt_list, columns=['project', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
     # gt_pd.to_csv(os.path.join(gt_out_path, "gt.csv"), index=False, sep=',')
     score_pd = pd.DataFrame(data=score, columns=['project', 'score'])
+    gt_pd = pd.DataFrame(data=gt_list, columns=['project', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
+    compare_pd = pd.merge(score_pd, gt_pd, how='inner', on='project')
+    # 计算本方法结果和gt结果相关性
+    print('CCOR:')
+    r1 = pearsonr(compare_pd['score'], compare_pd['CCOR'])
+    print("pearson系数：", r1[0])
+    print("   P-Value：", r1[1])
+    print('CCFOR:')
+    r1 = pearsonr(compare_pd['score'], compare_pd['CCFOR'])
+    print("pearson系数：", r1[0])
+    print("P-Value：", r1[1])
+    print('CPCO:')
+    r1 = pearsonr(compare_pd['score'], compare_pd['CPCO'])
+    print("pearson系数：", r1[0])
+    print("   P-Value：", r1[1])
     score_pd.to_csv(os.path.join(SCORE_out_path, "score.csv"), index=False, sep=',')
 
 

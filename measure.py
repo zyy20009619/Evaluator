@@ -117,21 +117,21 @@ def command():
 
 
 def test():
-    # clone_code()
+    clone_code()
     # measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
-    with open('./projects.txt', encoding='utf-8') as file:
-        content = file.readlines()
-    top_ver = list()
-    gt = list()
-    for line in content:
-        tmp_gt = list()
-        tmp = line.split(',')
-        pro_path = tmp[0]
-        pro_name = tmp[1]
-        print(pro_name)
-        # th = tmp[2]
-        vers = tmp[2]
-        com_aarf(vers, pro_name)
+    # with open('./projects.txt', encoding='utf-8') as file:
+    #     content = file.readlines()
+    # top_ver = list()
+    # gt = list()
+    # for line in content:
+    #     tmp_gt = list()
+    #     tmp = line.split(',')
+    #     pro_path = tmp[0]
+    #     pro_name = tmp[1]
+    #     print(pro_name)
+    #     # th = tmp[2]
+    #     vers = tmp[2]
+        # com_aarf(vers, pro_name)
         # com_inter(pro_path, ver, pro_name, 'ours', top_ver)
         # top_ver = pd.DataFrame(data=top_ver)
         # top_ver = pd.DataFrame(data=top_ver,

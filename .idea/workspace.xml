@@ -2,32 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Evaluator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Evaluator.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arch_debt/measure_arch.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/measure_arch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/c-README.md" beforeDir="false" afterPath="$PROJECT_DIR$/c-README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/function_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_file.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/com_metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/com_metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/moduleUtil.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/moduleUtil.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/project.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/project.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projects.txt" beforeDir="false" afterPath="$PROJECT_DIR$/projects.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/score_compete/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/score_compete/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/score_compete/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/score_compete/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/score_compete/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/score_compete/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/score_compete/.idea/score_compete.iml" beforeDir="false" afterPath="$PROJECT_DIR$/score_compete/.idea/score_compete.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/score_compete/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/score_compete/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/rel_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/rel_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +81,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="D:\python\python.exe" />
+      <option name="SDK_HOME" value="D:\python3\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -206,23 +187,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>575</line>
-          <option name="timeStamp" value="263" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>531</line>
+          <line>694</line>
           <option name="timeStamp" value="266" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py</url>
-          <line>183</line>
+          <line>184</line>
           <option name="timeStamp" value="268" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>116</line>
+          <line>277</line>
           <option name="timeStamp" value="277" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
+          <line>27</line>
+          <option name="timeStamp" value="278" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
+          <line>162</line>
+          <option name="timeStamp" value="280" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/experiment.py</url>
+          <line>67</line>
+          <option name="timeStamp" value="281" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/experiment.py</url>
+          <line>61</line>
+          <option name="timeStamp" value="288" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
