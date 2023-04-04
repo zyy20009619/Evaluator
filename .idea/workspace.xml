@@ -3,14 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arch_debt/measure_arch.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/measure_arch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/compete_strcut_dep.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/compete_strcut_dep.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module_measurement/evolution/com_icf_ecf.py" beforeDir="false" afterPath="$PROJECT_DIR$/module_measurement/evolution/com_icf_ecf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projects.txt" beforeDir="false" afterPath="$PROJECT_DIR$/projects.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,7 +49,7 @@
       <recent name="C:\Users\20465\Desktop\codes\Evaluator\module_measurement" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.measure">
+  <component name="RunManager" selected="Python.measure_arch">
     <configuration name="experiment" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Evaluator" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -98,6 +92,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="measure_arch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Evaluator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\20465\Desktop\codes\ml-smell-hound\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/arch_debt" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/arch_debt/measure_arch.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Evaluator" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -123,9 +138,11 @@
       <item itemvalue="Python.experiment" />
       <item itemvalue="Python.measure" />
       <item itemvalue="Python.test" />
+      <item itemvalue="Python.measure_arch" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.measure_arch" />
         <item itemvalue="Python.measure" />
         <item itemvalue="Python.experiment" />
         <item itemvalue="Python.test" />
@@ -189,23 +206,18 @@
           <option name="timeStamp" value="249" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>699</line>
-          <option name="timeStamp" value="266" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/changeproness.py</url>
           <line>193</line>
           <option name="timeStamp" value="268" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>504</line>
+          <line>577</line>
           <option name="timeStamp" value="278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>665</line>
+          <line>738</line>
           <option name="timeStamp" value="280" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -225,8 +237,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/arch_debt/measure_arch.py</url>
-          <line>92</line>
-          <option name="timeStamp" value="293" />
+          <line>151</line>
+          <option name="timeStamp" value="308" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -7,7 +7,7 @@ import pandas as pd
 from function_file import measure_package_metrics, compare_diff, measure_multi_version
 from detect_algo.detect_root_cause import analyse_data
 from detect_algo.scan_quality_change import detect_change
-from arch_debt.measure_arch import com_mc, com_inter, com_aarf
+from arch_debt.measure_arch import *
 from experiment import out_file_list, clone_code
 
 
@@ -117,21 +117,24 @@ def command():
 
 
 def test():
+    get_main_gt()
     # clone_code()
     # measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
-    with open('./projects.txt', encoding='utf-8') as file:
-        content = file.readlines()
-    top_ver = list()
-    gt = list()
-    for line in content:
-        tmp_gt = list()
-        tmp = line.split(',')
-        pro_path = tmp[0]
-        pro_name = tmp[1]
-        print(pro_name)
-        # th = tmp[2]
-        vers = tmp[2]
-        com_aarf(vers, pro_name)
+    # with open('./projects.txt', encoding='utf-8') as file:
+    #     content = file.readlines()
+    # top_ver = list()
+    # gt = list()
+    # mc_list = list()
+    # for line in content:
+    #     tmp_gt = list()
+    #     tmp = line.split(',')
+    #     pro_path = tmp[0]
+    #     pro_name = tmp[1]
+    #     print(pro_name)
+    #     # th = tmp[2]
+    #     vers = tmp[2]
+    #     # com_aarf(vers, pro_name, mc_list)
+    #     get_struct_gt(pro_name, pro_path, vers, mc_list)
         # com_inter(pro_path, ver, pro_name, 'ours', top_ver)
         # top_ver = pd.DataFrame(data=top_ver)
         # top_ver = pd.DataFrame(data=top_ver,
@@ -148,6 +151,9 @@ def test():
         # com_mc(pro_path, ver, pro_name, 'arcade', files, set())
         # com_mc(pro_path, ver, pro_name, 'dv8', files, set())
         # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
+    mc = pd.DataFrame(data=mc_list, columns=['project', 'tool', 'mc_metric', 'Precision', 'Recall', 'Accuracy', 'F1-score'])
+    mc.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "mc_results.csv"), index=False,
+              sep=',')
     # gt = pd.DataFrame(data=gt, columns=['project', '#author', '#cmt', 'changeloc'])
     # gt.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "gt.csv"), index=False,
     #           sep=',')

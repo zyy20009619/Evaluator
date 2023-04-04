@@ -13,7 +13,7 @@ from sklearn.metrics import f1_score
 
 
 # 计算每个项目(取最新版本)的gt(三个指标)及其阈值，求精确率等
-def com_aarf(vers, pro_name):
+def com_aarf(vers, pro_name, mc_list):
     versions = vers.split('?')
     # ths = th.split(';')  # #auth/#cmt/#cChurn
     # gt
@@ -22,20 +22,20 @@ def com_aarf(vers, pro_name):
     print('pro_name:', pro_name)
     print('ours:')
     sample = get_ours(pro_name, files, 'ours')
-    get_metric(auth, cmt, cChurn, sample)
+    get_metric(auth, cmt, cChurn, sample, mc_list, 'ours', pro_name)
     # dv8
     print('dv8:')
     sample = get_dv8(pro_name, files, 'dv8')
-    get_metric(auth, cmt, cChurn, sample)
+    get_metric(auth, cmt, cChurn, sample, mc_list, 'dv8', pro_name)
     # designite
     print('designite:')
     sample = get_designite(pro_name, files, 'designite')
-    get_metric(auth, cmt, cChurn, sample)
+    get_metric(auth, cmt, cChurn, sample, mc_list, 'designite', pro_name)
     # designite
 
 
 def get_designite(pro_name, files, method):
-    compare_base_path = r'E:\results\bishe-results\mc-result\Designite-results'
+    compare_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\Designite-results'
     design_file_path = compare_base_path + '/' + pro_name + '/designCodeSmells.csv'
     implementation_file_path = compare_base_path + '/' + pro_name + '/implementationCodeSmells.csv'
 
@@ -52,20 +52,20 @@ def get_designite(pro_name, files, method):
     return get_sample_dis(files, set(designite_pd['Type Name']), method)
 
 
-def get_metric(auth, cmt, cChurn, sample):
+def get_metric(auth, cmt, cChurn, sample, mc_list, tool, pro_name):
     auth_label = pd.merge(auth, sample, how='inner', on='filename')
     cmt_label = pd.merge(cmt, sample, how='inner', on='filename')
     cChurn_label = pd.merge(cChurn, sample, how='inner', on='filename')
     print('auth:')
-    get_metrics(auth_label)
+    get_metrics(auth_label, mc_list, pro_name, tool, '#auth')
     print('cmt:')
-    get_metrics(cmt_label)
+    get_metrics(cmt_label, mc_list, pro_name, tool, '#cmt')
     print('cChurn:')
-    get_metrics(cChurn_label)
+    get_metrics(cChurn_label, mc_list, pro_name, tool, '#cChurn')
 
 
 def get_dv8(pro_name, files, method):
-    dv8_base_path = r'E:\results\bishe-results\mc-result\dv8-results'
+    dv8_base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\dv8-results'
     file_path = dv8_base_path + '/' + pro_name + '/dv8-analysis-result/file-measure-report.csv'
     dv8_pd = read_csv_to_pd(file_path)
     pf_pd = dv8_pd[
@@ -84,7 +84,7 @@ def get_dv8(pro_name, files, method):
     return get_sample_dis(files, set(all_pf_files), method)
 
 
-def get_metrics(label):
+def get_metrics(label, mc_list, pro_name, tool, mc_metric):
     TP = len(label[(label['label_pre'] == 1) & (label['label'] == 1)])
     FP = len(label[(label['label_pre'] == 1) & (label['label'] == 0)])
     FN = len(label[(label['label_pre'] == 0) & (label['label'] == 1)])
@@ -97,19 +97,92 @@ def get_metrics(label):
     print('Accuracy:', accuracy_score(label['label'], label['label_pre']))
     # 计算F1
     print('F1:', f1_score(label['label'], label['label_pre']))
+    mc_list.append([pro_name, tool, mc_metric, precision_score(label['label'], label['label_pre']),
+                    recall_score(label['label'], label['label_pre']),
+                    accuracy_score(label['label'], label['label_pre']), f1_score(label['label'], label['label_pre'])])
 
 
 def get_gt(pro_name, versions):
-    detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+    # 第一种ground-truth：历史中的维护数据
+    return get_history_gt(pro_name, versions)
+    # 第二种ground-truth：结构中的维护成本较高
+
+
+def get_struct_gt(pro_name, pro_path, versions, mc_list):
+    versions = versions.split('?')
+    os.chdir(pro_path)
+    os.system('git checkout -f ' + versions[0])
+    struct_path = 'D:\\paper-data-and-result\\results\\paper-results\mv\\' + pro_name + '-enre-out\\' + versions[0]
+    struct_res = read_csv_to_pd(os.path.join(struct_path, 'measure_result_class.csv'))
+    struct_res = struct_res[['class_name', 'CBC']]
+    path_name = get_all_files_by_filter(pro_path, struct_res['class_name'])
+    path_name = pd.merge(struct_res, path_name, how='inner', on='class_name')
+    path_name.sort_values(by='CBC', inplace=True, ascending=False)
+
+    gt_file_number = 40
+    print('file number:', len(path_name))
+    print('gt file number:', gt_file_number)
+    path_name1 = path_name.iloc[0:gt_file_number]
+    path_name1['label'] = 1
+    path_name2 = path_name.iloc[gt_file_number:]
+    path_name2['label'] = 0
+    path_name = pd.concat([path_name1, path_name2])
+    # ours
+    print('pro_name:', pro_name)
+    print('ours:')
+    sample = get_ours(pro_name, path_name['filename'], 'ours')
+    sample = pd.merge(path_name, sample, how='inner', on='filename')
+    get_metrics(sample, mc_list, pro_name, 'ours', 'struct')
+    # dv8
+    print('dv8:')
+    sample = get_dv8(pro_name, path_name['filename'], 'dv8')
+    sample = pd.merge(path_name, sample, how='inner', on='filename')
+    get_metrics(sample, mc_list, pro_name, 'dv8', 'struct')
+    # designite
+    print('designite:')
+    sample = get_designite(pro_name, path_name['filename'], 'designite')
+    sample = pd.merge(path_name, sample, how='inner', on='filename')
+    get_metrics(sample, mc_list, pro_name, 'designite', 'struct')
+
+
+def get_main_gt():
+    base_path = r'D:\paper-data-and-result\results\bishe-results\mc-result\labels.csv'
+    gt_res = read_csv_to_pd(base_path)[['projectname', 'path', 'overall']]
+    argouml = gt_res[gt_res['projectname'] == 'argouml']['overall']
+    print(argouml)
+
+# if __name__ == '__main__':
+#     get_main_gt()
+
+
+def get_all_files_by_filter(project_path, quali_name):
+    file_list_java = list()
+    for filename, dirs, files in os.walk(project_path, topdown=True):
+        filename = filename.split(project_path)[1]
+        filename = filename.replace("\\", "/")
+        if filename.startswith(".git") or filename.startswith(".github"):
+            continue
+        for file in files:
+            file_temp = filename + "\\" + file
+            file_temp = file_temp[1:]
+            file_temp = file_temp.replace("\\", "/")
+            if file.endswith(".java"):
+                file_list_java.append(file_temp)
+    path = _format_file_path(file_list_java, quali_name)
+    path_name = pd.DataFrame(data=path, columns=['filename', 'class_name'])
+    return path_name
+
+def get_history_gt(pro_name, versions):
+    detect_path = 'D:\paper-data-and-result\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
     detection_res = set(detection_res['problem class'])
     # 读gt，整理所有文件，满足阈值条件的标记为1，不满足阈值条件的标记为0
-    base_version_path = os.path.join(os.path.join(r'E:\results\paper-results\mv',
+    base_version_path = os.path.join(os.path.join(r'D:\paper-data-and-result\results\paper-results\mv',
                                                   pro_name + '-enre-out'),
-                                     'mc/' + versions[3].replace('\n', ''))
+                                     'mc/' + versions[len(versions) - 1].replace('\n', ''))
     gt_path = read_csv_to_pd(os.path.join(base_version_path, 'file mc.csv'))
     # 取前5%为高维护成本文件
-    gt_file_number = 10
+    gt_file_number = 20
     # gt_file_number = len(detection_res)
     # gt_file_number = int(len(gt_path) * 0.03)
     # gt_file_number = int(len(gt_path) * 0.1)
@@ -148,7 +221,7 @@ def get_gt(pro_name, versions):
 
 
 def get_ours(pro_name, files, method):
-    detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+    detect_path = 'D:\paper-data-and-result\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
     detection_res = set(detection_res['problem class'])
     return get_sample_dis(files, detection_res, method)
@@ -160,10 +233,10 @@ def get_sample_dis(files, pf_entities, method):
     for pf_entity in pf_entities:
         for file in files:
             if method == 'ours' or method == 'designite':
-                if pf_entity.replace('.', '\\') in file:
+                if pf_entity.replace('.', '/') in file:
                     pos_files.append(file)
             elif method == 'dv8':
-                if pf_entity.replace('/', '\\') in file:
+                if pf_entity in file:
                     pos_files.append(file)
     pos_pd = pd.DataFrame(data=pos_files, columns=['filename'])
     pos_pd['label_pre'] = 1
@@ -178,7 +251,7 @@ def get_sample_dis(files, pf_entities, method):
 def com_inter(project_path, vers, pro_name, method, top_ver):
     versions = vers.split('?')
     # ours
-    detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+    detect_path = 'D:\paper-data-and-result\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
     detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
     detection_res.sort_values(by="class decay degree", inplace=True, ascending=False)
     detection_res.drop_duplicates(subset=['problem class'], keep='first', inplace=True)
@@ -311,9 +384,9 @@ def com_mc(project_path, vers, pro_name, method, files, our_pf_files, tmp_gt):
         versions = vers.split('?')
         os.chdir(project_path)
         os.system('git checkout -f ' + versions[0])
-        files = get_all_files_by_filter(project_path)
+        files = get_all_files_by_filter(project_path, list())
         print('file_number:', len(files))
-        detect_path = 'E:\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
+        detect_path = 'D:\paper-data-and-result\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
         detection_res = read_csv_to_pd(os.path.join(detect_path, 'detection result.csv'))
         # pf_entities = _format_file_path(files, list(
         #     set(detection_res[detection_res['class status'] != 'delete']['problem class'])))
@@ -334,20 +407,20 @@ def com_mc(project_path, vers, pro_name, method, files, our_pf_files, tmp_gt):
         extract_designite_pf_files(project_path, vers, pro_name, files, our_pf_files)
 
 
-def get_all_files_by_filter(project_path):
-    file_list_java = list()
-    for filename, dirs, files in os.walk(project_path, topdown=True):
-        filename = filename.split(project_path)[1]
-        filename = filename.replace("\\", "/")
-        if filename.startswith(".git") or filename.startswith(".github"):
-            continue
-        for file in files:
-            file_temp = filename + "\\" + file
-            file_temp = file_temp[1:]
-            file_temp = file_temp.replace("\\", "/")
-            if file.endswith(".java"):
-                file_list_java.append(file_temp)
-    return file_list_java
+# def get_all_files_by_filter(project_path):
+#     file_list_java = list()
+#     for filename, dirs, files in os.walk(project_path, topdown=True):
+#         filename = filename.split(project_path)[1]
+#         filename = filename.replace("\\", "/")
+#         if filename.startswith(".git") or filename.startswith(".github"):
+#             continue
+#         for file in files:
+#             file_temp = filename + "\\" + file
+#             file_temp = file_temp[1:]
+#             file_temp = file_temp.replace("\\", "/")
+#             if file.endswith(".java"):
+#                 file_list_java.append(file_temp)
+#     return file_list_java
 
 
 def extract_designite_pf_files(project_path, vers, pro_name, files, our_pf_files):
@@ -702,12 +775,22 @@ def com_pfs_mc(all_files_mc_pd, file_loc_dict, pf_entities, version_mc, gt_versi
     # return causes_mc_result
 
 
+# def _format_file_path(filenames, pf_entities):
+#     result = dict()
+#     for pf_entity in pf_entities:
+#         for file in filenames:
+#             if pf_entity.replace('.', '\\') in file:
+#                 result[file] = pf_entity
+#                 break
+#     # print(len(result))
+#     return result
+
 def _format_file_path(filenames, pf_entities):
-    result = dict()
+    result = list()
     for pf_entity in pf_entities:
         for file in filenames:
-            if pf_entity.replace('.', '\\') in file:
-                result[file] = pf_entity
+            if pf_entity.replace('.', '/') in file:
+                result.append([file, pf_entity])
                 break
     # print(len(result))
     return result
