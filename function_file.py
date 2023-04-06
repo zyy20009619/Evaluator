@@ -55,7 +55,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, lang, grau):
     if dep_dic:
         if lang == 'java':
             package_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field = get_rel_info(
-                dep_dic, lang, grau)
+                dep_dic, lang, grau, base_out_path)
             package_dic, score, c_count, m_count = get_module_metric(dep_dic['variables'], package_info, inherit,
                                                                      descendent, method_class, dep,
                                                                      call, called, override, overrided, import_val,
@@ -81,7 +81,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, lang, grau):
             return score
         else:
             # 在获取依赖时分别适配C语言和Java语言
-            var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang)
+            var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep = get_rel_info(dep_dic, lang, base_out_path)
             # 计算指标
             com_metrics(ver, var_id_to_var, file_contain, file_dep_matrix, struct_dep_matrix, function_dep, base_out_path)
 

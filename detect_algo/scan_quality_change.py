@@ -3,7 +3,7 @@ from util.csv_operator import read_csv_folder
 from util.metrics import *
 import pandas as pd
 import numpy as np
-from util.json_operator import read_file
+from util.json_operator import *
 from util.path_operator import create_file_path
 
 
@@ -23,6 +23,10 @@ def detect_change(path1, path2, opt, th):
         os.path.join(path2, 'measure_result_class.csv'),
         os.path.join(path1, 'measure_result_method.csv'),
         os.path.join(path2, 'measure_result_method.csv'))
+    dep1_res = pd.read_json(os.path.join(path1, 'dep.json'), encoding="utf-8", orient='records')
+    dep1_res = dep1_res.transpose()
+    dep2_res = pd.read_json(os.path.join(path2, 'dep.json'), encoding="utf-8", orient='records')
+    dep2_res = dep2_res.transpose()
     diff_class_inner, diff_class_left, diff_class_right, diff_class_all = com_diff(class1_res, class2_res, base_out,
                                                                                    'module_name', 'class_name', 'class',
                                                                                    65)
@@ -112,7 +116,8 @@ def detect_change(path1, path2, opt, th):
         # 将检测结果依据归属方信息进行整理
     else:
         # 一般场景下关注新版本相对于旧版本在模块质量上是否发生较大腐化
-        res = detect_common_project(diff_class_all, diff_method_all, opt, th)
+        res, dep_res = detect_common_project(diff_class_all, diff_method_all, dep1_res, dep2_res, opt, th)
+        write_result_to_json(os.path.join(base_out, "detection dep.json"), dep_res)
         # 统计检测结果数据
         res_count = [len(set(res[(res['problem'] == 'coupling') & (res['root cause'] == 'call')]['problem module'])),
                      len(set(res[(res['problem'] == 'coupling') & (res['root cause'] == 'inherit')]['problem module'])),
@@ -204,12 +209,15 @@ def detect_android_project(base_out, facade_data, class2_res, diff_class, diff_m
     # 获取到intrusive native和actively native类实体的质量diff并对腐化实体进行根因定位
     intrusive_res_pd = get_android_decay_root_cause(entity_pd, 'intrusive native', class2_res, diff_class, base_out,
                                                     diff_method, opt, th)
-    actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', class2_res, diff_class, base_out, diff_method, opt,
+    actively_res_pd = get_android_decay_root_cause(entity_pd, 'actively native', class2_res, diff_class, base_out,
+                                                   diff_method, opt,
                                                    th)
-    extensive_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', class2_res, diff_class, base_out, diff_method, opt,
-                                                   th)
-    obsoletely_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', class2_res, diff_class, base_out, diff_method, opt,
-                                                   th)
+    extensive_res_pd = get_android_decay_root_cause(entity_pd, 'extensive', class2_res, diff_class, base_out,
+                                                    diff_method, opt,
+                                                    th)
+    obsoletely_res_pd = get_android_decay_root_cause(entity_pd, 'obsoletely native', class2_res, diff_class, base_out,
+                                                     diff_method, opt,
+                                                     th)
     res_pd = pd.concat([intrusive_res_pd, actively_res_pd, extensive_res_pd, obsoletely_res_pd], axis=0)
     # res_pd = pd.concat([intrusive_res_pd], axis=0)
     res_pd = res_pd.rename(
@@ -218,7 +226,7 @@ def detect_android_project(base_out, facade_data, class2_res, diff_class, diff_m
     return res_pd
 
 
-def detect_common_project(diff_class_all, diff_method_all, opt, th):
+def detect_common_project(diff_class_all, diff_method_all, dep1_res, dep2_res, opt, th):
     diff_module_modify = diff_class_all
     # 对新增或着删除的module不关注（即其中所有的类status都为add或delete）
     deleted_module = list()
@@ -227,7 +235,7 @@ def detect_common_project(diff_class_all, diff_method_all, opt, th):
             deleted_module.append(name)
     deleted_index = diff_module_modify[diff_module_modify['module_name'].isin(deleted_module)].index
     diff_module_modify = diff_module_modify.drop(index=deleted_index)
-    return get_common_decay_root_cause(diff_module_modify, diff_method_all, opt, th)
+    return get_common_decay_root_cause(diff_module_modify, diff_method_all, dep1_res, dep2_res, opt, th)
 
 
 def get_android_decay_root_cause(ownership_pd, ownership, class2_res, diff_class, base_out, diff_method, opt, th):
@@ -254,23 +262,130 @@ def get_android_decay_root_cause(ownership_pd, ownership, class2_res, diff_class
     return res_pd
 
 
-def get_common_decay_root_cause(diff_module, diff_method, opt, th):
+def get_common_decay_root_cause(diff_module, diff_method, dep1_res, dep2_res, opt, th):
+    dep_res = dict()
     # 对产生腐化的模块实体进行定位（根据腐化严重程度进行输出）
     diff_module.sort_values(by="scop", inplace=True, ascending=False)
     coupling_df = detect_coupling_problem(diff_module[diff_module['scop'] > 0], diff_method, opt, th)
     coupling_df = coupling_df.rename(
         columns={'scop': 'module decay degree'})
+    coupling_res = dict()
+    detect_root_dep(coupling_df, dep1_res, dep2_res, coupling_res)
+    dep_res['coupling'] = coupling_res
     diff_module.sort_values(by="scoh", inplace=True, ascending=True)
     cohesion_df = detect_cohesion_problem(diff_module[diff_module['scoh'] < 0], diff_method, opt)
     cohesion_df = cohesion_df.rename(
         columns={'scoh': 'module decay degree'})
+    cohesion_res = dict()
+    detect_root_dep(cohesion_df, dep1_res, dep2_res, cohesion_res)
+    dep_res['cohesion'] = cohesion_res
     res_pd = pd.concat([coupling_df, cohesion_df], axis=0)
     # 将module_name数据平移到module_name_y,将status数据平移到status_x，删除这两列
     res_pd = res_pd.rename(
         columns={'CBC': 'class decay degree', 'CBM': 'method decay degree',
                  'class_name': 'problem class', 'method_name': 'problem method',
                  'module_name': 'problem module'})
-    return res_pd
+    return res_pd, dep_res
+
+
+def detect_root_dep(pf_df, dep1, dep2, dep_res):
+    # 定位call/import/inherit原因的依赖
+    set_root_dep(pf_df[pf_df['root cause'] == 'call'], dep_res, dep1, dep2, 'call', 'called')
+    set_root_dep(pf_df[pf_df['root cause'] == 'inherit'], dep_res, dep1, dep2, 'inherit', 'descendent')
+    # set_root_dep(pf_df[pf_df['root cause'] == 'descendent'], dep_res, dep1, dep2, 'descendent')
+    set_root_dep(pf_df[pf_df['root cause'] == 'import'], dep_res, dep1, dep2, 'import', 'imported')
+    print('test')
+    # set_root_dep(pf_df[pf_df['root cause'] == 'imported'], dep_res, dep1, dep2, 'imported')
+
+
+def set_root_dep(pf_df, dep_res, dep1, dep2, dep_type, deped_type):
+    # if dep_type == 'call':
+    for index, row in pf_df.iterrows():
+        if row[2] not in dep_res:
+            dep_res[row[2]] = dict()
+            dep_res[row[2]]['decay degree'] = round(row[3], 4)
+            dep_res[row[2]]['root cause'] = dict()
+        if dep_type not in dep_res[row[2]]['root cause']:
+            dep_res[row[2]]['root cause'][dep_type] = dict()
+        dep_res[row[2]]['root cause'][dep_type][row[4]] = dict()
+        # dep_res[row[2]]['probelm class'][dep_type][row[4]]['decay degree'] = round(row[5], 4)
+        dep_res[row[2]]['root cause'][dep_type][row[4]]['status'] = row[6]
+        dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'] = dict()
+
+        if dep_type == 'call':
+            if row[7] not in dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep']:
+                dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[7]] = dict()
+            # dep_res[row[2]]['probelm class'][dep_type][row[4]]['probelm dep'][row[7]]['decay degree'] = round(row[8], 4)
+            dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[7]]['startLine'] = row[9]
+            dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[7]]['status'] = row[10]
+            # dep_res[row[2]]['probelm class'][dep_type][row[4]]['probelm dep'][row[7]]['probelm method'] = dict()
+            method_dep_diff(row[10], row[2], row[4], row[7], dep_type, dep_res, dep1, dep2)
+        else:
+            class_dep_diff(row[6], row[2], row[4], dep_type, deped_type, dep_res, dep1, dep2)
+
+
+def class_dep_diff(class_status, module_name, class_name, dep_type, deped_type, dep_res, dep1, dep2):
+    if class_status == 'modify':
+        type_dep1 = extr_class_dep(class_name, dep1, dep_type, deped_type)
+        type_dep2 = extr_class_dep(class_name, dep2, dep_type, deped_type)
+        inter_type_dep = type_dep1 & type_dep2
+        add_dep = type_dep2 - inter_type_dep
+        delete_dep = type_dep1 - inter_type_dep
+        if len(add_dep) != 0:
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['add'] = list(add_dep)
+        if len(delete_dep) != 0:
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['delete'] = list(delete_dep)
+    elif class_status == 'add':
+        add_dep = extr_class_dep(class_name, dep2, dep_type, deped_type)
+        dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['add'] = list(add_dep)
+    else:
+        delete_dep = extr_class_dep(class_name, dep1, dep_type, deped_type)
+        dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['delete'] = list(delete_dep)
+
+
+def extr_class_dep(class_name, dep, dep_type, deped_type):
+    type_dep = list()
+    if type(dep.loc[class_name][dep_type]) != float:
+        type_dep.extend(dep.loc[class_name][dep_type])
+    if type(dep.loc[class_name][deped_type]) != float:
+        type_dep.extend(dep.loc[class_name][deped_type])
+    return set(type_dep)
+
+
+def method_dep_diff(method_status, module_name, class_name, method_name, dep_type, dep_res, dep1, dep2):
+    if method_name not in dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']:
+        dep_res[module_name]['root cause'][dep_type][dep_type]['probelm dep'][method_name] = dict()
+    if method_status == 'modify':
+        type_dep1 = extr_method_dep(class_name, method_name, dep_type, dep1)
+        type_dep2 = extr_method_dep(class_name, method_name, dep_type, dep2)
+        inter_type_dep = type_dep1 & type_dep2
+        add_dep = type_dep2 - inter_type_dep
+        delete_dep = type_dep1 - inter_type_dep
+        if len(add_dep) != 0:
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name]['add'] = list(add_dep)
+        if len(delete_dep) != 0:
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name][
+                'delete'] = list(delete_dep)
+    elif method_status == 'add':
+        add_dep = extr_method_dep(class_name, method_name, dep_type, dep2)
+        if len(add_dep) != 0:
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name]['add'] = list(add_dep)
+    else:
+        delete_dep = extr_method_dep(class_name, method_name, dep_type, dep1)
+        if len(delete_dep) != 0:
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name][
+                'delete'] = list(delete_dep)
+
+
+def extr_method_dep(class_name, method_name, dep_type, dep):
+    type_dep = set()
+    if type(dep.loc[class_name][dep_type]) != float:
+        if method_name in dep.loc[class_name][dep_type]:
+            type_dep = set(dep.loc[class_name][dep_type][method_name])
+    if type(dep.loc[class_name]['called']) != float:
+        if method_name in dep.loc[class_name]['called']:
+            type_dep = set(dep.loc[class_name]['called'][method_name])
+    return type_dep
 
 
 def detect_coupling_problem(diff_class_measure, diff_method_measure, opt, th):

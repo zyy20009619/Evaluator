@@ -6,7 +6,7 @@ from util.json_operator import write_result_to_json
 from util.path_operator import create_file_path
 
 
-def get_rel_info(json_dic, lang, grau):
+def get_rel_info(json_dic, lang, grau, base_out_path):
     # TODO:如果后期依赖模型统一，请修改此处
     if lang == 'c':
         variables = json_dic[0]['variables']
@@ -14,7 +14,7 @@ def get_rel_info(json_dic, lang, grau):
         return get_c_rel(variables, cells)
     variables = json_dic['variables']
     cells = json_dic['cells']
-    return get_java_rel(variables, cells, grau)
+    return get_java_rel(variables, cells, grau, base_out_path)
 
 
 def get_three_model(first_contain, second_contain):
@@ -102,7 +102,7 @@ def add_dep_to_dict(src_id, dest_id, dic):
     dic[src_id][dest_id] += 1
 
 
-def get_java_rel(variables, cells, grau):
+def get_java_rel(variables, cells, grau, base_out_path):
     module_contain = dict()
     class_contain = dict()
     method_define_var = dict()
@@ -183,35 +183,59 @@ def get_java_rel(variables, cells, grau):
     module_info = get_module_info(module_contain, package_name_to_id, file_contain, class_contain,
                                    method_use_field, set_var, variables, grau)
     # save call/called/inherit/descendent/import_val/imported_val into a dep file
-    # save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,
-    #                   variables, os.path.join(base_out_path, 'dep.json'))
+    save_dep_to_json(inherit, descendent, call, called, import_val, imported_val, parameter,method_class,
+                      variables, os.path.join(base_out_path, 'dep.json'))
 
     return module_info, method_class, call, called, dep, inherit, descendent, override, overrided, import_val, imported_val, parameter, method_define_var, method_use_field
 
 
 def save_dep_to_json(inherit, descendent, call_id_dic, called_id_dic, import_val, imported_val,
-                      parameter, variables, dep_path):
+                      parameter, method_class, variables, dep_path):
     result = dict()
-    result['inherit'] = _convert_dep_name_dic(inherit, variables)
-    result['descendent'] = _convert_dep_name_dic(descendent, variables)
-    result['import'] = _convert_dep_name_dic(import_val, variables)
-    result['imported'] = _convert_dep_name_dic(imported_val, variables)
-    result['call'] = _convert_call_method_name_dic(call_id_dic, parameter, variables)
-    result['called'] = _convert_call_method_name_dic(called_id_dic, parameter, variables)
+    # 以类实体为粒度记录其依赖或者被依赖的信息
+    convert_dep_name_dic(inherit, variables, 'inherit', result)
+    convert_dep_name_dic(descendent, variables, 'descendent', result)
+    convert_dep_name_dic(import_val, variables, 'import', result)
+    convert_dep_name_dic(imported_val, variables, 'imported', result)
+    con_method_to_class(call_id_dic, variables, parameter, 'call', method_class, result)
+    con_method_to_class(called_id_dic, variables, parameter, 'called', method_class, result)
+
     write_result_to_json(dep_path, result)
 
 
-def _convert_dep_name_dic(id_dic, variables):
-    result = dict()
+def con_method_to_class(call_dic, variables, parameter, dep_type, method_class, result):
+    for method_id1 in call_dic:
+        if method_id1 not in method_class:
+            continue
+        method_name1 = _get_method_name(method_id1, parameter, variables)
+        class_name1 = variables[method_class[method_id1]]['qualifiedName']
+        if class_name1 not in result:
+            result[class_name1] = dict()
+        if dep_type not in result[class_name1]:
+            result[class_name1][dep_type] = dict()
+        if method_name1 not in result[class_name1][dep_type]:
+            result[class_name1][dep_type][method_name1] = list()
+        for method_id2 in call_dic[method_id1]:
+            result[class_name1][dep_type][method_name1].append(_get_method_name(method_id2, parameter, variables))
+
+
+def convert_dep_name_dic(id_dic, variables, dep_type, result):
     for src_id in id_dic:
-        if variables[src_id]['qualifiedName'] not in result:
-            result[variables[src_id]['qualifiedName']] = list()
+        src_name = variables[src_id]['qualifiedName']
+        if dep_type == 'import' or dep_type == 'imported':
+            src_name = variables[src_id]['qualifiedName'][:-5]
+        if src_name not in result:
+            result[src_name] = dict()
         for dest_id in id_dic[src_id]:
-            result[variables[src_id]['qualifiedName']].append(variables[dest_id]['qualifiedName'])
-    return result
+            dest_name = variables[dest_id]['qualifiedName']
+            if dep_type == 'import' or dep_type == 'imported':
+                dest_name = variables[dest_id]['qualifiedName'][:-5]
+            if dep_type not in result[src_name]:
+                result[src_name][dep_type] = list()
+            result[src_name][dep_type].append(dest_name)
 
 
-def _convert_call_method_name_dic(id_dic, parameter, variables):
+def convert_call_method_name_dic(id_dic, parameter, variables):
     name_dic = dict()
     for method_id1 in id_dic:
         method_name1 = _get_method_name(method_id1, parameter, variables)
@@ -223,9 +247,10 @@ def _convert_call_method_name_dic(id_dic, parameter, variables):
 
 
 def _get_method_name(method_id, parameter, variables):
-    if method_id not in parameter:
-        return variables[method_id]['qualifiedName'] + '/0'
-    return variables[method_id]['qualifiedName'] + '/' + str(len(parameter[method_id]))
+    return variables[method_id]['qualifiedName']
+    # if method_id not in parameter:
+    #     return variables[method_id]['qualifiedName'] + '/0'
+    # return variables[method_id]['qualifiedName'] + '/' + str(len(parameter[method_id]))
 
 
 def _add_dep(dic, src_id, dest_id):

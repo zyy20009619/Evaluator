@@ -123,31 +123,36 @@ def test():
     #     content = file.readlines()
     # top_ver = list()
     # gt = list()
+    # mc_list = list()
     # for line in content:
-    #     tmp_gt = list()
-    #     tmp = line.split(',')
-    #     pro_path = tmp[0]
-    #     pro_name = tmp[1]
-    #     print(pro_name)
-    #     # th = tmp[2]
-    #     vers = tmp[2]
-        # com_aarf(vers, pro_name)
-        # com_inter(pro_path, ver, pro_name, 'ours', top_ver)
-        # top_ver = pd.DataFrame(data=top_ver)
-        # top_ver = pd.DataFrame(data=top_ver,
-        #                        columns=['project', 'version', 'ours-#author(top10)', 'ours-#author(top50)',
-        #                                 'ours-#cmt(top10)', 'ours-#cmt(top50)', 'ours-changeloc(top10)',
-        #                                 'ours-changeloc(top50)', 'dv8-#author(top10)', 'dv8-#author(top50)',
-        #                                 'dv8-#cmt(top10)', 'dv8-#cmt(top50)', 'dv8-changeloc(top10)',
-        #                                 'dv8-changeloc(top50)'])
-        # top_ver.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "top.csv"), index=False, sep=',')
-        # out_file_list(pro_name, pro_path, ver.split('?'))
-        # files = com_mc(pro_path, ver, pro_name, 'ours', list(), set(), tmp_gt)
-        # gt.append(tmp_gt)
-        # com_mc(pro_path, ver, pro_name, 'designite', files, set())
-        # com_mc(pro_path, ver, pro_name, 'arcade', files, set())
-        # com_mc(pro_path, ver, pro_name, 'dv8', files, set())
-        # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
+    #     for index in [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]:
+    #         tmp_gt = list()
+    #         tmp = line.split(',')
+    #         pro_path = tmp[0]
+    #         pro_name = tmp[1]
+    #         print(pro_name)
+    #         # th = tmp[2]
+    #         vers = tmp[2]
+    #         com_aarf(vers, pro_name, mc_list, index)
+                # com_inter(pro_path, ver, pro_name, 'ours', top_ver)
+                # top_ver = pd.DataFrame(data=top_ver)
+                # top_ver = pd.DataFrame(data=top_ver,
+                #                        columns=['project', 'version', 'ours-#author(top10)', 'ours-#author(top50)',
+                #                                 'ours-#cmt(top10)', 'ours-#cmt(top50)', 'ours-changeloc(top10)',
+                #                                 'ours-changeloc(top50)', 'dv8-#author(top10)', 'dv8-#author(top50)',
+                #                                 'dv8-#cmt(top10)', 'dv8-#cmt(top50)', 'dv8-changeloc(top10)',
+                #                                 'dv8-changeloc(top50)'])
+                # top_ver.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "top.csv"), index=False, sep=',')
+                # out_file_list(pro_name, pro_path, ver.split('?'))
+                # files = com_mc(pro_path, ver, pro_name, 'ours', list(), set(), tmp_gt)
+                # gt.append(tmp_gt)
+                # com_mc(pro_path, ver, pro_name, 'designite', files, set())
+                # com_mc(pro_path, ver, pro_name, 'arcade', files, set())
+                # com_mc(pro_path, ver, pro_name, 'dv8', files, set())
+                # measure_multi_version(pro_path, '', os.path.join(r'D:\test', pro_name), 'mv', ver, 'common', 'java')
+    # mc = pd.DataFrame(data=mc_list, columns=['project', 'tool', 'top', 'mc_metric', 'Accuracy'])
+    # mc.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "mc_results.csv"), index=False,
+    #           sep=',')
     # gt = pd.DataFrame(data=gt, columns=['project', '#author', '#cmt', 'changeloc'])
     # gt.to_csv(os.path.join(r'D:\paper-data-and-result\results\bishe-results\mc-result', "gt.csv"), index=False,
     #           sep=',')
@@ -177,7 +182,7 @@ def test():
     # analyse_data(r'D:\paper-data-and-result\results\android-results\实验结果\honor-out\diffResult(r2android11)', r'D:\paper-data-and-result\results\android-results\实验结果\honor-out', 'honor')
     # detect_change(r'D:\paper-data-and-result\results\bishe-results\android-result\honor\s\android-12.0.0_r2',
     #               r'D:\paper-data-and-result\results\bishe-results\android-result\honor\s', 'extension', 0.6)
-    # detect_change(r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.4.0', r'D:\paper-data-and-result\results\bishe-results\mc-result\apollo\v0.5.0', 'common', 0.6)
+    # detect_change(r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\package\apollo\v0.4.0', r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\package\apollo\v0.5.0', 'common', 0.6)
     # detect_change(vers[0].replace('\n', ''), vers[1].replace('\n', ''), 'extension', 0.6)
     # analyse_data(r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out\diffResult', r'D:\paper-data-and-result\results\paper-results\mv\apollo-enre-out', 'common')
     # com_mc(project_path, vers[2:], os.path.join(outpath, 'analyseResult' + str(1)))

@@ -51,17 +51,17 @@ def del_method_dep(call, called, contain, override, overrided, parameter, method
             _append_FAN_IN_or_OUT(called_id, method_class, FAN_IN, c)
             _append_IDMC_or_EDMC(called_id, method_class, contain, EDMC, IDMC, c)
     # override
-    if id in override:
-        IsOverride = True
-        NOP += 1
-        _append_FAN_IN_or_OUT(id, method_class, FAN_OUT, c)
-        _append_IDMC_or_EDMC(override[id], method_class, contain, EDMC, IDMC, c)
+    # if id in override:
+    #     IsOverride = True
+    #     NOP += 1
+    #     _append_FAN_IN_or_OUT(id, method_class, FAN_OUT, c)
+    #     _append_IDMC_or_EDMC(override[id], method_class, contain, EDMC, IDMC, c)
     # overrided
-    if id in overrided:
-        for methods_id in overrided[id]:
-            Overrided.append(method_class[methods_id])
-            _append_FAN_IN_or_OUT(methods_id, method_class, FAN_IN, c)
-            _append_IDMC_or_EDMC(methods_id, method_class, contain, EDMC, IDMC, c)
+    # if id in overrided:
+    #     for methods_id in overrided[id]:
+    #         Overrided.append(method_class[methods_id])
+    #         _append_FAN_IN_or_OUT(methods_id, method_class, FAN_IN, c)
+    #         _append_IDMC_or_EDMC(methods_id, method_class, contain, EDMC, IDMC, c)
 
     method_value = [variables[id]['location']['startLine'],
                     len(set(FAN_IN)) + len(set(FAN_OUT)),

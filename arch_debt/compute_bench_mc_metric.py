@@ -180,7 +180,7 @@ def readHistory(historyFile):
     return commitCollection, len(commitCollection),bugCommitLen
 
 
-def computeEntry(historyFile, project_name):
+def computeEntry(historyFile, ver):
     CCOR_list = list()
     CCFOR_list = list()
     CPCO_list = list()
@@ -193,13 +193,13 @@ def computeEntry(historyFile, project_name):
     [changeCommiterDict, bugCommiterDict] = statisticCommiter(commitCollection)
     [CCFOR, BCFOR] = computeCFOR(changeCommiterDict, bugCommiterDict)
     [CPCO, BPCO] = computePCO(changeCommiterDict, bugCommiterDict)
-    aList = [project_name, CCOR, BCOR, CCFOR, BCFOR, CPCO, BPCO]
+    aList = [ver, CCOR, BCOR, CCFOR, BCFOR, CPCO, BPCO]
     return aList
 
 
-def com_gt(project_path, out_path, project_name, gt_list):
-    filename_java = get_file_mc(project_path, out_path, project_name)
-    aList = computeEntry(filename_java, project_name)
+def com_gt(project_path, out_path, pro_name, ver, gt_list):
+    filename_java = get_file_mc(project_path, out_path, ver)
+    aList = computeEntry(filename_java, pro_name + '(' + ver + ')')
     gt_list.append(aList)
 
 

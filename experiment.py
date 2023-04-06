@@ -1,5 +1,6 @@
 # coding=utf-8
 import os
+import re
 import shutil
 import csv
 import subprocess
@@ -17,63 +18,95 @@ from util.path_operator import create_dir_path
 from score_compete.index_measure import get_score
 from scipy.stats import pearsonr
 
+base_path = r'D:\paper-data-and-result\results\bishe-results\subjects.csv'
+pro_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\projects'
+SCORE_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\SCORE\component'
+measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\package'
+gt_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\gt'
+
 
 # 克隆代码并且计算每个项目的SCORE
 def clone_code():
-    base_path = r'D:\paper-data-and-result\results\bishe-results\subjects.csv'
-    pro_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\projects'
-    SCORE_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\SCORE\component\all'
-    measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\package'
-    gt_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\gt'
     subjects_pd = read_csv_to_pd(base_path)
-    subjects_pd = subjects_pd[['project name ', 'url']]
+    subjects_pd = subjects_pd[['project name ', 'version']]
 
     # os.chdir(pro_out_path)
     score = list()
     gt_list = list()
+    loc_list = list()
+    # get_tag(subjects_pd)
     for index, row in subjects_pd.iterrows():
         print(row[0])
+        vers = row[1].split('?')
         # os.system('git clone ' + row[1])
-        # 调用指标计算方法计算指标结果(粒度：package/component)
-        # measure_package_metrics(os.path.join(pro_out_path, row[0]), '', os.path.join(measure_out_path, row[0]), '',
+        # ver = vers[len(vers) - 1].replace('\n', '')
+        os.chdir(os.path.join(pro_out_path, row[0]))
+        for ver in vers:
+            ver = ver.replace('\n', '')
+            os.system('git checkout -f ' + ver)
+            #     # if ver != '':
+            # 统计项目的loc/file/commit
+            loc_count = os.popen('cloc .').read()
+            tmp_loc = loc_count.split('\n')
+            tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+            tmp_loc1 = [i for i in tmp_loc1 if i != '']
+            loc = tmp_loc1[4]
+            files = tmp_loc1[1]
+            # 统计commit
+            os.system('git log --numstat --date=iso > ' + os.path.join(pro_out_path, row[0]) + '/gitlog')
+            fp = open(os.path.join(pro_out_path, row[0]) + '/gitlog', encoding="utf8", errors='ignore')
+            commit_id = 0
+            for line in fp:
+                if re.match("commit\s[0-9a-zA-Z]+", line):
+                    commit_id = commit_id + 1
+            loc_list.append([row[0], ver, loc, files, commit_id])
+
+        # # 调用指标计算方法计算指标结果(粒度：package/component)
+        # measure_package_metrics(os.path.join(pro_out_path, row[0]), '',
+        #                         os.path.join(measure_out_path, row[0]), ver,
         #                         'java', 'package')
         # 根据需求计算SCORE值
         # metrics = ['module_name','scoh', 'scop', 'odd', 'idd']
         # weight = [[0.25], [0.25], [0.25], [0.25]]
-        metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm', 'chd',
-                   'DSM']
-        weight = [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08]]
-        # metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei']
-        # weight = [[0.1], [0.1], [0.1], [0.1], [0.12], [0.12], [0.12], [0.12], [0.12]]
-        measure_path = os.path.join(measure_out_path, row[0])
-        if os.path.exists(measure_path):
-            measure_pd = read_csv_to_pd(measure_path + '\\measure_result_class.csv')
-            module_list = measure_pd[metrics]
-            module_list.drop_duplicates(subset=['module_name'], keep='first', inplace=True)
-            del module_list['module_name']
-            [normalized_result, score_result] = get_score(module_list.values, weight, metrics[1:])
-        score.append([row[0], np.mean(score_result)])
-        # 计算groundtruth指标
-        com_gt(os.path.join(pro_out_path, row[0]), os.path.join(gt_out_path, row[0]), row[0], gt_list)
-    # gt_pd = pd.DataFrame(data=gt_list, columns=['project', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
+    #     metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei', 'chm',
+    #                'chd',
+    #                'DSM']
+    #     weight = [[0.1], [0.1], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08], [0.08]]
+    #     # metrics = ['module_name', 'scoh', 'scop', 'odd', 'idd', 'spread', 'focus', 'icf', 'ecf', 'rei']
+    #     # weight = [[0.1], [0.1], [0.1], [0.1], [0.12], [0.12], [0.12], [0.12], [0.12]]
+    #     measure_path = os.path.join(measure_out_path, row[0] + '\\' + ver)
+    #     if os.path.exists(measure_path):
+    #         measure_pd = read_csv_to_pd(measure_path + '\\measure_result_class.csv')
+    #         module_list = measure_pd[metrics]
+    #         module_list.drop_duplicates(subset=['module_name'], keep='first', inplace=True)
+    #         del module_list['module_name']
+    #         [normalized_result, score_result] = get_score(module_list.values, weight, metrics[1:])
+    #     score.append([row[0] + '(' + ver + ')', np.mean(score_result)])
+    #     # 计算groundtruth指标
+    #     com_gt(os.path.join(pro_out_path, row[0]), os.path.join(gt_out_path, row[0]), row[0], ver, gt_list)
+    loc_pd = pd.DataFrame(data=loc_list, columns=['project', 'version', 'loc', '#files', '#commit'])
+    loc_pd.to_csv(os.path.join(pro_out_path, "loc.csv"), index=False, sep=',')
+    # gt_pd = pd.DataFrame(data=gt_list, columns=['project(version)', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
     # gt_pd.to_csv(os.path.join(gt_out_path, "gt.csv"), index=False, sep=',')
-    score_pd = pd.DataFrame(data=score, columns=['project', 'score'])
-    gt_pd = pd.DataFrame(data=gt_list, columns=['project', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
-    compare_pd = pd.merge(score_pd, gt_pd, how='inner', on='project')
+    # score_pd = pd.DataFrame(data=score, columns=['project(version)', 'score'])
+    # gt_pd = pd.DataFrame(data=gt_list, columns=['version', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
+    # score_pd = read_csv_to_pd(os.path.join(SCORE_out_path, "score.csv"))
+    # gt_pd = read_csv_to_pd(os.path.join(gt_out_path, "gt.csv"))
+    # compare_pd = pd.merge(score_pd, gt_pd, how='inner', on='project(version)')
+    # compare_pd.to_csv(os.path.join(SCORE_out_path, "score.csv"), index=False, sep=',')
     # 计算本方法结果和gt结果相关性
-    print('CCOR:')
-    r1 = pearsonr(compare_pd['score'], compare_pd['CCOR'])
-    print("pearson系数：", r1[0])
-    print("   P-Value：", r1[1])
-    print('CCFOR:')
-    r1 = pearsonr(compare_pd['score'], compare_pd['CCFOR'])
-    print("pearson系数：", r1[0])
-    print("P-Value：", r1[1])
-    print('CPCO:')
-    r1 = pearsonr(compare_pd['score'], compare_pd['CPCO'])
-    print("pearson系数：", r1[0])
-    print("   P-Value：", r1[1])
-    score_pd.to_csv(os.path.join(SCORE_out_path, "score.csv"), index=False, sep=',')
+    # print('CCOR:')
+    # r1 = pearsonr(score_pd['score'], score_pd['CCOR'])
+    # print("pearson系数：", r1[0])
+    # print("   P-Value：", r1[1])
+    # print('CCFOR:')
+    # r2 = pearsonr(score_pd['score'], score_pd['CCFOR'])
+    # print("pearson系数：", r2[0])
+    # print("P-Value：", r2[1])
+    # print('CPCO:')
+    # r3 = pearsonr(score_pd['score'], score_pd['CPCO'])
+    # print("pearson系数：", r3[0])
+    # print("   P-Value：", r3[1])
 
 
 # 编译java文件
@@ -95,20 +128,19 @@ def out_file_list(pro_name, pro_path, version):
     # file_pd = pd.DataFrame(data=path_to_qualifiedName)
 
 
-def get_tag(content):
+def get_tag(subjects_pd):
     with open('./tag.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['project name', 'project url', 'versions', '#versions'])
-        for line in content:
-            con = line.split(',')
-            pro_path = con[0]
-            pro_name = con[1]
+        for index, row in subjects_pd.iterrows():
+            pro_name = row[0]
+            pro_path = os.path.join(pro_out_path, pro_name)
             os.chdir(pro_path)
 
             tag = os.popen('git tag').read().split('\n')
             tags = '?'.join(tag)
 
-            writer.writerow([pro_name, pro_path, tags, len(tag)])
+            writer.writerow([pro_name, pro_path, tags[:-1], len(tags[:-1].split('?'))])
 
 
 def evaluate(content, writer):

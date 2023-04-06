@@ -16,8 +16,14 @@ def _com_value(commit, module_classes):
         for module_name2 in module_classes:
             if module_name1 != module_name2:
                 ecf_value_list.extend(_com_icf_or_ecf(module_classes[module_name1], module_classes[module_name2], commit))
-        icf = float(format(sum(icf_value_list) / len(icf_value_list), '.4f'))
-        ecf = float(format(sum(ecf_value_list) / len(ecf_value_list), '.4f'))
+        if len(icf_value_list) != 0:
+            icf = float(format(sum(icf_value_list) / len(icf_value_list), '.4f'))
+        else:
+            icf = 1
+        if len(ecf_value_list) != 0:
+            ecf = float(format(sum(ecf_value_list) / len(ecf_value_list), '.4f'))
+        else:
+            ecf = 0
         icf_dic[module_name1] = icf
         ecf_dic[module_name1] = ecf
         rei_dic[module_name1] = float(format(_com_rei(icf, ecf), '.4f'))

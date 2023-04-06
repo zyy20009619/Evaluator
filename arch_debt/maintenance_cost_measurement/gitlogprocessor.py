@@ -5,12 +5,12 @@ from arch_debt.maintenance_cost_measurement.basedata import *
 from util.path_operator import create_file_path
 
 
-def generateLog(project_path, out_path):
-    # os.system('git checkout -f ' + version)
+def generateLog(project_path, out_path, ver):
     os.chdir(project_path)
+    os.system('git checkout -f ' + ver)
 
-    git_log_file = create_file_path(out_path, 'gitlog')
-    git_loc_file = create_file_path(out_path, 'gitloc')
+    git_log_file = create_file_path(out_path + '\\' + ver, 'gitlog')
+    git_loc_file = create_file_path(out_path + '\\' + ver, 'gitloc')
     # 获取git log文件
     os.system('git log --numstat --date=iso > ' + git_log_file)
     # 获取git loc文件
@@ -165,13 +165,13 @@ def get_all_files_by_filter(project_path):
     return file_list_java
 
 
-def get_file_mc(project_path, out_path, project_name):
-    gitlogFile, git_loc_file = generateLog(project_path, out_path)
+def get_file_mc(project_path, out_path, ver):
+    gitlogFile, git_loc_file = generateLog(project_path, out_path, ver)
     [fileList_all, fileList_java, fileList_notest] = getAllFilesByFilter(project_path)
 
     commitCollection_java = processGitLog(gitlogFile, fileList_java)
 
     resList = saveCommitCollection(commitCollection_java)
-    write_to_csv(resList, os.path.join(out_path, 'history-java.csv'))
+    write_to_csv(resList, os.path.join(out_path + '\\' + ver, 'history-java.csv'))
 
-    return os.path.join(out_path, 'history-java.csv')
+    return os.path.join(out_path + '\\' + ver, 'history-java.csv')
