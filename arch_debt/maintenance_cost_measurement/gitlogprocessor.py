@@ -12,7 +12,7 @@ def generateLog(project_path, out_path, ver):
     git_log_file = create_file_path(out_path + '\\' + ver, 'gitlog')
     git_loc_file = create_file_path(out_path + '\\' + ver, 'gitloc')
     # 获取git log文件
-    os.system('git log --numstat --date=iso > ' + git_log_file)
+    # os.system('git log --numstat --date=iso > ' + git_log_file)
     # 获取git loc文件
     # os.system('git ls-files | xargs wc -l > ' + git_loc_file)
 

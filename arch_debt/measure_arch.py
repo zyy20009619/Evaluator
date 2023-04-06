@@ -31,7 +31,6 @@ def com_aarf(vers, pro_name, mc_list, index):
     print('designite:')
     sample = get_designite(pro_name, files, 'designite')
     get_metric(auth, cmt, cChurn, sample, mc_list, index, 'designite', pro_name)
-    # designite
 
 
 def get_designite(pro_name, files, method):
@@ -106,8 +105,6 @@ def get_metrics(label, mc_list, index, pro_name, tool, mc_metric):
 def get_gt(pro_name, versions, index):
     # 第一种ground-truth：历史中的维护数据
     return get_history_gt(pro_name, versions, index)
-    # 第二种ground-truth：结构中的维护成本较高
-
 
 def get_struct_gt(pro_name, pro_path, versions, mc_list):
     versions = versions.split('?')
@@ -153,10 +150,6 @@ def get_main_gt():
     print(argouml)
 
 
-# if __name__ == '__main__':
-#     get_main_gt()
-
-
 def get_all_files_by_filter(project_path, quali_name):
     file_list_java = list()
     for filename, dirs, files in os.walk(project_path, topdown=True):
@@ -173,7 +166,6 @@ def get_all_files_by_filter(project_path, quali_name):
     path = _format_file_path(file_list_java, quali_name)
     path_name = pd.DataFrame(data=path, columns=['filename', 'class_name'])
     return path_name
-
 
 def get_history_gt(pro_name, versions, index):
     detect_path = 'D:\paper-data-and-result\\results\\bishe-results\\mc-result\\dbMIT-results\\' + pro_name + '\\analyseResult0.6'
@@ -236,10 +228,10 @@ def get_sample_dis(files, pf_entities, method):
     for pf_entity in pf_entities:
         for file in files:
             if method == 'ours' or method == 'designite':
-                if pf_entity.replace('.', '\\') in file:
+                if pf_entity.replace('.', '/') in file:
                     pos_files.append(file)
             elif method == 'dv8':
-                if pf_entity.replace('/', '\\') in file:
+                if pf_entity in file:
                     pos_files.append(file)
     pos_pd = pd.DataFrame(data=pos_files, columns=['filename'])
     pos_pd['label_pre'] = 1

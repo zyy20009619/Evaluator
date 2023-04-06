@@ -29,7 +29,6 @@ gt_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\gt'
 def clone_code():
     subjects_pd = read_csv_to_pd(base_path)
     subjects_pd = subjects_pd[['project name ', 'version']]
-
     # os.chdir(pro_out_path)
     score = list()
     gt_list = list()
@@ -43,6 +42,8 @@ def clone_code():
         os.chdir(os.path.join(pro_out_path, row[0]))
         for ver in vers:
             ver = ver.replace('\n', '')
+            if ver == '':
+                ver = 'main'
             os.system('git checkout -f ' + ver)
             #     # if ver != '':
             # 统计项目的loc/file/commit
