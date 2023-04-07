@@ -118,14 +118,14 @@ def command():
 
 def test():
     # get_main_gt()
-    # clone_code()
+    clone_code()
     # measure_package_metrics(r'D:\paper-data-and-result\results\c-results\main\Super-Simple-Tasker', r'D:\paper-data-and-result\results\c-results', r'D:\paper-data-and-result\results\c-results', 'main', dict(), 'c')
-    with open('./projects.txt', encoding='utf-8') as file:
-        content = file.readlines()
+    # with open('./projects.txt', encoding='utf-8') as file:
+    #     content = file.readlines()
     # top_ver = list()
     # gt = list()
     # mc_list = list()
-    for line in content:
+    # for line in content:
     #     for index in [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]:
     #         tmp_gt = list()
     #         tmp = line.split(',')

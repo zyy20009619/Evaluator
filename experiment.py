@@ -62,10 +62,10 @@ def clone_code():
                     commit_id = commit_id + 1
             loc_list.append([row[0], ver, loc, files, commit_id])
 
-        # # 调用指标计算方法计算指标结果(粒度：package/component)
-        # measure_package_metrics(os.path.join(pro_out_path, row[0]), '',
-        #                         os.path.join(measure_out_path, row[0]), ver,
-        #                         'java', 'package')
+            # 调用指标计算方法计算指标结果(粒度：package/component)
+            measure_package_metrics(os.path.join(pro_out_path, row[0]), '',
+                                    os.path.join(measure_out_path, row[0]), ver,
+                                    'java', 'package')
         # 根据需求计算SCORE值
         # metrics = ['module_name','scoh', 'scop', 'odd', 'idd']
         # weight = [[0.25], [0.25], [0.25], [0.25]]

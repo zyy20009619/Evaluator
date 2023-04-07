@@ -211,12 +211,20 @@ def con_method_to_class(call_dic, variables, parameter, dep_type, method_class, 
         class_name1 = variables[method_class[method_id1]]['qualifiedName']
         if class_name1 not in result:
             result[class_name1] = dict()
-        if dep_type not in result[class_name1]:
-            result[class_name1][dep_type] = dict()
-        if method_name1 not in result[class_name1][dep_type]:
-            result[class_name1][dep_type][method_name1] = list()
+            result[class_name1]['filepath'] = variables[variables[method_class[method_id1]]['parentId']]['File']
+            result[class_name1]['dep'] = dict()
+        if dep_type not in result[class_name1]['dep']:
+            result[class_name1]['dep'][dep_type] = dict()
+        if method_name1 not in result[class_name1]['dep'][dep_type]:
+            result[class_name1]['dep'][dep_type][method_name1] = dict()
         for method_id2 in call_dic[method_id1]:
-            result[class_name1][dep_type][method_name1].append(_get_method_name(method_id2, parameter, variables))
+            dest_dic = dict()
+            # TODO:暂时处理dest为class情况
+            if 'File' in variables[variables[method_id2]['parentId']]:
+                filepath = variables[variables[method_id2]['parentId']]['File']
+            else:
+                filepath = variables[variables[variables[method_id2]['parentId']]['parentId']]['File']
+            result[class_name1]['dep'][dep_type][method_name1][_get_method_name(method_id2, parameter, variables)] = filepath
 
 
 def convert_dep_name_dic(id_dic, variables, dep_type, result):
@@ -226,13 +234,15 @@ def convert_dep_name_dic(id_dic, variables, dep_type, result):
             src_name = variables[src_id]['qualifiedName'][:-5]
         if src_name not in result:
             result[src_name] = dict()
+            result[src_name]['filepath'] = variables[src_id]['File']
+            result[src_name]['dep'] = dict()
         for dest_id in id_dic[src_id]:
             dest_name = variables[dest_id]['qualifiedName']
             if dep_type == 'import' or dep_type == 'imported':
                 dest_name = variables[dest_id]['qualifiedName'][:-5]
-            if dep_type not in result[src_name]:
-                result[src_name][dep_type] = list()
-            result[src_name][dep_type].append(dest_name)
+            if dep_type not in result[src_name]['dep']:
+                result[src_name]['dep'][dep_type] = dict()
+            result[src_name]['dep'][dep_type][dest_name] = variables[dest_id]['File']
 
 
 def convert_call_method_name_dic(id_dic, parameter, variables):

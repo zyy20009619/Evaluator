@@ -150,11 +150,12 @@ def com_diff(res1, res2, base_out, focus_name1, focus_name2, grau, metric_num):
     merge_inner = pd.merge(res1, res2,
                            how='inner', left_on=[focus_name2],
                            right_on=[focus_name2], suffixes=['1', ''])
-    name_list = [focus_name1, focus_name2]
-    drop_name_list = [focus_name1, focus_name1 + '1', focus_name2]
+    name_list = [focus_name1, focus_name2, 'filepath']
+    drop_name_list = [focus_name1, focus_name1 + '1', focus_name2, 'filepath', 'filepath1']
     if grau == 'method':
         name_list = [focus_name1, focus_name2, 'startLine']
-        drop_name_list = [focus_name1, focus_name1 + '1', focus_name2, 'startLine', 'startLine1', 'module_name',
+        drop_name_list = [focus_name1, focus_name1 + '1', focus_name2, 'filepath', 'filepath1', 'startLine',
+                          'startLine1', 'module_name',
                           'module_name1']
     merge_inner_name = merge_inner[name_list]
     diff_inner = merge_inner.drop(drop_name_list, axis=1).diff(periods=metric_num, axis=1).iloc[
@@ -309,47 +310,54 @@ def set_root_dep(pf_df, dep_res, dep1, dep2, dep_type, deped_type):
             dep_res[row[2]]['root cause'][dep_type] = dict()
         dep_res[row[2]]['root cause'][dep_type][row[4]] = dict()
         # dep_res[row[2]]['probelm class'][dep_type][row[4]]['decay degree'] = round(row[5], 4)
-        dep_res[row[2]]['root cause'][dep_type][row[4]]['status'] = row[6]
+        dep_res[row[2]]['root cause'][dep_type][row[4]]['filepath'] = row[5]
+        dep_res[row[2]]['root cause'][dep_type][row[4]]['status'] = row[7]
         dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'] = dict()
 
         if dep_type == 'call':
             if row[7] not in dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep']:
-                dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[7]] = dict()
+                dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[8]] = dict()
             # dep_res[row[2]]['probelm class'][dep_type][row[4]]['probelm dep'][row[7]]['decay degree'] = round(row[8], 4)
-            dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[7]]['startLine'] = row[9]
-            dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[7]]['status'] = row[10]
+            dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[8]]['startLine'] = row[10]
+            dep_res[row[2]]['root cause'][dep_type][row[4]]['probelm dep'][row[8]]['status'] = row[11]
             # dep_res[row[2]]['probelm class'][dep_type][row[4]]['probelm dep'][row[7]]['probelm method'] = dict()
-            method_dep_diff(row[10], row[2], row[4], row[7], dep_type, dep_res, dep1, dep2)
+            method_dep_diff(row[11], row[2], row[4], row[8], dep_type, dep_res, dep1, dep2)
         else:
-            class_dep_diff(row[6], row[2], row[4], dep_type, deped_type, dep_res, dep1, dep2)
+            class_dep_diff(row[7], row[2], row[4], dep_type, deped_type, dep_res, dep1, dep2)
 
 
 def class_dep_diff(class_status, module_name, class_name, dep_type, deped_type, dep_res, dep1, dep2):
     if class_status == 'modify':
         type_dep1 = extr_class_dep(class_name, dep1, dep_type, deped_type)
         type_dep2 = extr_class_dep(class_name, dep2, dep_type, deped_type)
-        inter_type_dep = type_dep1 & type_dep2
-        add_dep = type_dep2 - inter_type_dep
-        delete_dep = type_dep1 - inter_type_dep
+        inter_type_dep = type_dep1.keys() & type_dep2.keys()
+        add_dep = type_dep2.keys() - inter_type_dep
+        delete_dep = type_dep1.keys() - inter_type_dep
         if len(add_dep) != 0:
-            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['add'] = list(add_dep)
+            add_tmp = dict()
+            for ad in add_dep:
+                add_tmp[ad] = type_dep2[ad]
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['add'] = add_tmp
         if len(delete_dep) != 0:
-            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['delete'] = list(delete_dep)
+            delete_tmp = dict()
+            for dd in delete_dep:
+                delete_tmp[dd] = type_dep1[dd]
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['delete'] = delete_tmp
     elif class_status == 'add':
         add_dep = extr_class_dep(class_name, dep2, dep_type, deped_type)
-        dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['add'] = list(add_dep)
+        dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['add'] = add_dep
     else:
         delete_dep = extr_class_dep(class_name, dep1, dep_type, deped_type)
-        dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['delete'] = list(delete_dep)
+        dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep']['delete'] = delete_dep
 
 
 def extr_class_dep(class_name, dep, dep_type, deped_type):
-    type_dep = list()
-    if type(dep.loc[class_name][dep_type]) != float:
-        type_dep.extend(dep.loc[class_name][dep_type])
-    if type(dep.loc[class_name][deped_type]) != float:
-        type_dep.extend(dep.loc[class_name][deped_type])
-    return set(type_dep)
+    type_dep = dict()
+    if dep_type in dep.loc[class_name]['dep'] and type(dep.loc[class_name]['dep'][dep_type]) != float:
+        type_dep = Merge(dep.loc[class_name]['dep'][dep_type], type_dep)
+    if deped_type in dep.loc[class_name]['dep'] and type(dep.loc[class_name]['dep'][deped_type]) != float:
+        type_dep = Merge(dep.loc[class_name]['dep'][deped_type], type_dep)
+    return type_dep
 
 
 def method_dep_diff(method_status, module_name, class_name, method_name, dep_type, dep_res, dep1, dep2):
@@ -358,34 +366,45 @@ def method_dep_diff(method_status, module_name, class_name, method_name, dep_typ
     if method_status == 'modify':
         type_dep1 = extr_method_dep(class_name, method_name, dep_type, dep1)
         type_dep2 = extr_method_dep(class_name, method_name, dep_type, dep2)
-        inter_type_dep = type_dep1 & type_dep2
-        add_dep = type_dep2 - inter_type_dep
-        delete_dep = type_dep1 - inter_type_dep
+        inter_type_dep = type_dep1.keys() & type_dep2.keys()
+        add_dep = type_dep2.keys() - inter_type_dep
+        delete_dep = type_dep1.keys() - inter_type_dep
         if len(add_dep) != 0:
-            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name]['add'] = list(add_dep)
+            add_tmp = dict()
+            for ad in add_dep:
+                add_tmp[ad] = type_dep2[ad]
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name]['add'] = add_tmp
         if len(delete_dep) != 0:
+            delete_tmp = dict()
+            for dd in delete_dep:
+                delete_tmp[dd] = type_dep1[dd]
             dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name][
-                'delete'] = list(delete_dep)
+                'delete'] = delete_tmp
     elif method_status == 'add':
         add_dep = extr_method_dep(class_name, method_name, dep_type, dep2)
         if len(add_dep) != 0:
-            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name]['add'] = list(add_dep)
+            dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name]['add'] = add_dep
     else:
         delete_dep = extr_method_dep(class_name, method_name, dep_type, dep1)
         if len(delete_dep) != 0:
             dep_res[module_name]['root cause'][dep_type][class_name]['probelm dep'][method_name][
-                'delete'] = list(delete_dep)
+                'delete'] = delete_dep
 
 
 def extr_method_dep(class_name, method_name, dep_type, dep):
-    type_dep = set()
-    if type(dep.loc[class_name][dep_type]) != float:
-        if method_name in dep.loc[class_name][dep_type]:
-            type_dep = set(dep.loc[class_name][dep_type][method_name])
-    if type(dep.loc[class_name]['called']) != float:
-        if method_name in dep.loc[class_name]['called']:
-            type_dep = set(dep.loc[class_name]['called'][method_name])
+    type_dep = dict()
+    if 'call' in dep.loc[class_name]['dep'] and type(dep.loc[class_name]['dep'][dep_type]) != float:
+        if method_name in dep.loc[class_name]['dep'][dep_type]:
+            type_dep = Merge(dep.loc[class_name]['dep'][dep_type][method_name], type_dep)
+    if 'called' in dep.loc[class_name]['dep'] and type(dep.loc[class_name]['dep']['called']) != float:
+        if method_name in dep.loc[class_name]['dep']['called']:
+            type_dep = Merge(dep.loc[class_name]['dep']['called'][method_name], type_dep)
     return type_dep
+
+
+def Merge(dict1, dict2):
+    res = {**dict1, **dict2}
+    return res
 
 
 def detect_coupling_problem(diff_class_measure, diff_method_measure, opt, th):
@@ -438,26 +457,30 @@ def set_root_cause(diff_import_decay_class, diff_inherit_decay_class, diff_call_
     else:
         module_metric = 'scoh'
     diff_import_decay_class = diff_import_decay_class.reindex(
-        columns=['root cause', 'module_name', module_metric, 'class_name', 'CBC', 'status'], fill_value='import')
+        columns=['root cause', 'module_name', module_metric, 'class_name', 'filepath', 'CBC', 'status'],
+        fill_value='import')
     diff_import_decay_class = diff_import_decay_class.rename(columns={'status': 'class status'})
     diff_inherit_decay_class = diff_inherit_decay_class.reindex(
-        columns=['root cause', 'module_name', module_metric, 'class_name', 'CBC', 'status'], fill_value='inherit')
+        columns=['root cause', 'module_name', module_metric, 'class_name', 'filepath', 'CBC', 'status'],
+        fill_value='inherit')
     diff_inherit_decay_class = diff_inherit_decay_class.rename(columns={'status': 'class status'})
     if opt == 'extension':
         diff_call_decay_class = diff_call_decay_class.reindex(
-            columns=['root cause', 'module_name_y', module_metric, 'class_name', 'CBC', 'status_y', 'method_name',
+            columns=['root cause', 'module_name_y', module_metric, 'class_name', 'filepath', 'CBC', 'status_y',
+                     'method_name',
                      'CBM', 'startLine',
                      'ownership', 'status_x'],
             fill_value='call')
     else:
         diff_call_decay_class = diff_call_decay_class.reindex(
-            columns=['root cause', 'module_name_y', module_metric, 'class_name', 'CBC', 'status_y', 'method_name',
+            columns=['root cause', 'module_name_y', module_metric, 'class_name', 'filepath_y', 'CBC', 'status_y',
+                     'method_name',
                      'CBM',
                      'startLine', 'status_x'],
             fill_value='call')
     diff_call_decay_class = diff_call_decay_class.rename(
-        columns={'module_name_y': 'module_name', 'status_y': 'class status', 'status_x': 'method status'})
-    coupling_df = pd.concat([diff_call_decay_class, diff_inherit_decay_class,
+        columns={'module_name_y': 'module_name', 'status_y': 'class status', 'status_x': 'method status', 'filepath_y': 'filepath'})
+    problem_df = pd.concat([diff_call_decay_class, diff_inherit_decay_class,
                              diff_import_decay_class], axis=0)
-    coupling_df.insert(0, 'problem', problem)
-    return coupling_df
+    problem_df.insert(0, 'problem', problem)
+    return problem_df

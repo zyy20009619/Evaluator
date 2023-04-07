@@ -101,6 +101,7 @@ def class_and_method_metric_compete(variables, contain, inherit, descendent, par
         class_metric = dict(zip(CLASS_METRICS, class_value))
         m_count += len(method_dic)
         class_metric['methods'] = method_dic
+        class_metric['filepath'] = variables[variables[c]['parentId']]['File']
         class_dic[variables[c]['qualifiedName']] = class_metric
     return class_dic, c_chm_list, c_chd_list, m_count
 

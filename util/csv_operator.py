@@ -46,13 +46,14 @@ def write_result_to_csv(class_file_path, method_file_path, ver, content):
     class_header.append("module_name")
     class_header.extend(MODULE_METRICS)
     class_header.append("class_name")
+    class_header.append("filepath")
     class_header.extend(CLASS_METRICS)
     class_csv_writer.writerow(class_header)
 
     method_f = open(method_file_path, 'w', encoding='utf-8', newline='')
     method_csv_writer = csv.writer(method_f)
     method_header = list()
-    method_header.extend(["module_name", "class_name", "method_name"])
+    method_header.extend(["module_name", "class_name", "filepath", "method_name"])
     method_header.extend(METHOD_METRICS)
     method_csv_writer.writerow(method_header)
 
@@ -69,13 +70,14 @@ def write_result_to_csv(class_file_path, method_file_path, ver, content):
             class_res.append(module)
             class_res.extend(module_value)
             class_res.append(class_name)
+            class_res.append(classes[class_name]['filepath'])
             class_res.extend(class_value)
             class_csv_writer.writerow(class_res)
             methods = classes[class_name]['methods']
             for method_name in methods:
                 method_value = list(itemgetter(*METHOD_METRICS)(methods[method_name]))
                 method_res = list()
-                method_res.extend([module, class_name, method_name])
+                method_res.extend([module, class_name, classes[class_name]['filepath'], method_name])
                 method_res.extend(method_value)
                 method_csv_writer.writerow(method_res)
     class_f.close()
