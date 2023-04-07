@@ -2,12 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/compute_bench_mc_metric.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/maintenance_cost_measurement/gitlogprocessor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arch_debt/measure_arch.py" beforeDir="false" afterPath="$PROJECT_DIR$/arch_debt/measure_arch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_algo/scan_quality_change.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/measure.py" beforeDir="false" afterPath="$PROJECT_DIR$/measure.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projects.txt" beforeDir="false" afterPath="$PROJECT_DIR$/projects.txt" afterDir="false" />
     </list>
@@ -19,7 +13,17 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectId" id="2O4nTefFfDQdFyokucM367oOHI3" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
   <component name="RunManager">
     <configuration name="measure" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Evaluator" />
@@ -48,7 +52,15 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c811219b-9ea3-4906-af8d-9ce80c8c5da9" name="Changes" comment="" />
+      <created>1680828730331</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1680828730331</updated>
+    </task>
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
