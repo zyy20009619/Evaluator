@@ -16,7 +16,7 @@ from module_measurement.com_metrics import com_metrics
 GIT_COMMAND = 'git log  --pretty=format:"commit %H(%ad)%nauthor:%an%ndescription:%s"  --date=format:"%Y-%m-%d %H:%M:%S" --numstat  --name-status  --reverse  >./master.txt'
 
 
-def measure_package_metrics(project_path, dep_path, output, ver, lang, grau):
+def measure_package_metrics(project_path, dep_path, output, ver, lang, grau, apollo_list):
     base_out_path = os.path.join(output, ver)
     os.makedirs(base_out_path, exist_ok=True)
     project_name = os.path.basename(project_path)
@@ -74,7 +74,7 @@ def measure_package_metrics(project_path, dep_path, output, ver, lang, grau):
             project_metric = dict(zip(PROJECT_METRICS, tmp_pro))
             project_metric['modules'] = package_dic
             project_dic[ver] = project_metric
-
+            apollo_list.append(project_metric['SMQ'])
             write_result_to_json(os.path.join(base_out_path, 'measure_result.json'), project_dic)
             write_result_to_csv(os.path.join(base_out_path, 'measure_result_class.csv'),
                                 os.path.join(base_out_path, 'measure_result_method.csv'), ver, project_dic)

@@ -21,7 +21,7 @@ from scipy.stats import pearsonr
 base_path = r'D:\paper-data-and-result\results\bishe-results\subjects.csv'
 pro_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\projects'
 SCORE_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\SCORE\component'
-measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\package'
+measure_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\measure_results\component'
 gt_out_path = r'D:\paper-data-and-result\results\bishe-results\metrics-rsult\gt'
 
 
@@ -33,6 +33,7 @@ def clone_code():
     score = list()
     gt_list = list()
     loc_list = list()
+    apollo_list = list()
     # get_tag(subjects_pd)
     for index, row in subjects_pd.iterrows():
         print(row[0])
@@ -46,26 +47,26 @@ def clone_code():
                 ver = 'main'
             os.system('git checkout -f ' + ver)
             #     # if ver != '':
-            # 统计项目的loc/file/commit
-            loc_count = os.popen('cloc .').read()
-            tmp_loc = loc_count.split('\n')
-            tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
-            tmp_loc1 = [i for i in tmp_loc1 if i != '']
-            loc = tmp_loc1[4]
-            files = tmp_loc1[1]
-            # 统计commit
-            os.system('git log --numstat --date=iso > ' + os.path.join(pro_out_path, row[0]) + '/gitlog')
-            fp = open(os.path.join(pro_out_path, row[0]) + '/gitlog', encoding="utf8", errors='ignore')
-            commit_id = 0
-            for line in fp:
-                if re.match("commit\s[0-9a-zA-Z]+", line):
-                    commit_id = commit_id + 1
-            loc_list.append([row[0], ver, loc, files, commit_id])
+            # # 统计项目的loc/file/commit
+            # loc_count = os.popen('cloc .').read()
+            # tmp_loc = loc_count.split('\n')
+            # tmp_loc1 = tmp_loc[len(tmp_loc) - 3].split(' ')
+            # tmp_loc1 = [i for i in tmp_loc1 if i != '']
+            # loc = tmp_loc1[4]
+            # files = tmp_loc1[1]
+            # # 统计commit
+            # os.system('git log --numstat --date=iso > ' + os.path.join(pro_out_path, row[0]) + '/gitlog')
+            # fp = open(os.path.join(pro_out_path, row[0]) + '/gitlog', encoding="utf8", errors='ignore')
+            # commit_id = 0
+            # for line in fp:
+            #     if re.match("commit\s[0-9a-zA-Z]+", line):
+            #         commit_id = commit_id + 1
+            # loc_list.append([row[0], ver, loc, files, commit_id])
 
             # 调用指标计算方法计算指标结果(粒度：package/component)
             measure_package_metrics(os.path.join(pro_out_path, row[0]), '',
                                     os.path.join(measure_out_path, row[0]), ver,
-                                    'java', 'package')
+                                    'java', 'component', apollo_list)
         # 根据需求计算SCORE值
         # metrics = ['module_name','scoh', 'scop', 'odd', 'idd']
         # weight = [[0.25], [0.25], [0.25], [0.25]]
@@ -85,8 +86,10 @@ def clone_code():
     #     score.append([row[0] + '(' + ver + ')', np.mean(score_result)])
     #     # 计算groundtruth指标
     #     com_gt(os.path.join(pro_out_path, row[0]), os.path.join(gt_out_path, row[0]), row[0], ver, gt_list)
-    loc_pd = pd.DataFrame(data=loc_list, columns=['project', 'version', 'loc', '#files', '#commit'])
-    loc_pd.to_csv(os.path.join(pro_out_path, "loc.csv"), index=False, sep=',')
+    # loc_pd = pd.DataFrame(data=loc_list, columns=['project', 'version', 'loc', '#files', '#commit'])
+    # loc_pd.to_csv(os.path.join(pro_out_path, "loc.csv"), index=False, sep=',')
+    apollo_pd = pd.DataFrame(data=apollo_list, columns=['project', 'version', 'loc', '#files', '#commit'])
+    apollo_pd.to_csv(os.path.join(SCORE_out_path, "apollo.csv"), index=False, sep=',')
     # gt_pd = pd.DataFrame(data=gt_list, columns=['project(version)', 'CCOR', 'BCOR', 'CCFOR', 'BCFOR', 'CPCO', 'BPCO'])
     # gt_pd.to_csv(os.path.join(gt_out_path, "gt.csv"), index=False, sep=',')
     # score_pd = pd.DataFrame(data=score, columns=['project(version)', 'score'])
