@@ -229,6 +229,8 @@ def con_method_to_class(call_dic, variables, parameter, dep_type, method_class, 
 
 def convert_dep_name_dic(id_dic, variables, dep_type, result):
     for src_id in id_dic:
+        if variables[src_id]['category'] == 'Package':
+            continue
         src_name = variables[src_id]['qualifiedName']
         if dep_type == 'import' or dep_type == 'imported':
             src_name = variables[src_id]['qualifiedName'][:-5]
@@ -237,6 +239,8 @@ def convert_dep_name_dic(id_dic, variables, dep_type, result):
             result[src_name]['filepath'] = variables[src_id]['File']
             result[src_name]['dep'] = dict()
         for dest_id in id_dic[src_id]:
+            if variables[dest_id]['category'] == 'Package':
+                continue
             dest_name = variables[dest_id]['qualifiedName']
             if dep_type == 'import' or dep_type == 'imported':
                 dest_name = variables[dest_id]['qualifiedName'][:-5]
